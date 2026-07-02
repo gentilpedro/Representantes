@@ -1,11 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/providers/core_providers.dart';
 import '../../data/repositories/mock_orders_repository.dart';
 import '../../domain/entities/order_summary.dart';
 import '../../domain/repositories/orders_repository.dart';
 
 final ordersRepositoryProvider = Provider<OrdersRepository>(
-  (ref) => MockOrdersRepository(),
+  (ref) => MockOrdersRepository(ref.watch(pendingOrdersBoxProvider)),
 );
 
 final ordersListProvider = FutureProvider.autoDispose<List<OrderSummary>>((

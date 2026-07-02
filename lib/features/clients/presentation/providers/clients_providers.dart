@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/providers/core_providers.dart';
 import '../../data/repositories/mock_clients_repository.dart';
 import '../../domain/entities/client_detail.dart';
 import '../../domain/entities/client_list_item.dart';
@@ -8,7 +9,7 @@ import '../../domain/repositories/clients_repository.dart';
 enum ClientFilter { all, favorites, blocked, offline }
 
 final clientsRepositoryProvider = Provider<ClientsRepository>(
-  (ref) => MockClientsRepository(),
+  (ref) => MockClientsRepository(ref.watch(clientsCacheBoxProvider)),
 );
 
 final clientsListProvider = FutureProvider.autoDispose<List<ClientListItem>>((

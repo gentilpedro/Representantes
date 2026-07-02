@@ -11,6 +11,8 @@ import 'package:josapar_representantes/features/auth/domain/repositories/auth_re
 import 'package:josapar_representantes/features/auth/presentation/providers/auth_providers.dart';
 import 'package:josapar_representantes/main.dart';
 
+import 'support/hive_test_setup.dart';
+
 class _AlreadyLoggedInAuthRepository implements AuthRepository {
   static final _user = AppUser(
     id: '88294',
@@ -53,6 +55,10 @@ class _ControllableConnectivityService implements ConnectivityService {
 }
 
 void main() {
+  setUpAll(() async {
+    await setUpHiveForTest();
+  });
+
   testWidgets(
     'Sincronização automática: pedido feito offline sincroniza sozinho ao '
     'reconectar; rascunho nunca entra na fila',
@@ -86,6 +92,11 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.text('Finalizar'));
       await tester.pumpAndSettle();
+      // `_finalizeOrder` agora também grava no Hive (I/O real de disco) e
+      // não tem nenhum spinner visível durante a espera, então
+      // `pumpAndSettle` sozinho pode não dar tempo suficiente — mesmo
+      // padrão já visto no restante da suíte.
+      await tester.pump(const Duration(seconds: 2));
 
       expect(
         find.text(

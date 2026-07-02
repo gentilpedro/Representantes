@@ -109,6 +109,15 @@ class _VisitCardState extends ConsumerState<VisitCard> {
                               filled: true,
                             ),
                           ],
+                          if (visit.isProspect) ...[
+                            const SizedBox(width: 8),
+                            const StatusChip(
+                              label: 'Cliente em Potencial',
+                              icon: Icons.person_search_outlined,
+                              foreground: AppColors.warning,
+                              background: AppColors.warningSoft,
+                            ),
+                          ],
                         ],
                       ),
                       Row(

@@ -1,12 +1,27 @@
+import 'dart:async';
+
+import 'package:hive/hive.dart';
+
 import '../../../../core/utils/formatters.dart';
 import '../../domain/entities/order_summary.dart';
 import '../../domain/repositories/orders_repository.dart';
+import '../local/offline_order_record.dart';
 
-/// Dados em memória espelhando a tela "Meus Pedidos" do protótipo. Mantém
-/// uma lista mutável (não apenas fixa) para que pedidos criados em "Novo
-/// Pedido" e sincronizações apareçam de verdade nesta lista, exatamente como
-/// a implementação real (contra a Web API .NET 10) fará.
+/// Dados em memória espelhando a tela "Meus Pedidos" do protótipo, com uma
+/// exceção: pedidos `pending` (feitos offline, aguardando sincronização) são
+/// também gravados na box Hive `pending_orders`, e restaurados dali quando o
+/// app reabre — é a fila de pedidos que precisa sobreviver a um restart ou
+/// refresh da página. Assim que um pedido é sincronizado com sucesso, seu
+/// registro é apagado da box (ver [syncPendingOrders]); o restante do
+/// histórico (enviados/erro/rascunho) continua sendo só dado de exemplo, já
+/// que ainda não existe uma Web API real para guardar isso de verdade.
 class MockOrdersRepository implements OrdersRepository {
+  MockOrdersRepository(this._pendingOrdersBox) {
+    _restorePendingFromBox();
+  }
+
+  final Box<OfflineOrderRecord> _pendingOrdersBox;
+
   final List<OrderSummary> _orders = [
     const OrderSummary(
       id: '9082',
@@ -62,6 +77,28 @@ class MockOrdersRepository implements OrdersRepository {
 
   int _nextSequence = 9083;
 
+  void _restorePendingFromBox() {
+    for (final record in _pendingOrdersBox.values) {
+      _orders.insert(
+        0,
+        OrderSummary(
+          id: record.id,
+          code: record.code,
+          clientName: record.clientName,
+          dateLabel: record.dateLabel,
+          itemsCount: record.itemsCount,
+          total: record.total,
+          status: OrderStatus.pending,
+          isToday: true,
+        ),
+      );
+      final restoredSequence = int.tryParse(record.id);
+      if (restoredSequence != null && restoredSequence >= _nextSequence) {
+        _nextSequence = restoredSequence + 1;
+      }
+    }
+  }
+
   @override
   Future<List<OrderSummary>> fetchOrders() async {
     await Future.delayed(const Duration(milliseconds: 500));
@@ -88,6 +125,26 @@ class MockOrdersRepository implements OrdersRepository {
       isToday: true,
     );
     _orders.insert(0, order);
+    if (!isDraft) {
+      // Não aguarda o flush em disco: `Box.put` já atualiza o estado em
+      // memória da box na hora (por isso o restore em
+      // `_restorePendingFromBox` funciona mesmo sem esperar aqui), e
+      // aguardar a escrita real trava dentro do `FakeAsync` do
+      // `flutter_test` (I/O de verdade não avança com `tester.pump`).
+      unawaited(
+        _pendingOrdersBox.put(
+          order.id,
+          OfflineOrderRecord(
+            id: order.id,
+            code: order.code,
+            clientName: order.clientName,
+            itemsCount: order.itemsCount,
+            total: order.total,
+            dateLabel: order.dateLabel,
+          ),
+        ),
+      );
+    }
     return order;
   }
 
@@ -98,6 +155,7 @@ class MockOrdersRepository implements OrdersRepository {
     for (var i = 0; i < _orders.length; i++) {
       if (_orders[i].status == OrderStatus.pending) {
         _orders[i] = _orders[i].copyWith(status: OrderStatus.sent);
+        unawaited(_pendingOrdersBox.delete(_orders[i].id));
         syncedCount++;
       }
     }

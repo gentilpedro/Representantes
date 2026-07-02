@@ -9,6 +9,7 @@ class ScheduledVisit {
     required this.status,
     this.notes = '',
     this.isGeoValidated = false,
+    this.isProspect = false,
   });
 
   final String id;
@@ -18,6 +19,10 @@ class ScheduledVisit {
   final VisitStatus status;
   final String notes;
   final bool isGeoValidated;
+
+  /// `true` quando a parada é um cliente em potencial (lead), não um
+  /// cliente já cadastrado — ver `LeadsRepository`.
+  final bool isProspect;
 
   ScheduledVisit copyWith({
     VisitStatus? status,
@@ -32,6 +37,7 @@ class ScheduledVisit {
       status: status ?? this.status,
       notes: notes ?? this.notes,
       isGeoValidated: isGeoValidated ?? this.isGeoValidated,
+      isProspect: isProspect,
     );
   }
 }

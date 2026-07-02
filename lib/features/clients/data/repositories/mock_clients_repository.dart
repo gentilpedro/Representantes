@@ -1,13 +1,33 @@
+import 'dart:async';
+
+import 'package:hive/hive.dart';
+
 import '../../domain/entities/client_detail.dart';
 import '../../domain/entities/client_list_item.dart';
 import '../../domain/repositories/clients_repository.dart';
+import '../local/cached_client.dart';
 
-/// Dados fixos espelhando as telas "Clientes" e "Detalhe do Cliente" do
-/// protótipo. Inclui o cliente "Supermercado Silva & Filhos Ltda" (mesmo
-/// referenciado em Pedidos e Novo Pedido) para manter a navegação coerente
-/// entre os módulos.
+/// Carteira de clientes cacheada localmente (box `clients_cache`),
+/// espelhando as telas "Clientes" e "Detalhe do Cliente" do protótipo. Na
+/// primeira execução semeia com os dados fixos abaixo (inclui o cliente
+/// "Supermercado Silva & Filhos Ltda", também referenciado em Pedidos e
+/// Novo Pedido), simulando "o último download semanal" — quando a Web API
+/// existir, [refreshCache] passa a baixar de verdade em vez de re-semear os
+/// mesmos exemplos. O app lê sempre do cache local, então funciona offline
+/// entre atualizações.
 class MockClientsRepository implements ClientsRepository {
-  static const _clients = [
+  MockClientsRepository(this._box) {
+    if (_box.isEmpty) {
+      for (var i = 0; i < _seedClients.length; i++) {
+        final client = _seedClients[i];
+        _box.put(client.id, CachedClient.fromClient(client, sortOrder: i));
+      }
+    }
+  }
+
+  final Box<CachedClient> _box;
+
+  static const _seedClients = [
     ClientListItem(
       id: 'silva-88291',
       code: '88291',
@@ -67,6 +87,12 @@ class MockClientsRepository implements ClientsRepository {
       isFavorite: true,
     ),
   ];
+
+  List<ClientListItem> get _clients {
+    final cached = _box.values.toList()
+      ..sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
+    return cached.map((c) => c.toClient()).toList();
+  }
 
   @override
   Future<List<ClientListItem>> fetchClients() async {
@@ -138,5 +164,20 @@ class MockClientsRepository implements ClientsRepository {
       orderHistory: const [],
       notes: null,
     );
+  }
+
+  /// Reaponta o cache para os dados mais recentes do servidor. Sem uma Web
+  /// API real ainda, só re-semeia os mesmos exemplos — a peça (box +
+  /// método) já fica pronta para virar um download semanal de verdade.
+  Future<void> refreshCache() async {
+    // Não aguarda o flush em disco (mesmo motivo de `MockOrdersRepository`):
+    // `Box.clear`/`Box.put` já atualizam o estado em memória na hora.
+    unawaited(_box.clear());
+    for (var i = 0; i < _seedClients.length; i++) {
+      final client = _seedClients[i];
+      unawaited(
+        _box.put(client.id, CachedClient.fromClient(client, sortOrder: i)),
+      );
+    }
   }
 }

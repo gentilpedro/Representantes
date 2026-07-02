@@ -1,11 +1,31 @@
+import 'dart:async';
+
+import 'package:hive/hive.dart';
+
 import '../../domain/entities/product.dart';
 import '../../domain/entities/product_detail.dart';
 import '../../domain/repositories/catalog_repository.dart';
+import '../local/cached_product.dart';
 
-/// Dados fixos espelhando as telas "Catálogo de Produtos" e "Detalhe do
-/// Produto" do protótipo.
+/// Catálogo cacheado localmente (box `products_cache`), espelhando as telas
+/// "Catálogo de Produtos" e "Detalhe do Produto" do protótipo. Na primeira
+/// execução semeia com os dados fixos abaixo, simulando "o último download
+/// semanal" — quando a Web API existir, [refreshCache] passa a baixar de
+/// verdade em vez de re-semear os mesmos exemplos. O app lê sempre do cache
+/// local, então funciona offline entre atualizações.
 class MockCatalogRepository implements CatalogRepository {
-  static const _products = [
+  MockCatalogRepository(this._box) {
+    if (_box.isEmpty) {
+      for (var i = 0; i < _seedProducts.length; i++) {
+        final product = _seedProducts[i];
+        _box.put(product.id, CachedProduct.fromProduct(product, sortOrder: i));
+      }
+    }
+  }
+
+  final Box<CachedProduct> _box;
+
+  static const _seedProducts = [
     Product(
       id: 'tio-joao-tipo1',
       sku: 'ARZ-TJ-T1',
@@ -79,6 +99,12 @@ class MockCatalogRepository implements CatalogRepository {
     ),
   ];
 
+  List<Product> get _products {
+    final cached = _box.values.toList()
+      ..sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
+    return cached.map((c) => c.toProduct()).toList();
+  }
+
   @override
   Future<List<Product>> fetchProducts() async {
     await Future.delayed(const Duration(milliseconds: 400));
@@ -126,5 +152,20 @@ class MockCatalogRepository implements CatalogRepository {
         'Unidades disponíveis': '${product.availableUnits}',
       },
     );
+  }
+
+  /// Reaponta o cache para os dados mais recentes do servidor. Sem uma Web
+  /// API real ainda, só re-semeia os mesmos exemplos — a peça (box +
+  /// método) já fica pronta para virar um download semanal de verdade.
+  Future<void> refreshCache() async {
+    // Não aguarda o flush em disco (mesmo motivo de `MockOrdersRepository`):
+    // `Box.clear`/`Box.put` já atualizam o estado em memória na hora.
+    unawaited(_box.clear());
+    for (var i = 0; i < _seedProducts.length; i++) {
+      final product = _seedProducts[i];
+      unawaited(
+        _box.put(product.id, CachedProduct.fromProduct(product, sortOrder: i)),
+      );
+    }
   }
 }

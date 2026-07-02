@@ -11,6 +11,8 @@ import 'package:josapar_representantes/features/auth/domain/repositories/auth_re
 import 'package:josapar_representantes/features/auth/presentation/providers/auth_providers.dart';
 import 'package:josapar_representantes/main.dart';
 
+import 'support/hive_test_setup.dart';
+
 /// A instância real usa o plugin `geolocator`, que trava esperando resposta
 /// de platform channel em ambiente de teste (sem handler mockado). Nos
 /// testes, sobrescrevemos por uma implementação que resolve na hora — o
@@ -58,6 +60,10 @@ class _AlreadyLoggedInAuthRepository implements AuthRepository {
 }
 
 void main() {
+  setUpAll(() async {
+    await setUpHiveForTest();
+  });
+
   testWidgets('Fluxo de Agenda: roteiro do dia, status das visitas e check-in', (
     WidgetTester tester,
   ) async {
@@ -103,8 +109,10 @@ void main() {
     ); // só a visita "Em Andamento" tem esse botão ainda.
     expect(
       find.text('Check-in'),
-      findsNWidgets(2),
-    ); // as duas visitas pendentes.
+      findsNWidgets(3),
+    ); // as duas visitas pendentes + a parada de lead (também pending).
+    // A parada vinda de `LeadsRepository` aparece com o chip de potencial.
+    expect(find.text('Cliente em Potencial'), findsOneWidget);
 
     // Faz check-in na primeira visita pendente ("Rede de Postos Shell - Loja").
     final checkInButton = find.text('Check-in').first;
@@ -115,6 +123,6 @@ void main() {
 
     // Agora duas visitas têm botão "Check-out" (a que já estava em andamento + a recém check-in).
     expect(find.text('Check-out'), findsNWidgets(2));
-    expect(find.text('Check-in'), findsOneWidget);
+    expect(find.text('Check-in'), findsNWidgets(2));
   });
 }

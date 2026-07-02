@@ -9,6 +9,8 @@ import 'package:josapar_representantes/features/auth/domain/repositories/auth_re
 import 'package:josapar_representantes/features/auth/presentation/providers/auth_providers.dart';
 import 'package:josapar_representantes/main.dart';
 
+import 'support/hive_test_setup.dart';
+
 class _FakeConnectivityService implements ConnectivityService {
   @override
   Future<bool> isOnline() async => true;
@@ -40,6 +42,10 @@ class _FakeAuthRepository implements AuthRepository {
 }
 
 void main() {
+  setUpAll(() async {
+    await setUpHiveForTest();
+  });
+
   testWidgets(
     'Primeiro Acesso: matrícula, requisitos de senha e retorno ao Login',
     (WidgetTester tester) async {

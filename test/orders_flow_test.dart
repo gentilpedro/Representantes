@@ -9,6 +9,8 @@ import 'package:josapar_representantes/features/auth/domain/repositories/auth_re
 import 'package:josapar_representantes/features/auth/presentation/providers/auth_providers.dart';
 import 'package:josapar_representantes/main.dart';
 
+import 'support/hive_test_setup.dart';
+
 /// `AppShell` mantém o `SyncController` sempre ativo, que checa
 /// conectividade real via `connectivity_plus` — sem handler mockado isso
 /// trava o teste, então sempre sobrescrevemos por uma versão "sempre
@@ -44,6 +46,10 @@ class _AlreadyLoggedInAuthRepository implements AuthRepository {
 }
 
 void main() {
+  setUpAll(() async {
+    await setUpHiveForTest();
+  });
+
   testWidgets(
     'Fluxo de Pedidos: lista, filtro, novo pedido, catálogo e adicionar ao carrinho',
     (WidgetTester tester) async {

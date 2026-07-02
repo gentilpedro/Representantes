@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../leads/presentation/providers/leads_providers.dart';
 import '../../data/repositories/mock_agenda_repository.dart';
 import '../../data/services/location_service.dart';
 import '../../domain/entities/daily_route.dart';
@@ -9,7 +10,7 @@ import '../../domain/repositories/agenda_repository.dart';
 DateTime _dateOnly(DateTime date) => DateTime(date.year, date.month, date.day);
 
 final agendaRepositoryProvider = Provider<AgendaRepository>(
-  (ref) => MockAgendaRepository(),
+  (ref) => MockAgendaRepository(ref.watch(leadsRepositoryProvider)),
 );
 
 final locationServiceProvider = Provider<LocationService>(

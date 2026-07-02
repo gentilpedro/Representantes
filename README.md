@@ -18,6 +18,9 @@ App em Flutter para representantes comerciais da Josapar, cobrindo:
 - Sincronização automática: pedidos finalizados offline ficam salvos localmente como
   `pending` e são enviados sozinhos assim que a conexão volta (sem precisar tocar em
   "Sincronizar Agora") — rascunhos (`draft`) nunca entram nessa fila
+- Persistência local de verdade (Hive): a fila de pedidos offline e o cache de
+  produtos/clientes/leads sobrevivem a um restart do app ou refresh da página — veja
+  [Persistência local](#persistência-local) abaixo
 - Perfil / configurações
 
 Feito para rodar tanto em **mobile (Android e iOS)** quanto em **Web**, a partir do
@@ -117,10 +120,35 @@ flutter run
 Para instalar num iPhone físico é necessária uma conta de desenvolvedor Apple
 configurada no Xcode (`ios/Runner.xcworkspace`) para assinatura do app.
 
+## Persistência local
+
+Diferente do resto da camada de dados (que é toda mock em memória), duas coisas
+realmente sobrevivem a um restart do app ou a um refresh da página web, usando
+[Hive](https://pub.dev/packages/hive) (banco embutido, sem plugin nativo — funciona em
+Android/iOS/Windows/Web sem setup extra):
+
+- **Fila de pedidos offline** (`lib/features/orders/data/local/offline_order_record.dart`):
+  todo pedido finalizado com "Finalizar" (não rascunho) é gravado localmente enquanto
+  fica `pending`. Feche a aba, dê refresh, reabra o app — o pedido continua na fila.
+  Assim que é sincronizado (reconexão automática ou "Sincronizar Agora"), o registro
+  local é apagado — rascunhos nunca entram nessa fila.
+- **Cache de referência** (produtos, clientes e "clientes em potencial"/leads): na
+  primeira execução é semeado com os dados de exemplo do protótipo, simulando "o
+  último download do servidor"; dali em diante o app lê sempre do cache local. Sem uma
+  Web API real ainda, `refreshCache()` em cada repositório só re-semeia os mesmos
+  exemplos — a peça já fica pronta para virar um download semanal de verdade. Leads
+  ainda não têm tela própria; a única integração visível hoje é uma parada extra na
+  Agenda de Visitas com o chip "Cliente em Potencial".
+
+O resto (histórico de pedidos já enviados, detalhe de cliente, notificações etc.)
+continua sendo dado de exemplo fixo, já que ainda não existe uma Web API real para
+guardar isso de verdade.
+
 ## Rodando os testes automatizados
 
-O projeto tem 9 testes de widget cobrindo o fluxo real de cada tela (não apenas
-renderização). Para rodar todos:
+O projeto tem testes de widget cobrindo o fluxo real de cada tela (não apenas
+renderização), incluindo a durabilidade da persistência local entre "restarts". Para
+rodar todos:
 
 ```bash
 flutter test
@@ -130,17 +158,18 @@ flutter test
 
 ```
 lib/
-  core/                # tema, formatação, storage de sessão, utilitários compartilhados
+  core/                # tema, formatação, storage de sessão/Hive, utilitários compartilhados
   features/
-    auth/               # login e sessão
+    auth/               # boas-vindas, primeiro acesso, login e sessão
     dashboard/          # tela inicial do representante
-    orders/             # pedidos, catálogo, carrinho
-    clients/            # clientes e detalhe financeiro
-    agenda/             # agenda de visitas com GPS
+    orders/             # pedidos, catálogo, carrinho, fila offline (Hive)
+    clients/            # clientes e detalhe financeiro (cache Hive)
+    leads/               # clientes em potencial (cache Hive, sem tela própria ainda)
+    agenda/             # agenda de visitas com GPS (inclui paradas de leads)
     reports/            # relatórios e gráficos
     sync/                # sincronização offline e notificações
     profile/            # perfil e configurações
-test/                  # testes de fluxo (*_flow_test.dart), um por feature
+test/                  # testes de fluxo (*_flow_test.dart) e de persistência local
 ```
 
 Cada feature segue o padrão `domain/` (entidades + interface do repositório) →
