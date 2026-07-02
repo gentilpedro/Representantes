@@ -1,0 +1,208 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../../core/router/app_routes.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/responsive_content.dart';
+import '../../../orders/presentation/providers/new_order_providers.dart';
+import '../providers/clients_providers.dart';
+import '../widgets/client_card.dart';
+
+/// Quando [pickMode] é true, a tela funciona como um seletor: tocar num
+/// cliente o define como "cliente selecionado" do pedido em construção
+/// ([newOrderControllerProvider]) e volta para a tela anterior, em vez de
+/// abrir o Detalhe do Cliente.
+class ClientsScreen extends ConsumerWidget {
+  const ClientsScreen({super.key, this.pickMode = false});
+
+  final bool pickMode;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final clientsAsync = ref.watch(filteredClientsProvider);
+    final filter = ref.watch(clientFilterProvider);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(pickMode ? 'Selecionar Cliente' : 'Clientes'),
+        actions: pickMode
+            ? null
+            : [
+                IconButton(
+                  onPressed: () {},
+                  icon: const Icon(Icons.sync_outlined),
+                ),
+                IconButton(
+                  onPressed: () => context.push(AppRoutes.notifications),
+                  icon: const Icon(Icons.notifications_outlined),
+                ),
+              ],
+      ),
+      body: ResponsiveContent(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+              child: Column(
+                children: [
+                  TextField(
+                    onChanged: (value) =>
+                        ref.read(clientSearchQueryProvider.notifier).state =
+                            value,
+                    decoration: const InputDecoration(
+                      hintText: 'Nome, CNPJ ou Código...',
+                      prefixIcon: Icon(Icons.search),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        _FilterChip(
+                          label: 'Todos',
+                          value: ClientFilter.all,
+                          groupValue: filter,
+                        ),
+                        const SizedBox(width: 8),
+                        _FilterChip(
+                          label: 'Favoritos',
+                          value: ClientFilter.favorites,
+                          groupValue: filter,
+                        ),
+                        const SizedBox(width: 8),
+                        _FilterChip(
+                          label: 'Bloqueados',
+                          value: ClientFilter.blocked,
+                          groupValue: filter,
+                        ),
+                        const SizedBox(width: 8),
+                        _FilterChip(
+                          label: 'Offline',
+                          value: ClientFilter.offline,
+                          groupValue: filter,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: clientsAsync.when(
+                loading: () => const Center(
+                  child: CircularProgressIndicator(color: AppColors.primary),
+                ),
+                error: (error, _) => Center(
+                  child: Text('Não foi possível carregar os clientes.\n$error'),
+                ),
+                data: (clients) {
+                  if (clients.isEmpty) {
+                    return const Center(
+                      child: Text('Nenhum cliente encontrado.'),
+                    );
+                  }
+                  return ListView(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Exibindo ${clients.length} clientes',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      for (final client in clients) ...[
+                        ClientCard(
+                          client: client,
+                          onTap: pickMode
+                              ? () {
+                                  ref
+                                      .read(newOrderControllerProvider.notifier)
+                                      .selectClient(client.toSummary());
+                                  context.pop();
+                                }
+                              : () => context.push(
+                                  AppRoutes.clientDetail(client.id),
+                                ),
+                          onToggleFavorite: () {
+                            final overrides = {
+                              ...ref.read(favoriteOverridesProvider),
+                            };
+                            overrides[client.id] = !client.isFavorite;
+                            ref.read(favoriteOverridesProvider.notifier).state =
+                                overrides;
+                          },
+                        ),
+                        const SizedBox(height: 12),
+                      ],
+                      const SizedBox(height: 8),
+                      const Text(
+                        'Fim da lista. Use a busca para encontrar outros clientes na base.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: AppColors.textMuted,
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: pickMode
+          ? null
+          : FloatingActionButton(
+              onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text(
+                    'Cadastro de novo cliente ainda não implementado.',
+                  ),
+                ),
+              ),
+              child: const Icon(Icons.person_add_alt_1_outlined),
+            ),
+    );
+  }
+}
+
+class _FilterChip extends ConsumerWidget {
+  const _FilterChip({
+    required this.label,
+    required this.value,
+    required this.groupValue,
+  });
+
+  final String label;
+  final ClientFilter value;
+  final ClientFilter groupValue;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final selected = value == groupValue;
+    return ChoiceChip(
+      label: Text(label),
+      selected: selected,
+      onSelected: (_) => ref.read(clientFilterProvider.notifier).state = value,
+      selectedColor: AppColors.primary,
+      backgroundColor: AppColors.surface,
+      side: const BorderSide(color: AppColors.border),
+      labelStyle: TextStyle(
+        color: selected ? Colors.white : AppColors.textPrimary,
+        fontWeight: FontWeight.w600,
+        fontSize: 13,
+      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+    );
+  }
+}
