@@ -1,14 +1,14 @@
-# Josapar Representantes
+# Pedro Dev Representantes
 
 > ⚠️ **Este projeto é um protótipo funcional.** Foi construído a partir de telas do
 > Visily para validar fluxos e experiência de uso com representantes de vendas da
-> Josapar S.A. **Nenhum dado é real** — toda a camada de dados (login, pedidos,
+> Pedro Dev **Nenhum dado é real** — toda a camada de dados (login, pedidos,
 > clientes, agenda, relatórios, sincronização) é servida por repositórios *mock* em
 > memória, feitos para simular a futura Web API .NET 10 da empresa. Quando a API real
 > existir, basta trocar as implementações em `lib/**/data/repositories/` — as telas não
 > precisam mudar.
 
-App em Flutter para representantes comerciais da Josapar, cobrindo:
+App em Flutter para representantes comerciais da Pedro Dev, cobrindo:
 
 - Login e dashboard do representante
 - Pedidos (lista, novo pedido, catálogo de produtos, carrinho)
