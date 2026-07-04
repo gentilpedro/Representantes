@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/app_routes.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_palette.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../../core/widgets/responsive_content.dart';
 import '../providers/agenda_providers.dart';
@@ -45,10 +45,10 @@ class AgendaScreen extends ConsumerWidget {
                 children: [
                   Row(
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.calendar_today,
                         size: 16,
-                        color: AppColors.primary,
+                        color: context.colors.primary,
                       ),
                       const SizedBox(width: 8),
                       Text(
@@ -81,10 +81,12 @@ class AgendaScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 20),
               routeAsync.when(
-                loading: () => const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 40),
+                loading: () => Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 40),
                   child: Center(
-                    child: CircularProgressIndicator(color: AppColors.primary),
+                    child: CircularProgressIndicator(
+                      color: context.colors.primary,
+                    ),
                   ),
                 ),
                 error: (error, _) => Padding(
@@ -112,14 +114,14 @@ class AgendaScreen extends ConsumerWidget {
                             vertical: 3,
                           ),
                           decoration: BoxDecoration(
-                            color: AppColors.neutralSoft,
+                            color: context.colors.neutralSoft,
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Text(
                             '${route.visitsPlanned} Visitas',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 10,
-                              color: AppColors.textSecondary,
+                              color: context.colors.textSecondary,
                             ),
                           ),
                         ),
@@ -157,31 +159,31 @@ class _RouteTip extends StatelessWidget {
       margin: const EdgeInsets.symmetric(vertical: 8),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppColors.infoSoft,
+        color: context.colors.infoSoft,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.info_outline, size: 18, color: AppColors.primary),
+          Icon(Icons.info_outline, size: 18, color: context.colors.primary),
           const SizedBox(width: 10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'Dica de Rota',
                   style: TextStyle(
                     fontWeight: FontWeight.w700,
                     fontSize: 12,
-                    color: AppColors.primaryDark,
+                    color: context.colors.primaryDark,
                   ),
                 ),
                 Text(
                   message,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
-                    color: AppColors.primaryDark,
+                    color: context.colors.primaryDark,
                   ),
                 ),
               ],

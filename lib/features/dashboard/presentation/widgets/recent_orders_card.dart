@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_palette.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../../core/widgets/status_chip.dart';
 import '../../domain/entities/dashboard_summary.dart';
@@ -64,11 +64,11 @@ class _RecentOrderTile extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 18,
-            backgroundColor: AppColors.neutralSoft,
+            backgroundColor: context.colors.neutralSoft,
             child: Text(
               order.clientName.substring(0, 1),
-              style: const TextStyle(
-                color: AppColors.textSecondary,
+              style: TextStyle(
+                color: context.colors.textSecondary,
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -88,9 +88,9 @@ class _RecentOrderTile extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   '${order.code} · ${order.timeLabel}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
-                    color: AppColors.textMuted,
+                    color: context.colors.textMuted,
                   ),
                 ),
               ],
@@ -101,14 +101,14 @@ class _RecentOrderTile extends StatelessWidget {
             children: [
               Text(
                 AppFormatters.currency(order.amount),
-                style: const TextStyle(
+                style: TextStyle(
                   fontWeight: FontWeight.w700,
                   fontSize: 13,
-                  color: AppColors.primary,
+                  color: context.colors.primary,
                 ),
               ),
               const SizedBox(height: 4),
-              _statusChip(order.status),
+              _statusChip(context, order.status),
             ],
           ),
         ],
@@ -116,25 +116,25 @@ class _RecentOrderTile extends StatelessWidget {
     );
   }
 
-  Widget _statusChip(RecentOrderStatus status) {
+  Widget _statusChip(BuildContext context, RecentOrderStatus status) {
     switch (status) {
       case RecentOrderStatus.synced:
-        return const StatusChip(
+        return StatusChip(
           label: 'Sincronizado',
-          foreground: AppColors.success,
-          background: AppColors.successSoft,
+          foreground: context.colors.success,
+          background: context.colors.successSoft,
         );
       case RecentOrderStatus.pending:
-        return const StatusChip(
+        return StatusChip(
           label: 'Pendente',
-          foreground: AppColors.warning,
-          background: AppColors.warningSoft,
+          foreground: context.colors.warning,
+          background: context.colors.warningSoft,
         );
       case RecentOrderStatus.draft:
-        return const StatusChip(
+        return StatusChip(
           label: 'Rascunho',
-          foreground: AppColors.textSecondary,
-          background: AppColors.neutralSoft,
+          foreground: context.colors.textSecondary,
+          background: context.colors.neutralSoft,
         );
     }
   }

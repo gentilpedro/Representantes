@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_palette.dart';
 import '../../../../core/utils/formatters.dart';
 
 class DaySelector extends StatelessWidget {
@@ -63,9 +63,9 @@ class _DayChip extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
-          color: selected ? AppColors.primary : AppColors.surface,
+          color: selected ? context.colors.primary : context.colors.surface,
           border: Border.all(
-            color: selected ? AppColors.primary : AppColors.border,
+            color: selected ? context.colors.primary : context.colors.border,
           ),
           borderRadius: BorderRadius.circular(12),
         ),
@@ -75,7 +75,7 @@ class _DayChip extends StatelessWidget {
               label,
               style: TextStyle(
                 fontSize: 10,
-                color: selected ? Colors.white70 : AppColors.textMuted,
+                color: selected ? Colors.white70 : context.colors.textMuted,
               ),
             ),
             const SizedBox(height: 2),
@@ -84,7 +84,7 @@ class _DayChip extends StatelessWidget {
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
-                color: selected ? Colors.white : AppColors.textPrimary,
+                color: selected ? Colors.white : context.colors.textPrimary,
               ),
             ),
           ],

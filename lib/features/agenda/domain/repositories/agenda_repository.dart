@@ -1,8 +1,11 @@
 import '../entities/daily_route.dart';
 
-/// Contrato da agenda. A implementação real deve consumir a Web API .NET 10
-/// (ex: `GET /api/agenda?date=...`) e persistir check-in/check-out via
-/// `POST /api/visits/{id}/checkin`.
+/// Contrato da agenda, contra `GET /api/agenda?date=...` e
+/// `POST /api/visits/{id}/check-in|check-out` da Web API .NET 10.
 abstract class AgendaRepository {
   Future<DailyRoute> fetchDailyRoute(DateTime date);
+
+  Future<void> checkIn(String visitId, {double? latitude, double? longitude});
+
+  Future<void> checkOut(String visitId, String notes);
 }

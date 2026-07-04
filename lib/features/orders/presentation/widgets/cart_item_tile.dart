@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_palette.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../domain/entities/cart_item.dart';
 
@@ -37,9 +37,9 @@ class CartItemTile extends StatelessWidget {
                   height: 52,
                   fit: BoxFit.cover,
                   placeholder: (context, url) =>
-                      const ColoredBox(color: AppColors.neutralSoft),
+                      ColoredBox(color: context.colors.neutralSoft),
                   errorWidget: (context, url, error) =>
-                      const ColoredBox(color: AppColors.neutralSoft),
+                      ColoredBox(color: context.colors.neutralSoft),
                 ),
               ),
               const SizedBox(width: 10),
@@ -56,17 +56,17 @@ class CartItemTile extends StatelessWidget {
                     ),
                     Text(
                       'Ref: ${item.sku}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 11,
-                        color: AppColors.textMuted,
+                        color: context.colors.textMuted,
                       ),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       AppFormatters.currency(item.unitPrice),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
-                        color: AppColors.textSecondary,
+                        color: context.colors.textSecondary,
                       ),
                     ),
                   ],
@@ -74,9 +74,9 @@ class CartItemTile extends StatelessWidget {
               ),
               IconButton(
                 onPressed: onRemove,
-                icon: const Icon(
+                icon: Icon(
                   Icons.delete_outline,
-                  color: AppColors.error,
+                  color: context.colors.error,
                   size: 20,
                 ),
                 padding: EdgeInsets.zero,
@@ -104,9 +104,9 @@ class CartItemTile extends StatelessWidget {
                 onTap: () => onQuantityChanged(item.quantity + 1),
               ),
               const SizedBox(width: 16),
-              const Text(
+              Text(
                 'DESC %',
-                style: TextStyle(fontSize: 10, color: AppColors.textMuted),
+                style: TextStyle(fontSize: 10, color: context.colors.textMuted),
               ),
               const SizedBox(width: 6),
               SizedBox(
@@ -131,9 +131,9 @@ class CartItemTile extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  const Text(
+                  Text(
                     'SUBTOTAL ITEM',
-                    style: TextStyle(fontSize: 9, color: AppColors.textMuted),
+                    style: TextStyle(fontSize: 9, color: context.colors.textMuted),
                   ),
                   Text(
                     AppFormatters.currency(item.subtotal),
@@ -167,7 +167,7 @@ class _QtyButton extends StatelessWidget {
         width: 26,
         height: 26,
         decoration: BoxDecoration(
-          border: Border.all(color: AppColors.border),
+          border: Border.all(color: context.colors.border),
           borderRadius: BorderRadius.circular(6),
         ),
         child: Icon(icon, size: 14),

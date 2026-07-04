@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_palette.dart';
 import '../../domain/entities/reports_summary.dart';
 
 class ReportKpiCard extends StatelessWidget {
@@ -24,8 +24,8 @@ class ReportKpiCard extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
                   color: isPositive
-                      ? AppColors.successSoft
-                      : AppColors.errorSoft,
+                      ? context.colors.successSoft
+                      : context.colors.errorSoft,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
@@ -33,7 +33,7 @@ class ReportKpiCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
-                    color: isPositive ? AppColors.success : AppColors.error,
+                    color: isPositive ? context.colors.success : context.colors.error,
                   ),
                 ),
               ),
@@ -46,9 +46,9 @@ class ReportKpiCard extends StatelessWidget {
             const SizedBox(height: 2),
             Text(
               kpi.label,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 11,
-                color: AppColors.textSecondary,
+                color: context.colors.textSecondary,
               ),
             ),
           ],

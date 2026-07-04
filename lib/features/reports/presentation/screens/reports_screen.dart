@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_palette.dart';
 import '../../../../core/widgets/responsive_content.dart';
 import '../../domain/entities/reports_summary.dart';
 import '../providers/reports_providers.dart';
@@ -64,8 +64,8 @@ class ReportsScreen extends ConsumerWidget {
             ),
             Expanded(
               child: summaryAsync.when(
-                loading: () => const Center(
-                  child: CircularProgressIndicator(color: AppColors.primary),
+                loading: () => Center(
+                  child: CircularProgressIndicator(color: context.colors.primary),
                 ),
                 error: (error, _) => Center(
                   child: Text(
@@ -133,11 +133,11 @@ class _PeriodChip extends ConsumerWidget {
       label: Text(label),
       selected: selected,
       onSelected: (_) => ref.read(reportPeriodProvider.notifier).state = value,
-      selectedColor: AppColors.primary,
-      backgroundColor: AppColors.surface,
-      side: const BorderSide(color: AppColors.border),
+      selectedColor: context.colors.primary,
+      backgroundColor: context.colors.surface,
+      side: BorderSide(color: context.colors.border),
       labelStyle: TextStyle(
-        color: selected ? Colors.white : AppColors.textPrimary,
+        color: selected ? Colors.white : context.colors.textPrimary,
         fontWeight: FontWeight.w600,
         fontSize: 13,
       ),

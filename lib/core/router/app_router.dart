@@ -86,7 +86,9 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         routes: [
           GoRoute(
             path: 'create-password',
-            builder: (context, state) => const CreatePasswordScreen(),
+            builder: (context, state) => CreatePasswordScreen(
+              identifier: state.uri.queryParameters['identifier'] ?? '',
+            ),
           ),
         ],
       ),

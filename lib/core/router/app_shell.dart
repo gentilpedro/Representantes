@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/sync/presentation/providers/sync_providers.dart';
-import '../theme/app_colors.dart';
+import '../theme/app_palette.dart';
 import '../widgets/responsive_content.dart';
 
 class AppShell extends ConsumerWidget {
@@ -78,7 +78,7 @@ class _DesktopShell extends StatelessWidget {
           NavigationRail(
             extended: extended,
             minExtendedWidth: 220,
-            backgroundColor: AppColors.surface,
+            backgroundColor: context.colors.surface,
             selectedIndex: navigationShell.currentIndex,
             onDestinationSelected: (index) => navigationShell.goBranch(
               index,
@@ -87,16 +87,16 @@ class _DesktopShell extends StatelessWidget {
             labelType: extended
                 ? NavigationRailLabelType.none
                 : NavigationRailLabelType.all,
-            selectedIconTheme: const IconThemeData(color: AppColors.primary),
-            selectedLabelTextStyle: const TextStyle(
-              color: AppColors.primary,
+            selectedIconTheme: IconThemeData(color: context.colors.primary),
+            selectedLabelTextStyle: TextStyle(
+              color: context.colors.primary,
               fontWeight: FontWeight.w700,
             ),
-            unselectedIconTheme: const IconThemeData(
-              color: AppColors.textMuted,
+            unselectedIconTheme: IconThemeData(
+              color: context.colors.textMuted,
             ),
-            unselectedLabelTextStyle: const TextStyle(
-              color: AppColors.textMuted,
+            unselectedLabelTextStyle: TextStyle(
+              color: context.colors.textMuted,
             ),
             leading: Padding(
               padding: EdgeInsets.symmetric(vertical: extended ? 20 : 14),
@@ -106,24 +106,21 @@ class _DesktopShell extends StatelessWidget {
                   Container(
                     width: 36,
                     height: 36,
-                    decoration: BoxDecoration(
-                      color: AppColors.textPrimary,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: const Icon(
-                      Icons.bolt,
+                    padding: const EdgeInsets.all(6),
+                    decoration: const BoxDecoration(
                       color: Colors.white,
-                      size: 20,
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
                     ),
+                    child: Image.asset('assets/branding/app_icon.png'),
                   ),
                   if (extended) ...[
                     const SizedBox(width: 10),
-                    const Text(
+                    Text(
                       'Josapar Rep.',
                       style: TextStyle(
                         fontWeight: FontWeight.w800,
                         fontSize: 15,
-                        color: AppColors.textPrimary,
+                        color: context.colors.textPrimary,
                       ),
                     ),
                   ],
@@ -139,10 +136,10 @@ class _DesktopShell extends StatelessWidget {
                 ),
             ],
           ),
-          const VerticalDivider(
+          VerticalDivider(
             width: 1,
             thickness: 1,
-            color: AppColors.border,
+            color: context.colors.border,
           ),
           Expanded(child: navigationShell),
         ],

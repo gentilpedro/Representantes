@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_palette.dart';
 import '../../domain/entities/reports_summary.dart';
 
 class SalesInsightCard extends StatelessWidget {
@@ -18,7 +18,7 @@ class SalesInsightCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.infoSoft,
+        color: context.colors.infoSoft,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
@@ -29,8 +29,8 @@ class SalesInsightCard extends StatelessWidget {
               Container(
                 width: 32,
                 height: 32,
-                decoration: const BoxDecoration(
-                  color: AppColors.primary,
+                decoration: BoxDecoration(
+                  color: context.colors.primary,
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
@@ -40,11 +40,11 @@ class SalesInsightCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 10),
-              const Text(
+              Text(
                 'Insight de Vendas',
                 style: TextStyle(
                   fontWeight: FontWeight.w700,
-                  color: AppColors.primaryDark,
+                  color: context.colors.primaryDark,
                 ),
               ),
             ],
@@ -52,9 +52,9 @@ class SalesInsightCard extends StatelessWidget {
           const SizedBox(height: 10),
           Text(
             insight.message,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 13,
-              color: AppColors.primaryDark,
+              color: context.colors.primaryDark,
               height: 1.4,
             ),
           ),

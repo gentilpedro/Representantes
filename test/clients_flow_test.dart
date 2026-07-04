@@ -2,46 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:josapar_representantes/core/providers/core_providers.dart';
-import 'package:josapar_representantes/core/services/connectivity_service.dart';
-import 'package:josapar_representantes/features/auth/domain/entities/app_user.dart';
-import 'package:josapar_representantes/features/auth/domain/repositories/auth_repository.dart';
-import 'package:josapar_representantes/features/auth/presentation/providers/auth_providers.dart';
 import 'package:josapar_representantes/main.dart';
 
-/// `AppShell` mantém o `SyncController` sempre ativo, que checa
-/// conectividade real via `connectivity_plus` — sem handler mockado isso
-/// trava o teste, então sempre sobrescrevemos por uma versão "sempre
-/// online, sem eventos" nos testes que passam pela tela principal.
-class _FakeConnectivityService implements ConnectivityService {
-  @override
-  Future<bool> isOnline() async => true;
-
-  @override
-  Stream<bool> get onStatusChange => const Stream.empty();
-}
-
-class _AlreadyLoggedInAuthRepository implements AuthRepository {
-  static final _user = AppUser(
-    id: '88294',
-    name: 'Ricardo Santos',
-    role: 'Representante Comercial Sênior',
-    region: 'Região Sul',
-    appVersion: 'v2.4.0',
-  );
-
-  @override
-  Future<AppUser?> restoreSession() async => _user;
-
-  @override
-  Future<AppUser> login({
-    required String identifier,
-    required String password,
-  }) async => _user;
-
-  @override
-  Future<void> logout() async {}
-}
+import 'fakes/test_overrides.dart';
 
 void main() {
   testWidgets(
@@ -49,14 +12,7 @@ void main() {
     (WidgetTester tester) async {
       await tester.pumpWidget(
         ProviderScope(
-          overrides: [
-            authRepositoryProvider.overrideWithValue(
-              _AlreadyLoggedInAuthRepository(),
-            ),
-            connectivityServiceProvider.overrideWithValue(
-              _FakeConnectivityService(),
-            ),
-          ],
+          overrides: testOverrides(),
           child: const JosaparRepresentantesApp(),
         ),
       );
@@ -64,7 +20,7 @@ void main() {
       // `AppShell` mantém o `SyncController` sempre observado em segundo
       // plano; sem um widget animando (spinner) durante o carregamento,
       // `pumpAndSettle` sozinho não garante tempo suficiente para os
-      // `Future.delayed` internos do mock resolverem — um `pump` manual
+      // `Future.delayed` internos do fake resolverem — um `pump` manual
       // avança o relógio fake de uma vez, evitando timers pendentes.
       await tester.pump(const Duration(seconds: 2));
 
@@ -78,7 +34,12 @@ void main() {
 
       expect(find.text('Supermercado Silva & Filhos Ltda'), findsOneWidget);
 
-      await tester.drag(find.byType(ListView).first, const Offset(0, -600));
+      final clientsList = find.byType(ListView).first;
+      await tester.dragUntilVisible(
+        find.text('Mercearia do Canto - Unidade'),
+        clientsList,
+        const Offset(0, -300),
+      );
       await tester.pumpAndSettle();
       expect(find.text('Mercearia do Canto - Unidade'), findsOneWidget);
 

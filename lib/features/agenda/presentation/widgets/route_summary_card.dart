@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_palette.dart';
 import '../../domain/entities/daily_route.dart';
 
 class RouteSummaryCard extends StatelessWidget {
@@ -27,10 +27,10 @@ class RouteSummaryCard extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(14, 12, 14, 6),
             child: Row(
               children: [
-                const Icon(
+                Icon(
                   Icons.map_outlined,
                   size: 16,
-                  color: AppColors.primary,
+                  color: context.colors.primary,
                 ),
                 const SizedBox(width: 6),
                 const Text(
@@ -45,8 +45,12 @@ class RouteSummaryCard extends StatelessWidget {
               Container(
                 height: 140,
                 width: double.infinity,
-                color: AppColors.neutralSoft,
-                child: const Icon(Icons.map, size: 48, color: AppColors.border),
+                color: context.colors.neutralSoft,
+                child: Icon(
+                  Icons.map,
+                  size: 48,
+                  color: context.colors.border,
+                ),
               ),
               Positioned(
                 right: 10,
@@ -57,7 +61,7 @@ class RouteSummaryCard extends StatelessWidget {
                     minimumSize: const Size(0, 34),
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     backgroundColor: Colors.white,
-                    foregroundColor: AppColors.textPrimary,
+                    foregroundColor: context.colors.textPrimary,
                   ),
                   icon: const Icon(Icons.navigation_outlined, size: 15),
                   label: const Text(
@@ -76,11 +80,11 @@ class RouteSummaryCard extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'TOTAL DA ROTA',
                       style: TextStyle(
                         fontSize: 10,
-                        color: AppColors.textMuted,
+                        color: context.colors.textMuted,
                       ),
                     ),
                     Row(
@@ -98,9 +102,9 @@ class RouteSummaryCard extends StatelessWidget {
                           padding: const EdgeInsets.only(bottom: 2),
                           child: Text(
                             '(${route.estimatedDuration})',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 11,
-                              color: AppColors.textMuted,
+                              color: context.colors.textMuted,
                             ),
                           ),
                         ),
@@ -111,19 +115,19 @@ class RouteSummaryCard extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    const Text(
+                    Text(
                       'PROGRESSO',
                       style: TextStyle(
                         fontSize: 10,
-                        color: AppColors.textMuted,
+                        color: context.colors.textMuted,
                       ),
                     ),
                     Text(
                       '${route.completedOrInProgressCount}/${route.visitsPlanned} Visitas',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontWeight: FontWeight.w800,
                         fontSize: 14,
-                        color: AppColors.primary,
+                        color: context.colors.primary,
                       ),
                     ),
                   ],

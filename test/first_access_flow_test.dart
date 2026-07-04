@@ -2,42 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:josapar_representantes/core/providers/core_providers.dart';
-import 'package:josapar_representantes/core/services/connectivity_service.dart';
-import 'package:josapar_representantes/features/auth/domain/entities/app_user.dart';
-import 'package:josapar_representantes/features/auth/domain/repositories/auth_repository.dart';
-import 'package:josapar_representantes/features/auth/presentation/providers/auth_providers.dart';
 import 'package:josapar_representantes/main.dart';
 
-class _FakeConnectivityService implements ConnectivityService {
-  @override
-  Future<bool> isOnline() async => true;
-
-  @override
-  Stream<bool> get onStatusChange => const Stream.empty();
-}
-
-class _FakeAuthRepository implements AuthRepository {
-  static final _user = AppUser(
-    id: '88294',
-    name: 'Ricardo Santos',
-    role: 'Representante Comercial Sênior',
-    region: 'Região Sul',
-    appVersion: 'v2.4.0',
-  );
-
-  @override
-  Future<AppUser?> restoreSession() async => null;
-
-  @override
-  Future<AppUser> login({
-    required String identifier,
-    required String password,
-  }) async => _user;
-
-  @override
-  Future<void> logout() async {}
-}
+import 'fakes/fake_auth_repository.dart';
+import 'fakes/test_overrides.dart';
 
 void main() {
   testWidgets(
@@ -45,12 +13,7 @@ void main() {
     (WidgetTester tester) async {
       await tester.pumpWidget(
         ProviderScope(
-          overrides: [
-            authRepositoryProvider.overrideWithValue(_FakeAuthRepository()),
-            connectivityServiceProvider.overrideWithValue(
-              _FakeConnectivityService(),
-            ),
-          ],
+          overrides: testOverrides(authRepository: FakeAuthRepository.loggedOut()),
           child: const JosaparRepresentantesApp(),
         ),
       );
@@ -106,16 +69,11 @@ void main() {
       );
 
       await tester.tap(find.text('Salvar Senha'));
-      await tester.pump();
-      // `_save` simula 900ms de latência antes do redirecionamento.
-      await tester.pump(const Duration(seconds: 1));
       await tester.pumpAndSettle();
 
-      expect(
-        find.text('Senha criada! Faça login para continuar.'),
-        findsOneWidget,
-      );
-      expect(find.text('Acessar Sistema'), findsOneWidget);
+      // Ativação bem-sucedida já devolve uma sessão autenticada — o redirect
+      // do GoRouter leva direto ao Dashboard, sem passar pelo Login.
+      expect(find.textContaining('Olá, Ricardo'), findsOneWidget);
     },
   );
 }

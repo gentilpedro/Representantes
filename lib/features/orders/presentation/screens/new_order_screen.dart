@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/providers/core_providers.dart';
 import '../../../../core/router/app_routes.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_palette.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../../core/widgets/responsive_content.dart';
 import '../../../sync/presentation/providers/sync_providers.dart';
@@ -41,12 +41,12 @@ class NewOrderScreen extends ConsumerWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                Text(
                   'CLIENTE SELECIONADO',
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
-                    color: AppColors.textMuted,
+                    color: context.colors.textMuted,
                   ),
                 ),
                 TextButton(
@@ -70,12 +70,12 @@ class NewOrderScreen extends ConsumerWidget {
                         width: 40,
                         height: 40,
                         decoration: BoxDecoration(
-                          color: AppColors.primarySoft,
+                          color: context.colors.primarySoft,
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.apartment_outlined,
-                          color: AppColors.primary,
+                          color: context.colors.primary,
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -92,9 +92,9 @@ class NewOrderScreen extends ConsumerWidget {
                             ),
                             Text(
                               'CNPJ: ${client.cnpj}',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 11,
-                                color: AppColors.textMuted,
+                                color: context.colors.textMuted,
                               ),
                             ),
                             const SizedBox(height: 6),
@@ -121,10 +121,10 @@ class NewOrderScreen extends ConsumerWidget {
               children: [
                 Text(
                   'ITENS NO CARRINHO (${orderState.items.length})',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
-                    color: AppColors.textMuted,
+                    color: context.colors.textMuted,
                   ),
                 ),
                 OutlinedButton.icon(
@@ -142,12 +142,12 @@ class NewOrderScreen extends ConsumerWidget {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 14),
                 child: orderState.items.isEmpty
-                    ? const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 24),
+                    ? Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 24),
                         child: Center(
                           child: Text(
                             'Nenhum item adicionado ainda.',
-                            style: TextStyle(color: AppColors.textMuted),
+                            style: TextStyle(color: context.colors.textMuted),
                           ),
                         ),
                       )
@@ -178,12 +178,12 @@ class NewOrderScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 20),
-            const Text(
+            Text(
               'OBSERVAÇÕES DO PEDIDO',
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w700,
-                color: AppColors.textMuted,
+                color: context.colors.textMuted,
               ),
             ),
             const SizedBox(height: 6),
@@ -202,15 +202,15 @@ class NewOrderScreen extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Row(
+                    Row(
                       children: [
                         Icon(
                           Icons.credit_card,
                           size: 16,
-                          color: AppColors.primary,
+                          color: context.colors.primary,
                         ),
-                        SizedBox(width: 6),
-                        Text(
+                        const SizedBox(width: 6),
+                        const Text(
                           'Resumo da Negociação',
                           style: TextStyle(fontWeight: FontWeight.w700),
                         ),
@@ -245,10 +245,10 @@ class NewOrderScreen extends ConsumerWidget {
                           children: [
                             Text(
                               AppFormatters.currency(orderState.total),
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontWeight: FontWeight.w800,
                                 fontSize: 18,
-                                color: AppColors.primary,
+                                color: context.colors.primary,
                               ),
                             ),
                             const SizedBox(width: 8),
@@ -258,7 +258,7 @@ class NewOrderScreen extends ConsumerWidget {
                                 vertical: 3,
                               ),
                               decoration: BoxDecoration(
-                                color: AppColors.neutralSoft,
+                                color: context.colors.neutralSoft,
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: const Text(
@@ -273,13 +273,13 @@ class NewOrderScreen extends ConsumerWidget {
                         ),
                       ],
                     ),
-                    const Align(
+                    Align(
                       alignment: Alignment.centerRight,
                       child: Text(
                         'Faturamento Direto',
                         style: TextStyle(
                           fontSize: 11,
-                          color: AppColors.textMuted,
+                          color: context.colors.textMuted,
                         ),
                       ),
                     ),
@@ -291,19 +291,19 @@ class NewOrderScreen extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: AppColors.infoSoft,
+                color: context.colors.infoSoft,
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Row(
+              child: Row(
                 children: [
-                  Icon(Icons.info_outline, size: 18, color: AppColors.primary),
-                  SizedBox(width: 10),
+                  Icon(Icons.info_outline, size: 18, color: context.colors.primary),
+                  const SizedBox(width: 10),
                   Expanded(
                     child: Text(
                       'Este pedido será salvo localmente e sincronizado assim que houver conexão estável.',
                       style: TextStyle(
                         fontSize: 12,
-                        color: AppColors.primaryDark,
+                        color: context.colors.primaryDark,
                       ),
                     ),
                   ),
@@ -355,12 +355,20 @@ Future<void> _saveDraft(
   NewOrderController controller,
   NewOrderState orderState,
 ) async {
+  final client = orderState.client;
+  if (client == null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Selecione um cliente antes de salvar.')),
+    );
+    return;
+  }
   await ref
       .read(ordersRepositoryProvider)
       .createOrder(
-        clientName: orderState.client?.name ?? 'Cliente não informado',
-        itemsCount: orderState.items.length,
-        total: orderState.total,
+        clientId: client.id,
+        clientName: client.name,
+        items: orderState.items,
+        notes: orderState.notes,
         isDraft: true,
       );
   controller.clear();
@@ -382,12 +390,20 @@ Future<void> _finalizeOrder(
   NewOrderController controller,
   NewOrderState orderState,
 ) async {
+  final client = orderState.client;
+  if (client == null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Selecione um cliente antes de finalizar.')),
+    );
+    return;
+  }
   await ref
       .read(ordersRepositoryProvider)
       .createOrder(
-        clientName: orderState.client?.name ?? 'Cliente não informado',
-        itemsCount: orderState.items.length,
-        total: orderState.total,
+        clientId: client.id,
+        clientName: client.name,
+        items: orderState.items,
+        notes: orderState.notes,
         isDraft: false,
       );
   controller.clear();
@@ -423,7 +439,7 @@ class _MiniTag extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: AppColors.neutralSoft,
+        color: context.colors.neutralSoft,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
@@ -449,9 +465,9 @@ class _SummaryLine extends StatelessWidget {
         children: [
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 13,
-              color: AppColors.textSecondary,
+              color: context.colors.textSecondary,
             ),
           ),
           Text(

@@ -1,7 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_palette.dart';
 import '../../../../core/theme/chart_colors.dart';
 import '../../domain/entities/reports_summary.dart';
 
@@ -26,9 +26,9 @@ class SalesTrendChart extends StatelessWidget {
               'Tendência de Vendas',
               style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
             ),
-            const Text(
+            Text(
               'Comparativo Vendas vs. Meta Mensal',
-              style: TextStyle(fontSize: 11, color: AppColors.textMuted),
+              style: TextStyle(fontSize: 11, color: context.colors.textMuted),
             ),
             const SizedBox(height: 16),
             SizedBox(
@@ -56,9 +56,9 @@ class SalesTrendChart extends StatelessWidget {
                         interval: maxY > 0 ? (maxY / 4).roundToDouble() : 1,
                         getTitlesWidget: (value, meta) => Text(
                           value.toInt().toString(),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 9,
-                            color: AppColors.textMuted,
+                            color: context.colors.textMuted,
                           ),
                         ),
                       ),
@@ -76,9 +76,9 @@ class SalesTrendChart extends StatelessWidget {
                             padding: const EdgeInsets.only(top: 4),
                             child: Text(
                               points[index].monthLabel,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 10,
-                                color: AppColors.textMuted,
+                                color: context.colors.textMuted,
                               ),
                             ),
                           );
@@ -109,7 +109,7 @@ class SalesTrendChart extends StatelessWidget {
                           FlSpot(i.toDouble(), points[i].target),
                       ],
                       isCurved: true,
-                      color: AppColors.textSecondary,
+                      color: context.colors.textSecondary,
                       barWidth: 2,
                       dashArray: [6, 4],
                       dotData: const FlDotData(show: false),
@@ -123,7 +123,7 @@ class SalesTrendChart extends StatelessWidget {
               children: [
                 _LegendDot(color: ChartColors.categorical[0], label: 'Vendas'),
                 const SizedBox(width: 16),
-                const _LegendDot(color: AppColors.textSecondary, label: 'Meta'),
+                _LegendDot(color: context.colors.textSecondary, label: 'Meta'),
               ],
             ),
           ],
@@ -152,7 +152,7 @@ class _LegendDot extends StatelessWidget {
         const SizedBox(width: 6),
         Text(
           label,
-          style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+          style: TextStyle(fontSize: 11, color: context.colors.textSecondary),
         ),
       ],
     );

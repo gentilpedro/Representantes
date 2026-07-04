@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_palette.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../../core/widgets/status_chip.dart';
 import '../../domain/entities/reports_summary.dart';
@@ -56,11 +56,11 @@ class _ClientTile extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 16,
-            backgroundColor: AppColors.neutralSoft,
+            backgroundColor: context.colors.neutralSoft,
             child: Text(
               client.name.substring(0, 1),
-              style: const TextStyle(
-                color: AppColors.textSecondary,
+              style: TextStyle(
+                color: context.colors.textSecondary,
                 fontWeight: FontWeight.w700,
                 fontSize: 12,
               ),
@@ -80,9 +80,9 @@ class _ClientTile extends StatelessWidget {
                 ),
                 Text(
                   'Volume total: ${AppFormatters.currency(client.volume)}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
-                    color: AppColors.textMuted,
+                    color: context.colors.textMuted,
                   ),
                 ),
               ],
@@ -91,11 +91,11 @@ class _ClientTile extends StatelessWidget {
           StatusChip(
             label: isUp ? 'ALTA' : 'QUEDA',
             icon: isUp ? Icons.trending_up : Icons.trending_down,
-            foreground: isUp ? AppColors.success : AppColors.error,
-            background: isUp ? AppColors.successSoft : AppColors.errorSoft,
+            foreground: isUp ? context.colors.success : context.colors.error,
+            background: isUp ? context.colors.successSoft : context.colors.errorSoft,
           ),
           const SizedBox(width: 4),
-          const Icon(Icons.chevron_right, size: 18, color: AppColors.textMuted),
+          Icon(Icons.chevron_right, size: 18, color: context.colors.textMuted),
         ],
       ),
     );

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_palette.dart';
 import '../../../../core/widgets/responsive_content.dart';
 import '../../domain/entities/app_notification.dart';
 import '../providers/notifications_providers.dart';
@@ -66,8 +66,8 @@ class NotificationsScreen extends ConsumerWidget {
             ),
             Expanded(
               child: notificationsAsync.when(
-                loading: () => const Center(
-                  child: CircularProgressIndicator(color: AppColors.primary),
+                loading: () => Center(
+                  child: CircularProgressIndicator(color: context.colors.primary),
                 ),
                 error: (error, _) => Center(
                   child: Text(
@@ -95,12 +95,12 @@ class NotificationsScreen extends ConsumerWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text(
+                            Text(
                               'RECENTES',
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w700,
-                                color: AppColors.textMuted,
+                                color: context.colors.textMuted,
                               ),
                             ),
                             Container(
@@ -109,14 +109,14 @@ class NotificationsScreen extends ConsumerWidget {
                                 vertical: 3,
                               ),
                               decoration: BoxDecoration(
-                                color: AppColors.neutralSoft,
+                                color: context.colors.neutralSoft,
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: Text(
                                 '${recent.length} Itens',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 10,
-                                  color: AppColors.textSecondary,
+                                  color: context.colors.textSecondary,
                                 ),
                               ),
                             ),
@@ -135,12 +135,12 @@ class NotificationsScreen extends ConsumerWidget {
                       ],
                       if (older.isNotEmpty) ...[
                         const SizedBox(height: 8),
-                        const Text(
+                        Text(
                           'ANTERIORES',
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w700,
-                            color: AppColors.textMuted,
+                            color: context.colors.textMuted,
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -185,11 +185,11 @@ class _FilterChip extends ConsumerWidget {
       selected: selected,
       onSelected: (_) =>
           ref.read(notificationFilterProvider.notifier).state = value,
-      selectedColor: AppColors.primary,
-      backgroundColor: AppColors.surface,
-      side: const BorderSide(color: AppColors.border),
+      selectedColor: context.colors.primary,
+      backgroundColor: context.colors.surface,
+      side: BorderSide(color: context.colors.border),
       labelStyle: TextStyle(
-        color: selected ? Colors.white : AppColors.textPrimary,
+        color: selected ? Colors.white : context.colors.textPrimary,
         fontWeight: FontWeight.w600,
         fontSize: 13,
       ),

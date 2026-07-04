@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_palette.dart';
 import '../../../../core/widgets/status_chip.dart';
 import '../../domain/entities/app_notification.dart';
 
@@ -14,22 +14,22 @@ class NotificationTile extends StatelessWidget {
   final AppNotification notification;
   final VoidCallback onTap;
 
-  (IconData, Color, String) get _categoryMeta {
+  (IconData, Color, String) _categoryMeta(BuildContext context) {
     switch (notification.category) {
       case NotificationCategory.order:
-        return (Icons.shopping_cart_outlined, AppColors.primary, 'PEDIDO');
+        return (Icons.shopping_cart_outlined, context.colors.primary, 'PEDIDO');
       case NotificationCategory.promotion:
-        return (Icons.sell_outlined, AppColors.warning, 'PROMOÇÃO');
+        return (Icons.sell_outlined, context.colors.warning, 'PROMOÇÃO');
       case NotificationCategory.announcement:
-        return (Icons.campaign_outlined, AppColors.textSecondary, 'COMUNICADO');
+        return (Icons.campaign_outlined, context.colors.textSecondary, 'COMUNICADO');
       case NotificationCategory.launch:
-        return (Icons.inventory_2_outlined, AppColors.success, 'LANÇAMENTO');
+        return (Icons.inventory_2_outlined, context.colors.success, 'LANÇAMENTO');
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final (icon, color, label) = _categoryMeta;
+    final (icon, color, label) = _categoryMeta(context);
 
     return InkWell(
       onTap: onTap,
@@ -37,10 +37,10 @@ class NotificationTile extends StatelessWidget {
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
           color: notification.isRead
-              ? AppColors.surface
-              : AppColors.primarySoft,
+              ? context.colors.surface
+              : context.colors.primarySoft,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AppColors.border),
+          border: Border.all(color: context.colors.border),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -73,9 +73,9 @@ class NotificationTile extends StatelessWidget {
                       const Spacer(),
                       Text(
                         notification.timeLabel,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 11,
-                          color: AppColors.textMuted,
+                          color: context.colors.textMuted,
                         ),
                       ),
                     ],
@@ -93,18 +93,18 @@ class NotificationTile extends StatelessWidget {
                     notification.message,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
-                      color: AppColors.textSecondary,
+                      color: context.colors.textSecondary,
                       height: 1.3,
                     ),
                   ),
                   if (notification.isUrgent) ...[
                     const SizedBox(height: 6),
-                    const StatusChip(
+                    StatusChip(
                       label: 'Urgente',
                       foreground: Colors.white,
-                      background: AppColors.error,
+                      background: context.colors.error,
                       filled: true,
                     ),
                   ],
@@ -112,10 +112,10 @@ class NotificationTile extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 6),
-            const Icon(
+            Icon(
               Icons.chevron_right,
               size: 18,
-              color: AppColors.textMuted,
+              color: context.colors.textMuted,
             ),
           ],
         ),

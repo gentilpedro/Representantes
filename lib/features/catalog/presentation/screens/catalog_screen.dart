@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/app_routes.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_palette.dart';
 import '../../../../core/widgets/responsive_content.dart';
 import '../../../orders/presentation/providers/new_order_providers.dart';
 import '../providers/catalog_providers.dart';
@@ -37,8 +37,8 @@ class CatalogScreen extends ConsumerWidget {
                   top: 8,
                   child: Container(
                     padding: const EdgeInsets.all(3),
-                    decoration: const BoxDecoration(
-                      color: AppColors.error,
+                    decoration: BoxDecoration(
+                      color: context.colors.error,
                       shape: BoxShape.circle,
                     ),
                     child: Text(
@@ -82,7 +82,7 @@ class CatalogScreen extends ConsumerWidget {
                       const SizedBox(width: 8),
                       Container(
                         decoration: BoxDecoration(
-                          border: Border.all(color: AppColors.border),
+                          border: Border.all(color: context.colors.border),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: IconButton(
@@ -106,13 +106,13 @@ class CatalogScreen extends ConsumerWidget {
                                         .read(catalogCategoryProvider.notifier)
                                         .state =
                                     c,
-                            selectedColor: AppColors.primary,
-                            backgroundColor: AppColors.surface,
-                            side: const BorderSide(color: AppColors.border),
+                            selectedColor: context.colors.primary,
+                            backgroundColor: context.colors.surface,
+                            side: BorderSide(color: context.colors.border),
                             labelStyle: TextStyle(
                               color: category == c
                                   ? Colors.white
-                                  : AppColors.textPrimary,
+                                  : context.colors.textPrimary,
                               fontWeight: FontWeight.w600,
                               fontSize: 13,
                             ),
@@ -130,8 +130,8 @@ class CatalogScreen extends ConsumerWidget {
             ),
             Expanded(
               child: productsAsync.when(
-                loading: () => const Center(
-                  child: CircularProgressIndicator(color: AppColors.primary),
+                loading: () => Center(
+                  child: CircularProgressIndicator(color: context.colors.primary),
                 ),
                 error: (error, _) => Center(
                   child: Text('Não foi possível carregar o catálogo.\n$error'),

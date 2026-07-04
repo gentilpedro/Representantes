@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/app_routes.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_palette.dart';
 import '../../../../core/widgets/responsive_content.dart';
+import '../providers/auth_providers.dart';
 
 class _PasswordRequirement {
   const _PasswordRequirement(this.label, this.isMet);
@@ -32,22 +34,24 @@ final _passwordRequirements = <_PasswordRequirement>[
   ),
 ];
 
-/// Último passo do fluxo de "Primeiro Acesso": define a senha da conta.
-/// Protótipo — não persiste nada de verdade, apenas simula o cadastro e
-/// devolve o representante para o Login (que aceita qualquer credencial).
-class CreatePasswordScreen extends StatefulWidget {
-  const CreatePasswordScreen({super.key});
+/// Último passo do fluxo de "Primeiro Acesso": define a senha da conta via
+/// `POST /api/auth/first-access/activate`, que já devolve uma sessão
+/// autenticada — o redirect do [GoRouter] leva direto ao dashboard.
+class CreatePasswordScreen extends ConsumerStatefulWidget {
+  const CreatePasswordScreen({super.key, required this.identifier});
+
+  final String identifier;
 
   @override
-  State<CreatePasswordScreen> createState() => _CreatePasswordScreenState();
+  ConsumerState<CreatePasswordScreen> createState() =>
+      _CreatePasswordScreenState();
 }
 
-class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
+class _CreatePasswordScreenState extends ConsumerState<CreatePasswordScreen> {
   final _passwordController = TextEditingController();
   final _confirmController = TextEditingController();
   bool _obscurePassword = true;
   bool _obscureConfirm = true;
-  bool _isSaving = false;
 
   @override
   void dispose() {
@@ -63,21 +67,29 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
       _confirmController.text.isNotEmpty &&
       _confirmController.text == _passwordController.text;
 
-  bool get _canSave => _allRequirementsMet && _passwordsMatch && !_isSaving;
+  bool _canSave(bool isLoading) =>
+      _allRequirementsMet && _passwordsMatch && !isLoading;
 
   Future<void> _save() async {
-    setState(() => _isSaving = true);
-    await Future.delayed(const Duration(milliseconds: 900));
-    if (!mounted) return;
-    setState(() => _isSaving = false);
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Senha criada! Faça login para continuar.')),
-    );
-    context.go(AppRoutes.login);
+    await ref
+        .read(authControllerProvider.notifier)
+        .activateAccount(
+          identifier: widget.identifier,
+          password: _passwordController.text,
+        );
+
+    final state = ref.read(authControllerProvider);
+    if (state.hasError && mounted) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(state.error.toString())));
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final isLoading = ref.watch(authControllerProvider).isLoading;
+
     return Scaffold(
       appBar: AppBar(title: const Text('Criar Senha')),
       body: ResponsiveContent(
@@ -85,12 +97,12 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(24, 24, 24, 24),
           children: [
-            const Text(
+            Text(
               'Para garantir a segurança dos seus dados, crie uma senha '
               'forte seguindo os critérios abaixo.',
               style: TextStyle(
                 fontSize: 13,
-                color: AppColors.textSecondary,
+                color: context.colors.textSecondary,
                 height: 1.4,
               ),
             ),
@@ -150,19 +162,19 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
             Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: AppColors.neutralSoft,
+                color: context.colors.neutralSoft,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'REQUISITOS DE SEGURANÇA',
                     style: TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.w700,
                       letterSpacing: 0.4,
-                      color: AppColors.textMuted,
+                      color: context.colors.textMuted,
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -179,8 +191,8 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
             ),
             const SizedBox(height: 28),
             ElevatedButton(
-              onPressed: _canSave ? _save : null,
-              child: _isSaving
+              onPressed: _canSave(isLoading) ? _save : null,
+              child: isLoading
                   ? const SizedBox(
                       width: 22,
                       height: 22,
@@ -218,7 +230,7 @@ class _RequirementRow extends StatelessWidget {
         Icon(
           isMet ? Icons.check_circle : Icons.circle_outlined,
           size: 15,
-          color: isMet ? AppColors.success : AppColors.textMuted,
+          color: isMet ? context.colors.success : context.colors.textMuted,
         ),
         const SizedBox(width: 8),
         Expanded(
@@ -226,7 +238,9 @@ class _RequirementRow extends StatelessWidget {
             label,
             style: TextStyle(
               fontSize: 12,
-              color: isMet ? AppColors.textPrimary : AppColors.textMuted,
+              color: isMet
+                  ? context.colors.textPrimary
+                  : context.colors.textMuted,
               fontWeight: isMet ? FontWeight.w600 : FontWeight.w400,
             ),
           ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_palette.dart';
 import '../../../../core/theme/chart_colors.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../domain/entities/reports_summary.dart';
@@ -26,9 +26,9 @@ class TopProductsChart extends StatelessWidget {
               'Produtos Mais Vendidos',
               style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
             ),
-            const Text(
+            Text(
               'Volume financeiro por SKU',
-              style: TextStyle(fontSize: 11, color: AppColors.textMuted),
+              style: TextStyle(fontSize: 11, color: context.colors.textMuted),
             ),
             const SizedBox(height: 16),
             for (var i = 0; i < products.length; i++) ...[
@@ -68,17 +68,17 @@ class _ProductBar extends StatelessWidget {
           children: [
             Text(
               product.name,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
+                color: context.colors.textPrimary,
               ),
             ),
             Text(
               AppFormatters.currency(product.amount),
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 11,
-                color: AppColors.textSecondary,
+                color: context.colors.textSecondary,
               ),
             ),
           ],
@@ -90,7 +90,7 @@ class _ProductBar extends StatelessWidget {
             builder: (context, constraints) {
               return Stack(
                 children: [
-                  Container(height: 10, color: AppColors.neutralSoft),
+                  Container(height: 10, color: context.colors.neutralSoft),
                   Container(
                     height: 10,
                     width: constraints.maxWidth * fraction.clamp(0, 1),

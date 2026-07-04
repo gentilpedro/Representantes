@@ -7,4 +7,6 @@ abstract class ClientsRepository {
   Future<List<ClientListItem>> fetchClients();
 
   Future<ClientDetail> fetchClientDetail(String clientId);
+
+  Future<void> toggleFavorite(String clientId, bool isFavorite);
 }

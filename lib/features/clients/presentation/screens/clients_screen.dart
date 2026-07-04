@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/app_routes.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_palette.dart';
 import '../../../../core/widgets/responsive_content.dart';
 import '../../../orders/presentation/providers/new_order_providers.dart';
 import '../providers/clients_providers.dart';
@@ -91,8 +91,8 @@ class ClientsScreen extends ConsumerWidget {
             ),
             Expanded(
               child: clientsAsync.when(
-                loading: () => const Center(
-                  child: CircularProgressIndicator(color: AppColors.primary),
+                loading: () => Center(
+                  child: CircularProgressIndicator(color: context.colors.primary),
                 ),
                 error: (error, _) => Center(
                   child: Text('Não foi possível carregar os clientes.\n$error'),
@@ -111,9 +111,9 @@ class ClientsScreen extends ConsumerWidget {
                         children: [
                           Text(
                             'Exibindo ${clients.length} clientes',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 12,
-                              color: AppColors.textSecondary,
+                              color: context.colors.textSecondary,
                             ),
                           ),
                         ],
@@ -133,23 +133,23 @@ class ClientsScreen extends ConsumerWidget {
                                   AppRoutes.clientDetail(client.id),
                                 ),
                           onToggleFavorite: () {
-                            final overrides = {
-                              ...ref.read(favoriteOverridesProvider),
-                            };
-                            overrides[client.id] = !client.isFavorite;
-                            ref.read(favoriteOverridesProvider.notifier).state =
-                                overrides;
+                            ref
+                                .read(clientsRepositoryProvider)
+                                .toggleFavorite(client.id, !client.isFavorite)
+                                .then((_) {
+                                  ref.invalidate(clientsListProvider);
+                                });
                           },
                         ),
                         const SizedBox(height: 12),
                       ],
                       const SizedBox(height: 8),
-                      const Text(
+                      Text(
                         'Fim da lista. Use a busca para encontrar outros clientes na base.',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 11,
-                          color: AppColors.textMuted,
+                          color: context.colors.textMuted,
                         ),
                       ),
                     ],
@@ -194,11 +194,11 @@ class _FilterChip extends ConsumerWidget {
       label: Text(label),
       selected: selected,
       onSelected: (_) => ref.read(clientFilterProvider.notifier).state = value,
-      selectedColor: AppColors.primary,
-      backgroundColor: AppColors.surface,
-      side: const BorderSide(color: AppColors.border),
+      selectedColor: context.colors.primary,
+      backgroundColor: context.colors.surface,
+      side: BorderSide(color: context.colors.border),
       labelStyle: TextStyle(
-        color: selected ? Colors.white : AppColors.textPrimary,
+        color: selected ? Colors.white : context.colors.textPrimary,
         fontWeight: FontWeight.w600,
         fontSize: 13,
       ),

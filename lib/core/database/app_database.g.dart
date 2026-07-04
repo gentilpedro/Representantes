@@ -231,16 +231,966 @@ class SyncMetadataTableCompanion
   }
 }
 
+class $PendingOrdersTableTable extends PendingOrdersTable
+    with TableInfo<$PendingOrdersTableTable, PendingOrdersTableData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PendingOrdersTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _clientIdMeta = const VerificationMeta(
+    'clientId',
+  );
+  @override
+  late final GeneratedColumn<String> clientId = GeneratedColumn<String>(
+    'client_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _clientNameMeta = const VerificationMeta(
+    'clientName',
+  );
+  @override
+  late final GeneratedColumn<String> clientName = GeneratedColumn<String>(
+    'client_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _notesMeta = const VerificationMeta('notes');
+  @override
+  late final GeneratedColumn<String> notes = GeneratedColumn<String>(
+    'notes',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _totalMeta = const VerificationMeta('total');
+  @override
+  late final GeneratedColumn<double> total = GeneratedColumn<double>(
+    'total',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    clientId,
+    clientName,
+    notes,
+    total,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'pending_orders_table';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<PendingOrdersTableData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('client_id')) {
+      context.handle(
+        _clientIdMeta,
+        clientId.isAcceptableOrUnknown(data['client_id']!, _clientIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_clientIdMeta);
+    }
+    if (data.containsKey('client_name')) {
+      context.handle(
+        _clientNameMeta,
+        clientName.isAcceptableOrUnknown(data['client_name']!, _clientNameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_clientNameMeta);
+    }
+    if (data.containsKey('notes')) {
+      context.handle(
+        _notesMeta,
+        notes.isAcceptableOrUnknown(data['notes']!, _notesMeta),
+      );
+    }
+    if (data.containsKey('total')) {
+      context.handle(
+        _totalMeta,
+        total.isAcceptableOrUnknown(data['total']!, _totalMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_totalMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  PendingOrdersTableData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PendingOrdersTableData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      clientId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}client_id'],
+      )!,
+      clientName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}client_name'],
+      )!,
+      notes: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}notes'],
+      ),
+      total: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}total'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $PendingOrdersTableTable createAlias(String alias) {
+    return $PendingOrdersTableTable(attachedDatabase, alias);
+  }
+}
+
+class PendingOrdersTableData extends DataClass
+    implements Insertable<PendingOrdersTableData> {
+  final String id;
+  final String clientId;
+  final String clientName;
+  final String? notes;
+  final double total;
+  final DateTime createdAt;
+  const PendingOrdersTableData({
+    required this.id,
+    required this.clientId,
+    required this.clientName,
+    this.notes,
+    required this.total,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['client_id'] = Variable<String>(clientId);
+    map['client_name'] = Variable<String>(clientName);
+    if (!nullToAbsent || notes != null) {
+      map['notes'] = Variable<String>(notes);
+    }
+    map['total'] = Variable<double>(total);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  PendingOrdersTableCompanion toCompanion(bool nullToAbsent) {
+    return PendingOrdersTableCompanion(
+      id: Value(id),
+      clientId: Value(clientId),
+      clientName: Value(clientName),
+      notes: notes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(notes),
+      total: Value(total),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory PendingOrdersTableData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PendingOrdersTableData(
+      id: serializer.fromJson<String>(json['id']),
+      clientId: serializer.fromJson<String>(json['clientId']),
+      clientName: serializer.fromJson<String>(json['clientName']),
+      notes: serializer.fromJson<String?>(json['notes']),
+      total: serializer.fromJson<double>(json['total']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'clientId': serializer.toJson<String>(clientId),
+      'clientName': serializer.toJson<String>(clientName),
+      'notes': serializer.toJson<String?>(notes),
+      'total': serializer.toJson<double>(total),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  PendingOrdersTableData copyWith({
+    String? id,
+    String? clientId,
+    String? clientName,
+    Value<String?> notes = const Value.absent(),
+    double? total,
+    DateTime? createdAt,
+  }) => PendingOrdersTableData(
+    id: id ?? this.id,
+    clientId: clientId ?? this.clientId,
+    clientName: clientName ?? this.clientName,
+    notes: notes.present ? notes.value : this.notes,
+    total: total ?? this.total,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  PendingOrdersTableData copyWithCompanion(PendingOrdersTableCompanion data) {
+    return PendingOrdersTableData(
+      id: data.id.present ? data.id.value : this.id,
+      clientId: data.clientId.present ? data.clientId.value : this.clientId,
+      clientName: data.clientName.present
+          ? data.clientName.value
+          : this.clientName,
+      notes: data.notes.present ? data.notes.value : this.notes,
+      total: data.total.present ? data.total.value : this.total,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PendingOrdersTableData(')
+          ..write('id: $id, ')
+          ..write('clientId: $clientId, ')
+          ..write('clientName: $clientName, ')
+          ..write('notes: $notes, ')
+          ..write('total: $total, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, clientId, clientName, notes, total, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PendingOrdersTableData &&
+          other.id == this.id &&
+          other.clientId == this.clientId &&
+          other.clientName == this.clientName &&
+          other.notes == this.notes &&
+          other.total == this.total &&
+          other.createdAt == this.createdAt);
+}
+
+class PendingOrdersTableCompanion
+    extends UpdateCompanion<PendingOrdersTableData> {
+  final Value<String> id;
+  final Value<String> clientId;
+  final Value<String> clientName;
+  final Value<String?> notes;
+  final Value<double> total;
+  final Value<DateTime> createdAt;
+  final Value<int> rowid;
+  const PendingOrdersTableCompanion({
+    this.id = const Value.absent(),
+    this.clientId = const Value.absent(),
+    this.clientName = const Value.absent(),
+    this.notes = const Value.absent(),
+    this.total = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  PendingOrdersTableCompanion.insert({
+    required String id,
+    required String clientId,
+    required String clientName,
+    this.notes = const Value.absent(),
+    required double total,
+    required DateTime createdAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       clientId = Value(clientId),
+       clientName = Value(clientName),
+       total = Value(total),
+       createdAt = Value(createdAt);
+  static Insertable<PendingOrdersTableData> custom({
+    Expression<String>? id,
+    Expression<String>? clientId,
+    Expression<String>? clientName,
+    Expression<String>? notes,
+    Expression<double>? total,
+    Expression<DateTime>? createdAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (clientId != null) 'client_id': clientId,
+      if (clientName != null) 'client_name': clientName,
+      if (notes != null) 'notes': notes,
+      if (total != null) 'total': total,
+      if (createdAt != null) 'created_at': createdAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  PendingOrdersTableCompanion copyWith({
+    Value<String>? id,
+    Value<String>? clientId,
+    Value<String>? clientName,
+    Value<String?>? notes,
+    Value<double>? total,
+    Value<DateTime>? createdAt,
+    Value<int>? rowid,
+  }) {
+    return PendingOrdersTableCompanion(
+      id: id ?? this.id,
+      clientId: clientId ?? this.clientId,
+      clientName: clientName ?? this.clientName,
+      notes: notes ?? this.notes,
+      total: total ?? this.total,
+      createdAt: createdAt ?? this.createdAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (clientId.present) {
+      map['client_id'] = Variable<String>(clientId.value);
+    }
+    if (clientName.present) {
+      map['client_name'] = Variable<String>(clientName.value);
+    }
+    if (notes.present) {
+      map['notes'] = Variable<String>(notes.value);
+    }
+    if (total.present) {
+      map['total'] = Variable<double>(total.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PendingOrdersTableCompanion(')
+          ..write('id: $id, ')
+          ..write('clientId: $clientId, ')
+          ..write('clientName: $clientName, ')
+          ..write('notes: $notes, ')
+          ..write('total: $total, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $PendingOrderItemsTableTable extends PendingOrderItemsTable
+    with TableInfo<$PendingOrderItemsTableTable, PendingOrderItemsTableData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PendingOrderItemsTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _orderIdMeta = const VerificationMeta(
+    'orderId',
+  );
+  @override
+  late final GeneratedColumn<String> orderId = GeneratedColumn<String>(
+    'order_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _productIdMeta = const VerificationMeta(
+    'productId',
+  );
+  @override
+  late final GeneratedColumn<String> productId = GeneratedColumn<String>(
+    'product_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _productNameMeta = const VerificationMeta(
+    'productName',
+  );
+  @override
+  late final GeneratedColumn<String> productName = GeneratedColumn<String>(
+    'product_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _productSkuMeta = const VerificationMeta(
+    'productSku',
+  );
+  @override
+  late final GeneratedColumn<String> productSku = GeneratedColumn<String>(
+    'product_sku',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _unitPriceMeta = const VerificationMeta(
+    'unitPrice',
+  );
+  @override
+  late final GeneratedColumn<double> unitPrice = GeneratedColumn<double>(
+    'unit_price',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _quantityMeta = const VerificationMeta(
+    'quantity',
+  );
+  @override
+  late final GeneratedColumn<int> quantity = GeneratedColumn<int>(
+    'quantity',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _discountPercentMeta = const VerificationMeta(
+    'discountPercent',
+  );
+  @override
+  late final GeneratedColumn<double> discountPercent = GeneratedColumn<double>(
+    'discount_percent',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    orderId,
+    productId,
+    productName,
+    productSku,
+    unitPrice,
+    quantity,
+    discountPercent,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'pending_order_items_table';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<PendingOrderItemsTableData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('order_id')) {
+      context.handle(
+        _orderIdMeta,
+        orderId.isAcceptableOrUnknown(data['order_id']!, _orderIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_orderIdMeta);
+    }
+    if (data.containsKey('product_id')) {
+      context.handle(
+        _productIdMeta,
+        productId.isAcceptableOrUnknown(data['product_id']!, _productIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_productIdMeta);
+    }
+    if (data.containsKey('product_name')) {
+      context.handle(
+        _productNameMeta,
+        productName.isAcceptableOrUnknown(
+          data['product_name']!,
+          _productNameMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_productNameMeta);
+    }
+    if (data.containsKey('product_sku')) {
+      context.handle(
+        _productSkuMeta,
+        productSku.isAcceptableOrUnknown(data['product_sku']!, _productSkuMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_productSkuMeta);
+    }
+    if (data.containsKey('unit_price')) {
+      context.handle(
+        _unitPriceMeta,
+        unitPrice.isAcceptableOrUnknown(data['unit_price']!, _unitPriceMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_unitPriceMeta);
+    }
+    if (data.containsKey('quantity')) {
+      context.handle(
+        _quantityMeta,
+        quantity.isAcceptableOrUnknown(data['quantity']!, _quantityMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_quantityMeta);
+    }
+    if (data.containsKey('discount_percent')) {
+      context.handle(
+        _discountPercentMeta,
+        discountPercent.isAcceptableOrUnknown(
+          data['discount_percent']!,
+          _discountPercentMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_discountPercentMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  PendingOrderItemsTableData map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PendingOrderItemsTableData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      orderId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}order_id'],
+      )!,
+      productId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}product_id'],
+      )!,
+      productName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}product_name'],
+      )!,
+      productSku: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}product_sku'],
+      )!,
+      unitPrice: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}unit_price'],
+      )!,
+      quantity: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}quantity'],
+      )!,
+      discountPercent: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}discount_percent'],
+      )!,
+    );
+  }
+
+  @override
+  $PendingOrderItemsTableTable createAlias(String alias) {
+    return $PendingOrderItemsTableTable(attachedDatabase, alias);
+  }
+}
+
+class PendingOrderItemsTableData extends DataClass
+    implements Insertable<PendingOrderItemsTableData> {
+  final String id;
+  final String orderId;
+  final String productId;
+  final String productName;
+  final String productSku;
+  final double unitPrice;
+  final int quantity;
+  final double discountPercent;
+  const PendingOrderItemsTableData({
+    required this.id,
+    required this.orderId,
+    required this.productId,
+    required this.productName,
+    required this.productSku,
+    required this.unitPrice,
+    required this.quantity,
+    required this.discountPercent,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['order_id'] = Variable<String>(orderId);
+    map['product_id'] = Variable<String>(productId);
+    map['product_name'] = Variable<String>(productName);
+    map['product_sku'] = Variable<String>(productSku);
+    map['unit_price'] = Variable<double>(unitPrice);
+    map['quantity'] = Variable<int>(quantity);
+    map['discount_percent'] = Variable<double>(discountPercent);
+    return map;
+  }
+
+  PendingOrderItemsTableCompanion toCompanion(bool nullToAbsent) {
+    return PendingOrderItemsTableCompanion(
+      id: Value(id),
+      orderId: Value(orderId),
+      productId: Value(productId),
+      productName: Value(productName),
+      productSku: Value(productSku),
+      unitPrice: Value(unitPrice),
+      quantity: Value(quantity),
+      discountPercent: Value(discountPercent),
+    );
+  }
+
+  factory PendingOrderItemsTableData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PendingOrderItemsTableData(
+      id: serializer.fromJson<String>(json['id']),
+      orderId: serializer.fromJson<String>(json['orderId']),
+      productId: serializer.fromJson<String>(json['productId']),
+      productName: serializer.fromJson<String>(json['productName']),
+      productSku: serializer.fromJson<String>(json['productSku']),
+      unitPrice: serializer.fromJson<double>(json['unitPrice']),
+      quantity: serializer.fromJson<int>(json['quantity']),
+      discountPercent: serializer.fromJson<double>(json['discountPercent']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'orderId': serializer.toJson<String>(orderId),
+      'productId': serializer.toJson<String>(productId),
+      'productName': serializer.toJson<String>(productName),
+      'productSku': serializer.toJson<String>(productSku),
+      'unitPrice': serializer.toJson<double>(unitPrice),
+      'quantity': serializer.toJson<int>(quantity),
+      'discountPercent': serializer.toJson<double>(discountPercent),
+    };
+  }
+
+  PendingOrderItemsTableData copyWith({
+    String? id,
+    String? orderId,
+    String? productId,
+    String? productName,
+    String? productSku,
+    double? unitPrice,
+    int? quantity,
+    double? discountPercent,
+  }) => PendingOrderItemsTableData(
+    id: id ?? this.id,
+    orderId: orderId ?? this.orderId,
+    productId: productId ?? this.productId,
+    productName: productName ?? this.productName,
+    productSku: productSku ?? this.productSku,
+    unitPrice: unitPrice ?? this.unitPrice,
+    quantity: quantity ?? this.quantity,
+    discountPercent: discountPercent ?? this.discountPercent,
+  );
+  PendingOrderItemsTableData copyWithCompanion(
+    PendingOrderItemsTableCompanion data,
+  ) {
+    return PendingOrderItemsTableData(
+      id: data.id.present ? data.id.value : this.id,
+      orderId: data.orderId.present ? data.orderId.value : this.orderId,
+      productId: data.productId.present ? data.productId.value : this.productId,
+      productName: data.productName.present
+          ? data.productName.value
+          : this.productName,
+      productSku: data.productSku.present
+          ? data.productSku.value
+          : this.productSku,
+      unitPrice: data.unitPrice.present ? data.unitPrice.value : this.unitPrice,
+      quantity: data.quantity.present ? data.quantity.value : this.quantity,
+      discountPercent: data.discountPercent.present
+          ? data.discountPercent.value
+          : this.discountPercent,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PendingOrderItemsTableData(')
+          ..write('id: $id, ')
+          ..write('orderId: $orderId, ')
+          ..write('productId: $productId, ')
+          ..write('productName: $productName, ')
+          ..write('productSku: $productSku, ')
+          ..write('unitPrice: $unitPrice, ')
+          ..write('quantity: $quantity, ')
+          ..write('discountPercent: $discountPercent')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    orderId,
+    productId,
+    productName,
+    productSku,
+    unitPrice,
+    quantity,
+    discountPercent,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PendingOrderItemsTableData &&
+          other.id == this.id &&
+          other.orderId == this.orderId &&
+          other.productId == this.productId &&
+          other.productName == this.productName &&
+          other.productSku == this.productSku &&
+          other.unitPrice == this.unitPrice &&
+          other.quantity == this.quantity &&
+          other.discountPercent == this.discountPercent);
+}
+
+class PendingOrderItemsTableCompanion
+    extends UpdateCompanion<PendingOrderItemsTableData> {
+  final Value<String> id;
+  final Value<String> orderId;
+  final Value<String> productId;
+  final Value<String> productName;
+  final Value<String> productSku;
+  final Value<double> unitPrice;
+  final Value<int> quantity;
+  final Value<double> discountPercent;
+  final Value<int> rowid;
+  const PendingOrderItemsTableCompanion({
+    this.id = const Value.absent(),
+    this.orderId = const Value.absent(),
+    this.productId = const Value.absent(),
+    this.productName = const Value.absent(),
+    this.productSku = const Value.absent(),
+    this.unitPrice = const Value.absent(),
+    this.quantity = const Value.absent(),
+    this.discountPercent = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  PendingOrderItemsTableCompanion.insert({
+    required String id,
+    required String orderId,
+    required String productId,
+    required String productName,
+    required String productSku,
+    required double unitPrice,
+    required int quantity,
+    required double discountPercent,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       orderId = Value(orderId),
+       productId = Value(productId),
+       productName = Value(productName),
+       productSku = Value(productSku),
+       unitPrice = Value(unitPrice),
+       quantity = Value(quantity),
+       discountPercent = Value(discountPercent);
+  static Insertable<PendingOrderItemsTableData> custom({
+    Expression<String>? id,
+    Expression<String>? orderId,
+    Expression<String>? productId,
+    Expression<String>? productName,
+    Expression<String>? productSku,
+    Expression<double>? unitPrice,
+    Expression<int>? quantity,
+    Expression<double>? discountPercent,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (orderId != null) 'order_id': orderId,
+      if (productId != null) 'product_id': productId,
+      if (productName != null) 'product_name': productName,
+      if (productSku != null) 'product_sku': productSku,
+      if (unitPrice != null) 'unit_price': unitPrice,
+      if (quantity != null) 'quantity': quantity,
+      if (discountPercent != null) 'discount_percent': discountPercent,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  PendingOrderItemsTableCompanion copyWith({
+    Value<String>? id,
+    Value<String>? orderId,
+    Value<String>? productId,
+    Value<String>? productName,
+    Value<String>? productSku,
+    Value<double>? unitPrice,
+    Value<int>? quantity,
+    Value<double>? discountPercent,
+    Value<int>? rowid,
+  }) {
+    return PendingOrderItemsTableCompanion(
+      id: id ?? this.id,
+      orderId: orderId ?? this.orderId,
+      productId: productId ?? this.productId,
+      productName: productName ?? this.productName,
+      productSku: productSku ?? this.productSku,
+      unitPrice: unitPrice ?? this.unitPrice,
+      quantity: quantity ?? this.quantity,
+      discountPercent: discountPercent ?? this.discountPercent,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (orderId.present) {
+      map['order_id'] = Variable<String>(orderId.value);
+    }
+    if (productId.present) {
+      map['product_id'] = Variable<String>(productId.value);
+    }
+    if (productName.present) {
+      map['product_name'] = Variable<String>(productName.value);
+    }
+    if (productSku.present) {
+      map['product_sku'] = Variable<String>(productSku.value);
+    }
+    if (unitPrice.present) {
+      map['unit_price'] = Variable<double>(unitPrice.value);
+    }
+    if (quantity.present) {
+      map['quantity'] = Variable<int>(quantity.value);
+    }
+    if (discountPercent.present) {
+      map['discount_percent'] = Variable<double>(discountPercent.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PendingOrderItemsTableCompanion(')
+          ..write('id: $id, ')
+          ..write('orderId: $orderId, ')
+          ..write('productId: $productId, ')
+          ..write('productName: $productName, ')
+          ..write('productSku: $productSku, ')
+          ..write('unitPrice: $unitPrice, ')
+          ..write('quantity: $quantity, ')
+          ..write('discountPercent: $discountPercent, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $SyncMetadataTableTable syncMetadataTable =
       $SyncMetadataTableTable(this);
+  late final $PendingOrdersTableTable pendingOrdersTable =
+      $PendingOrdersTableTable(this);
+  late final $PendingOrderItemsTableTable pendingOrderItemsTable =
+      $PendingOrderItemsTableTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities => [syncMetadataTable];
+  List<DatabaseSchemaEntity> get allSchemaEntities => [
+    syncMetadataTable,
+    pendingOrdersTable,
+    pendingOrderItemsTable,
+  ];
 }
 
 typedef $$SyncMetadataTableTableCreateCompanionBuilder =
@@ -401,10 +1351,533 @@ typedef $$SyncMetadataTableTableProcessedTableManager =
       SyncMetadataTableData,
       PrefetchHooks Function()
     >;
+typedef $$PendingOrdersTableTableCreateCompanionBuilder =
+    PendingOrdersTableCompanion Function({
+      required String id,
+      required String clientId,
+      required String clientName,
+      Value<String?> notes,
+      required double total,
+      required DateTime createdAt,
+      Value<int> rowid,
+    });
+typedef $$PendingOrdersTableTableUpdateCompanionBuilder =
+    PendingOrdersTableCompanion Function({
+      Value<String> id,
+      Value<String> clientId,
+      Value<String> clientName,
+      Value<String?> notes,
+      Value<double> total,
+      Value<DateTime> createdAt,
+      Value<int> rowid,
+    });
+
+class $$PendingOrdersTableTableFilterComposer
+    extends Composer<_$AppDatabase, $PendingOrdersTableTable> {
+  $$PendingOrdersTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get clientId => $composableBuilder(
+    column: $table.clientId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get clientName => $composableBuilder(
+    column: $table.clientName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get notes => $composableBuilder(
+    column: $table.notes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get total => $composableBuilder(
+    column: $table.total,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$PendingOrdersTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $PendingOrdersTableTable> {
+  $$PendingOrdersTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get clientId => $composableBuilder(
+    column: $table.clientId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get clientName => $composableBuilder(
+    column: $table.clientName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get notes => $composableBuilder(
+    column: $table.notes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get total => $composableBuilder(
+    column: $table.total,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$PendingOrdersTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $PendingOrdersTableTable> {
+  $$PendingOrdersTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get clientId =>
+      $composableBuilder(column: $table.clientId, builder: (column) => column);
+
+  GeneratedColumn<String> get clientName => $composableBuilder(
+    column: $table.clientName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get notes =>
+      $composableBuilder(column: $table.notes, builder: (column) => column);
+
+  GeneratedColumn<double> get total =>
+      $composableBuilder(column: $table.total, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+}
+
+class $$PendingOrdersTableTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $PendingOrdersTableTable,
+          PendingOrdersTableData,
+          $$PendingOrdersTableTableFilterComposer,
+          $$PendingOrdersTableTableOrderingComposer,
+          $$PendingOrdersTableTableAnnotationComposer,
+          $$PendingOrdersTableTableCreateCompanionBuilder,
+          $$PendingOrdersTableTableUpdateCompanionBuilder,
+          (
+            PendingOrdersTableData,
+            BaseReferences<
+              _$AppDatabase,
+              $PendingOrdersTableTable,
+              PendingOrdersTableData
+            >,
+          ),
+          PendingOrdersTableData,
+          PrefetchHooks Function()
+        > {
+  $$PendingOrdersTableTableTableManager(
+    _$AppDatabase db,
+    $PendingOrdersTableTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PendingOrdersTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PendingOrdersTableTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$PendingOrdersTableTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> clientId = const Value.absent(),
+                Value<String> clientName = const Value.absent(),
+                Value<String?> notes = const Value.absent(),
+                Value<double> total = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => PendingOrdersTableCompanion(
+                id: id,
+                clientId: clientId,
+                clientName: clientName,
+                notes: notes,
+                total: total,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String clientId,
+                required String clientName,
+                Value<String?> notes = const Value.absent(),
+                required double total,
+                required DateTime createdAt,
+                Value<int> rowid = const Value.absent(),
+              }) => PendingOrdersTableCompanion.insert(
+                id: id,
+                clientId: clientId,
+                clientName: clientName,
+                notes: notes,
+                total: total,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$PendingOrdersTableTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $PendingOrdersTableTable,
+      PendingOrdersTableData,
+      $$PendingOrdersTableTableFilterComposer,
+      $$PendingOrdersTableTableOrderingComposer,
+      $$PendingOrdersTableTableAnnotationComposer,
+      $$PendingOrdersTableTableCreateCompanionBuilder,
+      $$PendingOrdersTableTableUpdateCompanionBuilder,
+      (
+        PendingOrdersTableData,
+        BaseReferences<
+          _$AppDatabase,
+          $PendingOrdersTableTable,
+          PendingOrdersTableData
+        >,
+      ),
+      PendingOrdersTableData,
+      PrefetchHooks Function()
+    >;
+typedef $$PendingOrderItemsTableTableCreateCompanionBuilder =
+    PendingOrderItemsTableCompanion Function({
+      required String id,
+      required String orderId,
+      required String productId,
+      required String productName,
+      required String productSku,
+      required double unitPrice,
+      required int quantity,
+      required double discountPercent,
+      Value<int> rowid,
+    });
+typedef $$PendingOrderItemsTableTableUpdateCompanionBuilder =
+    PendingOrderItemsTableCompanion Function({
+      Value<String> id,
+      Value<String> orderId,
+      Value<String> productId,
+      Value<String> productName,
+      Value<String> productSku,
+      Value<double> unitPrice,
+      Value<int> quantity,
+      Value<double> discountPercent,
+      Value<int> rowid,
+    });
+
+class $$PendingOrderItemsTableTableFilterComposer
+    extends Composer<_$AppDatabase, $PendingOrderItemsTableTable> {
+  $$PendingOrderItemsTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get orderId => $composableBuilder(
+    column: $table.orderId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get productId => $composableBuilder(
+    column: $table.productId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get productName => $composableBuilder(
+    column: $table.productName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get productSku => $composableBuilder(
+    column: $table.productSku,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get unitPrice => $composableBuilder(
+    column: $table.unitPrice,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get quantity => $composableBuilder(
+    column: $table.quantity,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get discountPercent => $composableBuilder(
+    column: $table.discountPercent,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$PendingOrderItemsTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $PendingOrderItemsTableTable> {
+  $$PendingOrderItemsTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get orderId => $composableBuilder(
+    column: $table.orderId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get productId => $composableBuilder(
+    column: $table.productId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get productName => $composableBuilder(
+    column: $table.productName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get productSku => $composableBuilder(
+    column: $table.productSku,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get unitPrice => $composableBuilder(
+    column: $table.unitPrice,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get quantity => $composableBuilder(
+    column: $table.quantity,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get discountPercent => $composableBuilder(
+    column: $table.discountPercent,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$PendingOrderItemsTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $PendingOrderItemsTableTable> {
+  $$PendingOrderItemsTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get orderId =>
+      $composableBuilder(column: $table.orderId, builder: (column) => column);
+
+  GeneratedColumn<String> get productId =>
+      $composableBuilder(column: $table.productId, builder: (column) => column);
+
+  GeneratedColumn<String> get productName => $composableBuilder(
+    column: $table.productName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get productSku => $composableBuilder(
+    column: $table.productSku,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get unitPrice =>
+      $composableBuilder(column: $table.unitPrice, builder: (column) => column);
+
+  GeneratedColumn<int> get quantity =>
+      $composableBuilder(column: $table.quantity, builder: (column) => column);
+
+  GeneratedColumn<double> get discountPercent => $composableBuilder(
+    column: $table.discountPercent,
+    builder: (column) => column,
+  );
+}
+
+class $$PendingOrderItemsTableTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $PendingOrderItemsTableTable,
+          PendingOrderItemsTableData,
+          $$PendingOrderItemsTableTableFilterComposer,
+          $$PendingOrderItemsTableTableOrderingComposer,
+          $$PendingOrderItemsTableTableAnnotationComposer,
+          $$PendingOrderItemsTableTableCreateCompanionBuilder,
+          $$PendingOrderItemsTableTableUpdateCompanionBuilder,
+          (
+            PendingOrderItemsTableData,
+            BaseReferences<
+              _$AppDatabase,
+              $PendingOrderItemsTableTable,
+              PendingOrderItemsTableData
+            >,
+          ),
+          PendingOrderItemsTableData,
+          PrefetchHooks Function()
+        > {
+  $$PendingOrderItemsTableTableTableManager(
+    _$AppDatabase db,
+    $PendingOrderItemsTableTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PendingOrderItemsTableTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$PendingOrderItemsTableTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$PendingOrderItemsTableTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> orderId = const Value.absent(),
+                Value<String> productId = const Value.absent(),
+                Value<String> productName = const Value.absent(),
+                Value<String> productSku = const Value.absent(),
+                Value<double> unitPrice = const Value.absent(),
+                Value<int> quantity = const Value.absent(),
+                Value<double> discountPercent = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => PendingOrderItemsTableCompanion(
+                id: id,
+                orderId: orderId,
+                productId: productId,
+                productName: productName,
+                productSku: productSku,
+                unitPrice: unitPrice,
+                quantity: quantity,
+                discountPercent: discountPercent,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String orderId,
+                required String productId,
+                required String productName,
+                required String productSku,
+                required double unitPrice,
+                required int quantity,
+                required double discountPercent,
+                Value<int> rowid = const Value.absent(),
+              }) => PendingOrderItemsTableCompanion.insert(
+                id: id,
+                orderId: orderId,
+                productId: productId,
+                productName: productName,
+                productSku: productSku,
+                unitPrice: unitPrice,
+                quantity: quantity,
+                discountPercent: discountPercent,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$PendingOrderItemsTableTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $PendingOrderItemsTableTable,
+      PendingOrderItemsTableData,
+      $$PendingOrderItemsTableTableFilterComposer,
+      $$PendingOrderItemsTableTableOrderingComposer,
+      $$PendingOrderItemsTableTableAnnotationComposer,
+      $$PendingOrderItemsTableTableCreateCompanionBuilder,
+      $$PendingOrderItemsTableTableUpdateCompanionBuilder,
+      (
+        PendingOrderItemsTableData,
+        BaseReferences<
+          _$AppDatabase,
+          $PendingOrderItemsTableTable,
+          PendingOrderItemsTableData
+        >,
+      ),
+      PendingOrderItemsTableData,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
   $AppDatabaseManager(this._db);
   $$SyncMetadataTableTableTableManager get syncMetadataTable =>
       $$SyncMetadataTableTableTableManager(_db, _db.syncMetadataTable);
+  $$PendingOrdersTableTableTableManager get pendingOrdersTable =>
+      $$PendingOrdersTableTableTableManager(_db, _db.pendingOrdersTable);
+  $$PendingOrderItemsTableTableTableManager get pendingOrderItemsTable =>
+      $$PendingOrderItemsTableTableTableManager(
+        _db,
+        _db.pendingOrderItemsTable,
+      );
 }
