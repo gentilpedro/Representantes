@@ -51,6 +51,51 @@ class ApiClientsRepository implements ClientsRepository {
     }
   }
 
+  @override
+  Future<ClientDetail> createClient({
+    required String name,
+    required String cnpj,
+    required String phone,
+    required String mobile,
+    required String email,
+    required double creditLimit,
+    required DeliveryAddress deliveryAddress,
+    String? notes,
+  }) async {
+    try {
+      final response = await _apiClient.dio.post<Map<String, dynamic>>(
+        '/api/clients',
+        data: {
+          'name': name,
+          'cnpj': cnpj,
+          'phone': phone,
+          'mobile': mobile,
+          'email': email,
+          'creditLimit': creditLimit,
+          'deliveryAddress': {
+            'street': deliveryAddress.street,
+            'district': deliveryAddress.district,
+            'city': deliveryAddress.city,
+            'state': deliveryAddress.state,
+          },
+          'notes': notes,
+        },
+      );
+      return _clientDetailFromJson(response.data!);
+    } on DioException catch (e) {
+      throw ClientsException(_createClientErrorMessage(e));
+    }
+  }
+
+  String _createClientErrorMessage(DioException e) {
+    if (e.response?.statusCode == 409) {
+      return 'Já existe um cliente cadastrado com esse CNPJ.';
+    }
+    final data = e.response?.data;
+    if (data is String && data.isNotEmpty) return data;
+    return 'Não foi possível cadastrar o cliente. Tente novamente.';
+  }
+
   String _errorMessage(DioException e) {
     if (e.response?.statusCode == 404) {
       return 'Cliente não encontrado.';

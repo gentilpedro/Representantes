@@ -5,18 +5,19 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_palette.dart';
 import '../../../../core/widgets/responsive_content.dart';
-import '../../../orders/presentation/providers/new_order_providers.dart';
+import '../../domain/entities/client_summary.dart';
 import '../providers/clients_providers.dart';
 import '../widgets/client_card.dart';
 
 /// Quando [pickMode] é true, a tela funciona como um seletor: tocar num
-/// cliente o define como "cliente selecionado" do pedido em construção
-/// ([newOrderControllerProvider]) e volta para a tela anterior, em vez de
-/// abrir o Detalhe do Cliente.
+/// cliente chama [onClientPicked] com o cliente escolhido e volta para a
+/// tela anterior, em vez de abrir o Detalhe do Cliente. Cada fluxo que usa
+/// o seletor (Novo Pedido, Nova Visita...) passa seu próprio callback.
 class ClientsScreen extends ConsumerWidget {
-  const ClientsScreen({super.key, this.pickMode = false});
+  const ClientsScreen({super.key, this.pickMode = false, this.onClientPicked});
 
   final bool pickMode;
+  final ValueChanged<ClientSummary>? onClientPicked;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -124,9 +125,7 @@ class ClientsScreen extends ConsumerWidget {
                           client: client,
                           onTap: pickMode
                               ? () {
-                                  ref
-                                      .read(newOrderControllerProvider.notifier)
-                                      .selectClient(client.toSummary());
+                                  onClientPicked?.call(client.toSummary());
                                   context.pop();
                                 }
                               : () => context.push(
@@ -163,13 +162,7 @@ class ClientsScreen extends ConsumerWidget {
       floatingActionButton: pickMode
           ? null
           : FloatingActionButton(
-              onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text(
-                    'Cadastro de novo cliente ainda não implementado.',
-                  ),
-                ),
-              ),
+              onPressed: () => context.push(AppRoutes.newClient),
               child: const Icon(Icons.person_add_alt_1_outlined),
             ),
     );

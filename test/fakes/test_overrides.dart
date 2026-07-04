@@ -12,6 +12,8 @@ import 'package:josapar_representantes/features/clients/domain/repositories/clie
 import 'package:josapar_representantes/features/clients/presentation/providers/clients_providers.dart';
 import 'package:josapar_representantes/features/dashboard/domain/repositories/dashboard_repository.dart';
 import 'package:josapar_representantes/features/dashboard/presentation/providers/dashboard_providers.dart';
+import 'package:josapar_representantes/features/leads/domain/repositories/leads_repository.dart';
+import 'package:josapar_representantes/features/leads/presentation/providers/leads_providers.dart';
 import 'package:josapar_representantes/features/notifications/domain/repositories/notifications_repository.dart';
 import 'package:josapar_representantes/features/notifications/presentation/providers/notifications_providers.dart';
 import 'package:josapar_representantes/features/orders/domain/repositories/orders_repository.dart';
@@ -29,6 +31,7 @@ import 'fake_catalog_repository.dart';
 import 'fake_clients_repository.dart';
 import 'fake_connectivity_service.dart';
 import 'fake_dashboard_repository.dart';
+import 'fake_leads_repository.dart';
 import 'fake_location_service.dart';
 import 'fake_notifications_repository.dart';
 import 'fake_orders_repository.dart';
@@ -58,6 +61,7 @@ List<Override> testOverrides({
   ProfileRepository? profileRepository,
   SyncRepository? syncRepository,
   LocationService? locationService,
+  LeadsRepository? leadsRepository,
 }) {
   final orders = ordersRepository ?? FakeOrdersRepository();
 
@@ -95,6 +99,9 @@ List<Override> testOverrides({
     ),
     locationServiceProvider.overrideWithValue(
       locationService ?? FakeLocationService(),
+    ),
+    leadsRepositoryProvider.overrideWithValue(
+      leadsRepository ?? FakeLeadsRepository(),
     ),
   ];
 }

@@ -24,6 +24,11 @@ class MoreScreen extends StatelessWidget {
         route: AppRoutes.reports,
       ),
       _MoreItem(
+        icon: Icons.person_search_outlined,
+        label: 'Leads',
+        route: AppRoutes.leads,
+      ),
+      _MoreItem(
         icon: Icons.sync_outlined,
         label: 'Sincronização',
         route: AppRoutes.sync,

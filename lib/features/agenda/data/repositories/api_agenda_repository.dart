@@ -51,6 +51,33 @@ class ApiAgendaRepository implements AgendaRepository {
     }
   }
 
+  @override
+  Future<void> createVisit({
+    required String clientId,
+    required DateTime scheduledAtUtc,
+    String? notes,
+  }) async {
+    try {
+      await _apiClient.dio.post<Map<String, dynamic>>(
+        '/api/visits',
+        data: {
+          'clientId': clientId,
+          'scheduledAtUtc': scheduledAtUtc.toUtc().toIso8601String(),
+          'notes': notes,
+        },
+      );
+    } on DioException catch (e) {
+      throw AgendaException(_createVisitErrorMessage(e));
+    }
+  }
+
+  String _createVisitErrorMessage(DioException e) {
+    final data = e.response?.data;
+    if (data is String && data.isNotEmpty) return data;
+    if (e.response?.statusCode == 404) return 'Cliente não encontrado.';
+    return 'Não foi possível agendar a visita. Tente novamente.';
+  }
+
   /// `yyyy-MM-dd` — formato exigido pelo binding de `DateOnly` da API.
   String _isoDate(DateTime date) {
     String pad(int n) => n.toString().padLeft(2, '0');

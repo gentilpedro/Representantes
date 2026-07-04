@@ -16,10 +16,18 @@ class AppRoutes {
 
   static const newOrder = '/orders/new';
   static const selectClient = '/orders/new/select-client';
+  static const newClient = '/clients/new';
+  static const newVisit = '/agenda/new';
+  static const selectClientForVisit = '/agenda/new/select-client';
   static const catalog = '/catalog';
   static String productDetail(String productId) => '/catalog/$productId';
   static const notifications = '/notifications';
   static const profile = '/more/profile';
   static const sync = '/more/sync';
   static const reports = '/more/reports';
+
+  static const leads = '/leads';
+  static String leadDetail(String leadId) => '/leads/$leadId';
+  static const newLead = '/leads/new';
+  static String editLead(String leadId) => '/leads/$leadId/edit';
 }

@@ -8,4 +8,10 @@ abstract class AgendaRepository {
   Future<void> checkIn(String visitId, {double? latitude, double? longitude});
 
   Future<void> checkOut(String visitId, String notes);
+
+  Future<void> createVisit({
+    required String clientId,
+    required DateTime scheduledAtUtc,
+    String? notes,
+  });
 }

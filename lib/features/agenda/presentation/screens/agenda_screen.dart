@@ -144,6 +144,10 @@ class AgendaScreen extends ConsumerWidget {
           ),
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => context.push(AppRoutes.newVisit),
+        child: const Icon(Icons.add),
+      ),
     );
   }
 }

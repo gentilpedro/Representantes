@@ -40,6 +40,20 @@ class AgendaController extends AsyncNotifier<DailyRoute> {
     ref.invalidateSelf();
     await future;
   }
+
+  Future<void> createVisit({
+    required String clientId,
+    required DateTime scheduledAtUtc,
+    String? notes,
+  }) async {
+    await ref.read(agendaRepositoryProvider).createVisit(
+      clientId: clientId,
+      scheduledAtUtc: scheduledAtUtc,
+      notes: notes,
+    );
+    ref.invalidateSelf();
+    await future;
+  }
 }
 
 final agendaControllerProvider =

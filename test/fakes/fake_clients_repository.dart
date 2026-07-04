@@ -162,4 +162,47 @@ class FakeClientsRepository implements ClientsRepository {
     if (index == -1) throw ClientsException('Cliente não encontrado.');
     _clients[index] = _clients[index].copyWith(isFavorite: isFavorite);
   }
+
+  @override
+  Future<ClientDetail> createClient({
+    required String name,
+    required String cnpj,
+    required String phone,
+    required String mobile,
+    required String email,
+    required double creditLimit,
+    required DeliveryAddress deliveryAddress,
+    String? notes,
+  }) async {
+    final id = 'c${_clients.length + 1}';
+    _clients.add(
+      ClientListItem(
+        id: id,
+        code: 'CLI-${10000 + _clients.length}',
+        name: name,
+        cnpj: cnpj,
+        city: deliveryAddress.city,
+        state: deliveryAddress.state,
+        tier: ClientTier.regular,
+        lastOrderDateLabel: 'Sem pedidos',
+        creditLimit: creditLimit,
+      ),
+    );
+
+    return ClientDetail(
+      id: id,
+      name: name,
+      code: 'CLI-${10000 + _clients.length - 1}',
+      cnpj: cnpj,
+      tier: ClientTier.regular,
+      phone: phone,
+      mobile: mobile,
+      email: email,
+      creditLimit: creditLimit,
+      creditUsedPercent: 0,
+      deliveryAddress: deliveryAddress,
+      orderHistory: const [],
+      notes: notes,
+    );
+  }
 }

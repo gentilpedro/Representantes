@@ -9,4 +9,17 @@ abstract class ClientsRepository {
   Future<ClientDetail> fetchClientDetail(String clientId);
 
   Future<void> toggleFavorite(String clientId, bool isFavorite);
+
+  /// Cadastra um cliente novo pelo app. O servidor gera o `code` e inicia o
+  /// cliente como `Regular`, sem favorito e sem uso de crédito.
+  Future<ClientDetail> createClient({
+    required String name,
+    required String cnpj,
+    required String phone,
+    required String mobile,
+    required String email,
+    required double creditLimit,
+    required DeliveryAddress deliveryAddress,
+    String? notes,
+  });
 }

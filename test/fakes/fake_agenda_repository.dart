@@ -1,9 +1,14 @@
+import 'package:josapar_representantes/core/utils/formatters.dart';
 import 'package:josapar_representantes/features/agenda/domain/entities/daily_route.dart';
 import 'package:josapar_representantes/features/agenda/domain/entities/scheduled_visit.dart';
 import 'package:josapar_representantes/features/agenda/domain/repositories/agenda_repository.dart';
 
 class FakeAgendaRepository implements AgendaRepository {
-  FakeAgendaRepository() : _visits = {for (final v in _seedVisits) v.id: v};
+  FakeAgendaRepository({this._clientNames = const {}})
+    : _visits = {for (final v in _seedVisits) v.id: v};
+
+  final Map<String, String> _clientNames;
+  int _sequence = 0;
 
   static const _seedVisits = <ScheduledVisit>[
     ScheduledVisit(
@@ -67,5 +72,23 @@ class FakeAgendaRepository implements AgendaRepository {
     final visit = _visits[visitId];
     if (visit == null) return;
     _visits[visitId] = visit.copyWith(status: VisitStatus.completed, notes: notes);
+  }
+
+  @override
+  Future<void> createVisit({
+    required String clientId,
+    required DateTime scheduledAtUtc,
+    String? notes,
+  }) async {
+    _sequence++;
+    final id = 'v-new-$_sequence';
+    _visits[id] = ScheduledVisit(
+      id: id,
+      clientName: _clientNames[clientId] ?? 'Cliente $clientId',
+      scheduledTimeLabel: AppFormatters.timeOfDay(scheduledAtUtc.toLocal()),
+      address: 'Endereço a confirmar',
+      status: VisitStatus.pending,
+      notes: notes ?? '',
+    );
   }
 }

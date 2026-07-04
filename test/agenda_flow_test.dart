@@ -57,5 +57,31 @@ void main() {
     // Agora duas visitas têm botão "Check-out" (a que já estava em andamento + a recém check-in).
     expect(find.text('Check-out'), findsNWidgets(2));
     expect(find.text('Check-in'), findsOneWidget);
+
+    // Deixa o SnackBar do check-in sumir — senão ele ocupa a área do FAB.
+    await tester.pump(const Duration(seconds: 5));
+    await tester.pumpAndSettle();
+
+    // Agenda uma visita nova pelo FAB.
+    await tester.tap(find.byIcon(Icons.add));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Nova Visita'), findsOneWidget);
+    await tester.tap(find.text('Alterar'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Selecionar Cliente'), findsOneWidget);
+    await tester.tap(find.text('Atacado Boa Vista'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Atacado Boa Vista'), findsOneWidget);
+    await tester.tap(find.text('Salvar'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Visita agendada com sucesso.'), findsOneWidget);
+    await tester.pump(const Duration(seconds: 5));
+
+    // A visita nova entra como pendente — mais um botão "Check-in" na lista.
+    expect(find.text('Check-in'), findsNWidgets(2));
   });
 }

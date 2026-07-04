@@ -95,6 +95,11 @@ class DashboardScreen extends ConsumerWidget {
                         label: 'Catálogo',
                         onTap: () => context.push(AppRoutes.catalog),
                       ),
+                      QuickAccessItem(
+                        icon: Icons.person_search_outlined,
+                        label: 'Leads',
+                        onTap: () => context.push(AppRoutes.leads),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 22),
