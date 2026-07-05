@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/app_routes.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_palette.dart';
 import '../../../../core/widgets/responsive_content.dart';
 import '../providers/auth_providers.dart';
 import '../widgets/auth_brand_panel.dart';
@@ -63,20 +63,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          const Text(
+                          Text(
                             'Acessar Sistema',
                             style: TextStyle(
                               fontSize: 26,
                               fontWeight: FontWeight.w800,
-                              color: AppColors.textPrimary,
+                              color: context.colors.textPrimary,
                             ),
                           ),
                           const SizedBox(height: 6),
-                          const Text(
+                          Text(
                             'Entre com seu código de representante para continuar.',
                             style: TextStyle(
                               fontSize: 13,
-                              color: AppColors.textSecondary,
+                              color: context.colors.textSecondary,
                             ),
                           ),
                           const SizedBox(height: 28),
@@ -223,34 +223,39 @@ class _BrandMark extends StatelessWidget {
         Container(
           width: 72,
           height: 72,
-          decoration: BoxDecoration(
-            color: AppColors.textPrimary,
-            borderRadius: BorderRadius.circular(18),
+          padding: const EdgeInsets.all(14),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.all(Radius.circular(18)),
           ),
-          child: const Icon(Icons.bolt, color: Colors.white, size: 36),
+          child: Image.asset('assets/branding/app_icon.png'),
         ),
         const SizedBox(height: 20),
-        const Text(
+        Text(
           'SOLUÇÕES EM VENDAS CORPORATIVAS',
           textAlign: TextAlign.center,
           style: TextStyle(
             fontWeight: FontWeight.w700,
             fontSize: 14,
             letterSpacing: 0.3,
-            color: AppColors.textPrimary,
+            color: context.colors.textPrimary,
           ),
         ),
         const SizedBox(height: 6),
-        const Row(
+        Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.shield_outlined, size: 13, color: AppColors.textMuted),
-            SizedBox(width: 4),
+            Icon(
+              Icons.shield_outlined,
+              size: 13,
+              color: context.colors.textMuted,
+            ),
+            const SizedBox(width: 4),
             Text(
               'CONEXÃO SEGURA JWT ATIVA',
               style: TextStyle(
                 fontSize: 11,
-                color: AppColors.textMuted,
+                color: context.colors.textMuted,
                 letterSpacing: 0.3,
               ),
             ),
@@ -272,30 +277,33 @@ class _SystemStatusFooter extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
           decoration: BoxDecoration(
-            border: Border.all(color: AppColors.border),
+            border: Border.all(color: context.colors.border),
             borderRadius: BorderRadius.circular(30),
           ),
-          child: const Row(
+          child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.wifi, size: 15, color: AppColors.textSecondary),
-              SizedBox(width: 6),
+              Icon(Icons.wifi, size: 15, color: context.colors.textSecondary),
+              const SizedBox(width: 6),
               Text(
                 'SISTEMA ONLINE (SINCRO AUTOMÁTICA)',
-                style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                style: TextStyle(
+                  fontSize: 11,
+                  color: context.colors.textSecondary,
+                ),
               ),
             ],
           ),
         ),
         const SizedBox(height: 14),
-        const Text(
+        Text(
           'VERSÃO 2.4.0-BUILD-88',
-          style: TextStyle(fontSize: 11, color: AppColors.textMuted),
+          style: TextStyle(fontSize: 11, color: context.colors.textMuted),
         ),
         const SizedBox(height: 4),
-        const Text(
+        Text(
           '© 2024 Josapar S.A. Todos os direitos reservados.',
-          style: TextStyle(fontSize: 11, color: AppColors.textMuted),
+          style: TextStyle(fontSize: 11, color: context.colors.textMuted),
         ),
       ],
     );

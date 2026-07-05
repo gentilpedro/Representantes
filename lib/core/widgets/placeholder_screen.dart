@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../theme/app_colors.dart';
+import '../theme/app_palette.dart';
 
 /// Placeholder temporário para telas ainda não implementadas nesta etapa.
 /// Cada uma será substituída pelo conteúdo real na etapa correspondente do
@@ -20,11 +20,11 @@ class PlaceholderScreen extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 48, color: AppColors.textMuted),
+            Icon(icon, size: 48, color: context.colors.textMuted),
             const SizedBox(height: 12),
             Text(
               '$title — em construção',
-              style: const TextStyle(color: AppColors.textMuted),
+              style: TextStyle(color: context.colors.textMuted),
             ),
           ],
         ),

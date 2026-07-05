@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_palette.dart';
 import '../../../../core/widgets/status_chip.dart';
 import '../../domain/entities/sync_summary.dart';
 
@@ -20,12 +20,12 @@ class SyncQueueTile extends StatelessWidget {
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: AppColors.primarySoft,
+                color: context.colors.primarySoft,
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(
                 _iconFor(item.status),
-                color: AppColors.primary,
+                color: context.colors.primary,
                 size: 18,
               ),
             ),
@@ -43,9 +43,9 @@ class SyncQueueTile extends StatelessWidget {
                   ),
                   Text(
                     item.subtitle,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 11,
-                      color: AppColors.textMuted,
+                      color: context.colors.textMuted,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -57,14 +57,14 @@ class SyncQueueTile extends StatelessWidget {
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color: AppColors.neutralSoft,
+                          color: context.colors.neutralSoft,
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
                           item.tag,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 10,
-                            color: AppColors.textSecondary,
+                            color: context.colors.textSecondary,
                           ),
                         ),
                       ),
@@ -78,20 +78,20 @@ class SyncQueueTile extends StatelessWidget {
               children: [
                 Text(
                   item.timeLabel,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
-                    color: AppColors.textMuted,
+                    color: context.colors.textMuted,
                   ),
                 ),
                 const SizedBox(height: 6),
-                _statusChip(item.status),
+                _statusChip(context, item.status),
               ],
             ),
             const SizedBox(width: 4),
-            const Icon(
+            Icon(
               Icons.chevron_right,
               size: 18,
-              color: AppColors.textMuted,
+              color: context.colors.textMuted,
             ),
           ],
         ),
@@ -110,25 +110,25 @@ class SyncQueueTile extends StatelessWidget {
     }
   }
 
-  Widget _statusChip(QueueItemStatus status) {
+  Widget _statusChip(BuildContext context, QueueItemStatus status) {
     switch (status) {
       case QueueItemStatus.pending:
-        return const StatusChip(
+        return StatusChip(
           label: 'Pendente',
-          foreground: AppColors.warning,
-          background: AppColors.warningSoft,
+          foreground: context.colors.warning,
+          background: context.colors.warningSoft,
         );
       case QueueItemStatus.offline:
-        return const StatusChip(
+        return StatusChip(
           label: 'Offline',
-          foreground: AppColors.textSecondary,
-          background: AppColors.neutralSoft,
+          foreground: context.colors.textSecondary,
+          background: context.colors.neutralSoft,
         );
       case QueueItemStatus.queued:
-        return const StatusChip(
+        return StatusChip(
           label: 'Na Fila',
-          foreground: AppColors.primary,
-          background: AppColors.primarySoft,
+          foreground: context.colors.primary,
+          background: context.colors.primarySoft,
         );
     }
   }

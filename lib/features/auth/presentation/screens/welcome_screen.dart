@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/providers/core_providers.dart';
 import '../../../../core/router/app_routes.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_palette.dart';
 import '../../../../core/widgets/responsive_content.dart';
 import '../widgets/auth_brand_panel.dart';
 
@@ -58,31 +58,32 @@ class WelcomeScreen extends ConsumerWidget {
         child: Container(
           width: 88,
           height: 88,
+          padding: const EdgeInsets.all(18),
           decoration: const BoxDecoration(
-            color: AppColors.primary,
+            color: Colors.white,
             shape: BoxShape.circle,
           ),
-          child: const Icon(Icons.bolt, color: Colors.white, size: 44),
+          child: Image.asset('assets/branding/app_icon.png'),
         ),
       ),
       const SizedBox(height: 24),
-      const Text(
+      Text(
         'Bem-vindo à Josapar',
         textAlign: TextAlign.center,
         style: TextStyle(
           fontSize: 24,
           fontWeight: FontWeight.w800,
-          color: AppColors.textPrimary,
+          color: context.colors.textPrimary,
         ),
       ),
       const SizedBox(height: 10),
-      const Text(
+      Text(
         'Acesse sua conta para gerenciar seus pedidos e acompanhar nossas '
         'novidades com agilidade.',
         textAlign: TextAlign.center,
         style: TextStyle(
           fontSize: 14,
-          color: AppColors.textSecondary,
+          color: context.colors.textSecondary,
           height: 1.4,
         ),
       ),
@@ -96,7 +97,7 @@ class WelcomeScreen extends ConsumerWidget {
       OutlinedButton.icon(
         onPressed: () => context.push(AppRoutes.firstAccess),
         style: OutlinedButton.styleFrom(
-          backgroundColor: AppColors.neutralSoft,
+          backgroundColor: context.colors.neutralSoft,
           side: BorderSide.none,
         ),
         icon: const Icon(Icons.person_add_alt_1_outlined, size: 18),
@@ -106,14 +107,14 @@ class WelcomeScreen extends ConsumerWidget {
       Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: AppColors.infoSoft,
+          color: context.colors.infoSoft,
           borderRadius: BorderRadius.circular(12),
         ),
-        child: const Row(
+        child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(Icons.info_outline, size: 18, color: AppColors.primary),
-            SizedBox(width: 10),
+            Icon(Icons.info_outline, size: 18, color: context.colors.primary),
+            const SizedBox(width: 10),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -123,16 +124,16 @@ class WelcomeScreen extends ConsumerWidget {
                     style: TextStyle(
                       fontWeight: FontWeight.w700,
                       fontSize: 13,
-                      color: AppColors.primaryDark,
+                      color: context.colors.primaryDark,
                     ),
                   ),
-                  SizedBox(height: 2),
+                  const SizedBox(height: 2),
                   Text(
                     'Você precisará do seu CPF ou CNPJ e do código de '
                     'cliente fornecido em sua última nota fiscal.',
                     style: TextStyle(
                       fontSize: 12,
-                      color: AppColors.primaryDark,
+                      color: context.colors.primaryDark,
                       height: 1.4,
                     ),
                   ),
@@ -172,7 +173,7 @@ class _StatusBar extends ConsumerWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             decoration: BoxDecoration(
-              color: AppColors.neutralSoft,
+              color: context.colors.neutralSoft,
               borderRadius: BorderRadius.circular(20),
             ),
             child: Row(
@@ -181,15 +182,15 @@ class _StatusBar extends ConsumerWidget {
                 Icon(
                   isOnline ? Icons.wifi : Icons.wifi_off,
                   size: 13,
-                  color: AppColors.textSecondary,
+                  color: context.colors.textSecondary,
                 ),
                 const SizedBox(width: 5),
                 Text(
                   isOnline ? 'ONLINE' : 'OFFLINE',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.w700,
-                    color: AppColors.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
                 ),
               ],
@@ -201,10 +202,10 @@ class _StatusBar extends ConsumerWidget {
                 onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Central de ajuda em breve.')),
                 ),
-                icon: const Icon(
+                icon: Icon(
                   Icons.help_outline,
                   size: 20,
-                  color: AppColors.textSecondary,
+                  color: context.colors.textSecondary,
                 ),
               ),
               IconButton(
@@ -213,10 +214,10 @@ class _StatusBar extends ConsumerWidget {
                     content: Text('Modo escuro ainda não disponível.'),
                   ),
                 ),
-                icon: const Icon(
+                icon: Icon(
                   Icons.dark_mode_outlined,
                   size: 20,
-                  color: AppColors.textSecondary,
+                  color: context.colors.textSecondary,
                 ),
               ),
               TextButton.icon(
@@ -225,14 +226,14 @@ class _StatusBar extends ConsumerWidget {
                     content: Text('Apenas Português (Brasil) disponível.'),
                   ),
                 ),
-                icon: const Icon(
+                icon: Icon(
                   Icons.public,
                   size: 16,
-                  color: AppColors.textSecondary,
+                  color: context.colors.textSecondary,
                 ),
                 label: const Text('PT-BR'),
                 style: TextButton.styleFrom(
-                  foregroundColor: AppColors.textSecondary,
+                  foregroundColor: context.colors.textSecondary,
                 ),
               ),
             ],
@@ -262,7 +263,7 @@ class _SecurityFooter extends StatelessWidget {
                   fontSize: 11,
                   fontWeight: FontWeight.w700,
                   letterSpacing: 0.5,
-                  color: AppColors.textMuted,
+                  color: context.colors.textMuted,
                 ),
               ),
             ),
@@ -272,8 +273,8 @@ class _SecurityFooter extends StatelessWidget {
         const SizedBox(height: 16),
         Container(
           padding: const EdgeInsets.symmetric(vertical: 14),
-          decoration: const BoxDecoration(
-            border: Border(top: BorderSide(color: AppColors.border)),
+          decoration: BoxDecoration(
+            border: Border(top: BorderSide(color: context.colors.border)),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -281,27 +282,30 @@ class _SecurityFooter extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Row(
+                  Row(
                     children: [
                       Icon(
                         Icons.shield_outlined,
                         size: 14,
-                        color: AppColors.textSecondary,
+                        color: context.colors.textSecondary,
                       ),
-                      SizedBox(width: 6),
+                      const SizedBox(width: 6),
                       Text(
                         'Josapar Segura',
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.textSecondary,
+                          color: context.colors.textSecondary,
                         ),
                       ),
                     ],
                   ),
-                  const Text(
+                  Text(
                     'v2.4.0-stable',
-                    style: TextStyle(fontSize: 11, color: AppColors.textMuted),
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: context.colors.textMuted,
+                    ),
                   ),
                 ],
               ),
@@ -320,9 +324,12 @@ class _SecurityFooter extends StatelessWidget {
                       style: TextStyle(fontSize: 12),
                     ),
                   ),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 8),
-                    child: Text('•', style: TextStyle(color: AppColors.border)),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: Text(
+                      '•',
+                      style: TextStyle(color: context.colors.border),
+                    ),
                   ),
                   TextButton(
                     onPressed: () {},

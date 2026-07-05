@@ -4,20 +4,20 @@ import '../../../../core/providers/core_providers.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../orders/domain/entities/order_summary.dart';
 import '../../../orders/presentation/providers/orders_providers.dart';
-import '../../data/repositories/mock_sync_repository.dart';
+import '../../data/repositories/api_sync_repository.dart';
 import '../../domain/entities/sync_summary.dart';
 import '../../domain/repositories/sync_repository.dart';
 
 final syncRepositoryProvider = Provider<SyncRepository>(
-  (ref) => MockSyncRepository(),
+  (ref) => ApiSyncRepository(ref.watch(apiClientProvider)),
 );
 
-/// Orquestra a fila de sincronização combinando os pedidos `pending` de
-/// verdade (vindos de `OrdersRepository`) com os itens de demonstração do
-/// `SyncRepository` (cadastros/check-ins). Também observa
-/// `connectivityStatusProvider` e dispara `syncNow()` sozinho assim que o
-/// dispositivo volta a ficar online — pedidos `draft` nunca entram nessa
-/// fila, então nunca são sincronizados automaticamente.
+/// Orquestra a fila de sincronização a partir dos pedidos `pending` de
+/// verdade (fila local no Drift, vinda de `OrdersRepository`) e do resumo
+/// real do servidor (`SyncRepository` → `GET /api/sync/summary`). Também
+/// observa `connectivityStatusProvider` e dispara `syncNow()` sozinho assim
+/// que o dispositivo volta a ficar online — pedidos `draft` nunca entram
+/// nessa fila, então nunca são sincronizados automaticamente.
 class SyncController extends AsyncNotifier<SyncSummary> {
   @override
   Future<SyncSummary> build() async {
@@ -65,17 +65,15 @@ class SyncController extends AsyncNotifier<SyncSummary> {
     );
   }
 
-  /// Envia toda a fila pendente (pedidos + itens de demonstração). Pode ser
-  /// disparado manualmente ("Sincronizar Agora") ou automaticamente pelo
-  /// listener de conectividade em [build].
+  /// Envia a fila local de pedidos pendentes pro servidor
+  /// (`POST /api/orders/batch-sync`). Pode ser disparado manualmente
+  /// ("Sincronizar Agora") ou automaticamente pelo listener de
+  /// conectividade em [build].
   Future<void> syncNow() async {
     if (state.isLoading) return;
     state = const AsyncLoading<SyncSummary>().copyWithPrevious(state);
     state = await AsyncValue.guard(() async {
-      final syncedOrders = await ref
-          .read(ordersRepositoryProvider)
-          .syncPendingOrders();
-      final base = await ref.read(syncRepositoryProvider).syncNow();
+      await ref.read(ordersRepositoryProvider).syncPendingOrders();
       // Só invalida se a tela de Pedidos estiver de fato montada e
       // observando — invalidar um provider `autoDispose` nunca lido cria e
       // descarta o elemento na hora, mas o `Future.delayed` interno
@@ -83,15 +81,9 @@ class SyncController extends AsyncNotifier<SyncSummary> {
       if (ref.exists(ordersListProvider)) {
         ref.invalidate(ordersListProvider);
       }
-      return SyncSummary(
-        isConnected: true,
-        lastUpdateLabel: base.lastUpdateLabel,
-        pendingCount: base.queue.length,
-        successCount: base.successCount + syncedOrders,
-        conflict: base.conflict,
-        queue: base.queue,
-        history: base.history,
-      );
+      // Recompõe do zero: `successCount` do `/api/sync/summary` já reflete
+      // o servidor pós-sync, e a fila local já foi limpa pelo sync acima.
+      return _composeSummary();
     });
   }
 }

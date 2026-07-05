@@ -1,15 +1,15 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../data/repositories/mock_agenda_repository.dart';
+import '../../../../core/providers/core_providers.dart';
+import '../../data/repositories/api_agenda_repository.dart';
 import '../../data/services/location_service.dart';
 import '../../domain/entities/daily_route.dart';
-import '../../domain/entities/scheduled_visit.dart';
 import '../../domain/repositories/agenda_repository.dart';
 
 DateTime _dateOnly(DateTime date) => DateTime(date.year, date.month, date.day);
 
 final agendaRepositoryProvider = Provider<AgendaRepository>(
-  (ref) => MockAgendaRepository(),
+  (ref) => ApiAgendaRepository(ref.watch(apiClientProvider)),
 );
 
 final locationServiceProvider = Provider<LocationService>(
@@ -27,56 +27,32 @@ class AgendaController extends AsyncNotifier<DailyRoute> {
     return ref.watch(agendaRepositoryProvider).fetchDailyRoute(date);
   }
 
-  void checkIn(String visitId, {required bool geoValidated}) {
-    final current = state.valueOrNull;
-    if (current == null) return;
-    state = AsyncData(
-      _updateVisit(
-        current,
-        visitId,
-        (v) => v.copyWith(
-          status: VisitStatus.inProgress,
-          isGeoValidated: geoValidated,
-        ),
-      ),
-    );
+  Future<void> checkIn(String visitId, {double? latitude, double? longitude}) async {
+    await ref
+        .read(agendaRepositoryProvider)
+        .checkIn(visitId, latitude: latitude, longitude: longitude);
+    ref.invalidateSelf();
+    await future;
   }
 
-  void checkOut(String visitId, String notes) {
-    final current = state.valueOrNull;
-    if (current == null) return;
-    state = AsyncData(
-      _updateVisit(
-        current,
-        visitId,
-        (v) => v.copyWith(status: VisitStatus.completed, notes: notes),
-      ),
-    );
+  Future<void> checkOut(String visitId, String notes) async {
+    await ref.read(agendaRepositoryProvider).checkOut(visitId, notes);
+    ref.invalidateSelf();
+    await future;
   }
 
-  void updateNotes(String visitId, String notes) {
-    final current = state.valueOrNull;
-    if (current == null) return;
-    state = AsyncData(
-      _updateVisit(current, visitId, (v) => v.copyWith(notes: notes)),
+  Future<void> createVisit({
+    required String clientId,
+    required DateTime scheduledAtUtc,
+    String? notes,
+  }) async {
+    await ref.read(agendaRepositoryProvider).createVisit(
+      clientId: clientId,
+      scheduledAtUtc: scheduledAtUtc,
+      notes: notes,
     );
-  }
-
-  DailyRoute _updateVisit(
-    DailyRoute route,
-    String visitId,
-    ScheduledVisit Function(ScheduledVisit) update,
-  ) {
-    return DailyRoute(
-      totalKm: route.totalKm,
-      estimatedDuration: route.estimatedDuration,
-      visitsPlanned: route.visitsPlanned,
-      routeTip: route.routeTip,
-      visits: [
-        for (final visit in route.visits)
-          if (visit.id == visitId) update(visit) else visit,
-      ],
-    );
+    ref.invalidateSelf();
+    await future;
   }
 }
 

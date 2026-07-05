@@ -49,36 +49,7 @@ class NewOrderState {
 class NewOrderController extends Notifier<NewOrderState> {
   @override
   NewOrderState build() {
-    return NewOrderState(
-      client: const ClientSummary(
-        id: '99423',
-        name: 'Supermercado Silva & Filhos Ltda',
-        cnpj: '12.345.678/0001-90',
-        code: '99423',
-        creditLimit: 15000,
-      ),
-      items: const [
-        CartItem(
-          productId: 'tio-joao-variedades',
-          name: 'Arroz Tio João Variedades 1kg',
-          sku: 'ARZ-001',
-          imageUrl:
-              'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=200',
-          unitPrice: 18.50,
-          quantity: 12,
-          discountPercent: 5,
-        ),
-        CartItem(
-          productId: 'feijao-meu-biju-preto',
-          name: 'Feijão Meu Biju Preto 1kg',
-          sku: 'FEJ-042',
-          imageUrl:
-              'https://images.unsplash.com/photo-1610725664285-7c57e6eea3f3?w=200',
-          unitPrice: 9.90,
-          quantity: 24,
-        ),
-      ],
-    );
+    return const NewOrderState(client: null, items: []);
   }
 
   void selectClient(ClientSummary client) {

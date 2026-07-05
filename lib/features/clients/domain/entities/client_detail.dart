@@ -51,6 +51,7 @@ class ClientDetail {
     required this.orderHistory,
     this.pendingInvoice,
     this.notes,
+    this.isFavorite = false,
   });
 
   final String id;
@@ -67,6 +68,7 @@ class ClientDetail {
   final List<ClientOrderHistoryItem> orderHistory;
   final PendingInvoice? pendingInvoice;
   final String? notes;
+  final bool isFavorite;
 
   double get creditAvailable => creditLimit * (1 - creditUsedPercent);
 }

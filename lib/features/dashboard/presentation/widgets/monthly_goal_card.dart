@@ -1,7 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_palette.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../domain/entities/dashboard_summary.dart';
 
@@ -34,11 +34,15 @@ class MonthlyGoalCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Row(
+                Row(
                   children: [
-                    Icon(Icons.show_chart, size: 18, color: AppColors.primary),
-                    SizedBox(width: 6),
-                    Text(
+                    Icon(
+                      Icons.show_chart,
+                      size: 18,
+                      color: context.colors.primary,
+                    ),
+                    const SizedBox(width: 6),
+                    const Text(
                       'Meta Mensal',
                       style: TextStyle(fontWeight: FontWeight.w700),
                     ),
@@ -46,8 +50,8 @@ class MonthlyGoalCard extends StatelessWidget {
                 ),
                 Text(
                   '${(percent * 100).toStringAsFixed(0)}% Atingido',
-                  style: const TextStyle(
-                    color: AppColors.success,
+                  style: TextStyle(
+                    color: context.colors.success,
                     fontWeight: FontWeight.w700,
                     fontSize: 12,
                   ),
@@ -60,8 +64,8 @@ class MonthlyGoalCard extends StatelessWidget {
               child: LinearProgressIndicator(
                 value: percent.clamp(0, 1),
                 minHeight: 8,
-                backgroundColor: AppColors.neutralSoft,
-                valueColor: const AlwaysStoppedAnimation(AppColors.primary),
+                backgroundColor: context.colors.neutralSoft,
+                valueColor: AlwaysStoppedAnimation(context.colors.primary),
               ),
             ),
             const SizedBox(height: 14),
@@ -110,9 +114,9 @@ class MonthlyGoalCard extends StatelessWidget {
                             padding: const EdgeInsets.only(top: 6),
                             child: Text(
                               series[index].monthLabel,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 11,
-                                color: AppColors.textSecondary,
+                                color: context.colors.textSecondary,
                               ),
                             ),
                           );
@@ -127,7 +131,7 @@ class MonthlyGoalCard extends StatelessWidget {
                         barRods: [
                           BarChartRodData(
                             toY: series[i].amount,
-                            color: AppColors.primary,
+                            color: context.colors.primary,
                             width: 18,
                             borderRadius: BorderRadius.circular(4),
                           ),
@@ -164,7 +168,7 @@ class _AmountLabel extends StatelessWidget {
       children: [
         Text(
           label,
-          style: const TextStyle(fontSize: 11, color: AppColors.textMuted),
+          style: TextStyle(fontSize: 11, color: context.colors.textMuted),
         ),
         const SizedBox(height: 2),
         Text(

@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_palette.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../domain/entities/product.dart';
 
@@ -29,21 +29,21 @@ class ProductCard extends StatelessWidget {
                     imageUrl: product.imageUrl,
                     fit: BoxFit.cover,
                     placeholder: (context, url) =>
-                        const ColoredBox(color: AppColors.neutralSoft),
-                    errorWidget: (context, url, error) => const ColoredBox(
-                      color: AppColors.neutralSoft,
+                        ColoredBox(color: context.colors.neutralSoft),
+                    errorWidget: (context, url, error) => ColoredBox(
+                      color: context.colors.neutralSoft,
                       child: Icon(
                         Icons.image_not_supported_outlined,
-                        color: AppColors.textMuted,
+                        color: context.colors.textMuted,
                       ),
                     ),
                   ),
                   if (product.badge == ProductBadge.offer)
-                    const _CornerBadge(label: 'OFERTA', color: AppColors.error),
+                    _CornerBadge(label: 'OFERTA', color: context.colors.error),
                   if (product.badge == ProductBadge.outOfStock)
-                    const _CornerBadge(
+                    _CornerBadge(
                       label: 'ESGOTADO',
-                      color: AppColors.textSecondary,
+                      color: context.colors.textSecondary,
                     ),
                   Positioned(
                     top: 6,
@@ -57,8 +57,8 @@ class ProductCard extends StatelessWidget {
                             : Icons.favorite_border,
                         size: 15,
                         color: product.isFavorite
-                            ? AppColors.error
-                            : AppColors.textMuted,
+                            ? context.colors.error
+                            : context.colors.textMuted,
                       ),
                     ),
                   ),
@@ -72,9 +72,9 @@ class ProductCard extends StatelessWidget {
                 children: [
                   Text(
                     product.brand,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 10,
-                      color: AppColors.primary,
+                      color: context.colors.primary,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -109,9 +109,9 @@ class ProductCard extends StatelessWidget {
                           child: Text(
                             AppFormatters.currency(product.originalPrice!),
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 11,
-                              color: AppColors.textMuted,
+                              color: context.colors.textMuted,
                               decoration: TextDecoration.lineThrough,
                             ),
                           ),
@@ -127,8 +127,8 @@ class ProductCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 10,
                       color: product.isOutOfStock
-                          ? AppColors.error
-                          : AppColors.textMuted,
+                          ? context.colors.error
+                          : context.colors.textMuted,
                     ),
                   ),
                 ],

@@ -11,11 +11,18 @@ import '../../features/auth/presentation/screens/splash_screen.dart';
 import '../../features/auth/presentation/screens/welcome_screen.dart';
 import '../../features/catalog/presentation/screens/catalog_screen.dart';
 import '../../features/catalog/presentation/screens/product_detail_screen.dart';
+import '../../features/agenda/presentation/providers/new_visit_providers.dart';
+import '../../features/agenda/presentation/screens/new_visit_screen.dart';
 import '../../features/clients/presentation/screens/client_detail_screen.dart';
 import '../../features/clients/presentation/screens/clients_screen.dart';
+import '../../features/clients/presentation/screens/new_client_screen.dart';
 import '../../features/dashboard/presentation/screens/dashboard_screen.dart';
+import '../../features/leads/presentation/screens/lead_detail_screen.dart';
+import '../../features/leads/presentation/screens/lead_form_screen.dart';
+import '../../features/leads/presentation/screens/leads_screen.dart';
 import '../../features/more/presentation/screens/more_screen.dart';
 import '../../features/notifications/presentation/screens/notifications_screen.dart';
+import '../../features/orders/presentation/providers/new_order_providers.dart';
 import '../../features/orders/presentation/screens/new_order_screen.dart';
 import '../../features/orders/presentation/screens/orders_screen.dart';
 import '../../features/profile/presentation/screens/profile_screen.dart';
@@ -86,7 +93,9 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         routes: [
           GoRoute(
             path: 'create-password',
-            builder: (context, state) => const CreatePasswordScreen(),
+            builder: (context, state) => CreatePasswordScreen(
+              identifier: state.uri.queryParameters['identifier'] ?? '',
+            ),
           ),
         ],
       ),
@@ -96,7 +105,53 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: AppRoutes.selectClient,
-        builder: (context, state) => const ClientsScreen(pickMode: true),
+        builder: (context, state) => Consumer(
+          builder: (context, ref, _) => ClientsScreen(
+            pickMode: true,
+            onClientPicked: (client) =>
+                ref.read(newOrderControllerProvider.notifier).selectClient(client),
+          ),
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.newClient,
+        builder: (context, state) => const NewClientScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.newVisit,
+        builder: (context, state) => const NewVisitScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.selectClientForVisit,
+        builder: (context, state) => Consumer(
+          builder: (context, ref, _) => ClientsScreen(
+            pickMode: true,
+            onClientPicked: (client) =>
+                ref.read(newVisitControllerProvider.notifier).selectClient(client),
+          ),
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.newLead,
+        builder: (context, state) => const LeadFormScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.leads,
+        builder: (context, state) => const LeadsScreen(),
+        routes: [
+          GoRoute(
+            path: ':leadId',
+            builder: (context, state) => LeadDetailScreen(
+              leadId: state.pathParameters['leadId']!,
+            ),
+          ),
+          GoRoute(
+            path: ':leadId/edit',
+            builder: (context, state) => LeadFormScreen(
+              editLeadId: state.pathParameters['leadId']!,
+            ),
+          ),
+        ],
       ),
       GoRoute(
         path: AppRoutes.catalog,

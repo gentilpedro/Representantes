@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../data/repositories/mock_clients_repository.dart';
+import '../../../../core/providers/core_providers.dart';
+import '../../data/repositories/api_clients_repository.dart';
 import '../../domain/entities/client_detail.dart';
 import '../../domain/entities/client_list_item.dart';
 import '../../domain/repositories/clients_repository.dart';
@@ -8,7 +9,7 @@ import '../../domain/repositories/clients_repository.dart';
 enum ClientFilter { all, favorites, blocked, offline }
 
 final clientsRepositoryProvider = Provider<ClientsRepository>(
-  (ref) => MockClientsRepository(),
+  (ref) => ApiClientsRepository(ref.watch(apiClientProvider)),
 );
 
 final clientsListProvider = FutureProvider.autoDispose<List<ClientListItem>>((
@@ -30,28 +31,13 @@ final clientFilterProvider = StateProvider.autoDispose<ClientFilter>(
   (ref) => ClientFilter.all,
 );
 
-/// Sobrepõe localmente o "favorito" de um cliente (a API real persistiria
-/// isso no backend); mapeia id -> favorito.
-final favoriteOverridesProvider = StateProvider.autoDispose<Map<String, bool>>(
-  (ref) => {},
-);
-
 final filteredClientsProvider =
     Provider.autoDispose<AsyncValue<List<ClientListItem>>>((ref) {
       final clientsAsync = ref.watch(clientsListProvider);
       final query = ref.watch(clientSearchQueryProvider).trim().toLowerCase();
       final filter = ref.watch(clientFilterProvider);
-      final favoriteOverrides = ref.watch(favoriteOverridesProvider);
 
-      return clientsAsync.whenData((rawClients) {
-        final clients = [
-          for (final client in rawClients)
-            if (favoriteOverrides.containsKey(client.id))
-              client.copyWith(isFavorite: favoriteOverrides[client.id]!)
-            else
-              client,
-        ];
-
+      return clientsAsync.whenData((clients) {
         return clients.where((client) {
           final matchesQuery =
               query.isEmpty ||

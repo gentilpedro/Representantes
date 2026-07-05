@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_palette.dart';
 
 class KpiCard extends StatelessWidget {
   const KpiCard({
@@ -27,12 +27,12 @@ class KpiCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Icon(icon, color: AppColors.textSecondary, size: 20),
+                Icon(icon, color: context.colors.textSecondary, size: 20),
                 if (growthLabel != null)
                   Text(
                     growthLabel!,
-                    style: const TextStyle(
-                      color: AppColors.success,
+                    style: TextStyle(
+                      color: context.colors.success,
                       fontWeight: FontWeight.w700,
                       fontSize: 12,
                     ),
@@ -47,8 +47,8 @@ class KpiCard extends StatelessWidget {
             const SizedBox(height: 2),
             Text(
               label,
-              style: const TextStyle(
-                color: AppColors.textSecondary,
+              style: TextStyle(
+                color: context.colors.textSecondary,
                 fontSize: 12,
               ),
             ),

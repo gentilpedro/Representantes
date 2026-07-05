@@ -1,36 +1,44 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../../core/providers/core_providers.dart';
+import '../../data/repositories/api_profile_repository.dart';
 import '../../domain/entities/permission_item.dart';
+import '../../domain/repositories/profile_repository.dart';
 
-/// Preferência local de UI — a implementação real persistiria isso (ex:
-/// `shared_preferences`) e aplicaria via [ThemeMode] no `MaterialApp`.
-final darkModeProvider = StateProvider<bool>((ref) => false);
+const _darkModePrefsKey = 'dark_mode_enabled';
 
-/// Permissões do representante: hoje um espelho estático do protótipo — a
-/// implementação real viria da Web API .NET 10 junto com o perfil do
-/// usuário autenticado.
-final permissionsProvider = Provider<List<PermissionItem>>((ref) {
-  return const [
-    PermissionItem(
-      icon: Icons.check_circle,
-      title: 'Vendas Offline Habilitadas',
-      description: 'Você pode registrar pedidos sem conexão ativa.',
-      status: PermissionStatus.granted,
-    ),
-    PermissionItem(
-      icon: Icons.check_circle,
-      title: 'Acesso a Tabelas Especiais',
-      description: 'Autorizado para preços promocionais de atacado.',
-      status: PermissionStatus.granted,
-    ),
-    PermissionItem(
-      icon: Icons.lock,
-      title: 'Aprovação de Crédito',
-      description: 'Requer revisão da diretoria para limites acima de R\$ 50k.',
-      status: PermissionStatus.restricted,
-    ),
-  ];
+/// Preferência local de "Modo Escuro", persistida via `shared_preferences` e
+/// aplicada ao [ThemeMode] do `MaterialApp` em `main.dart`.
+class DarkModeNotifier extends StateNotifier<bool> {
+  DarkModeNotifier() : super(false) {
+    _load();
+  }
+
+  Future<void> _load() async {
+    final prefs = await SharedPreferences.getInstance();
+    state = prefs.getBool(_darkModePrefsKey) ?? false;
+  }
+
+  Future<void> setEnabled(bool value) async {
+    state = value;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_darkModePrefsKey, value);
+  }
+}
+
+final darkModeProvider = StateNotifierProvider<DarkModeNotifier, bool>((ref) {
+  return DarkModeNotifier();
+});
+
+final profileRepositoryProvider = Provider<ProfileRepository>((ref) {
+  return ApiProfileRepository(ref.watch(apiClientProvider));
+});
+
+/// Permissões do representante, vindas da Web API .NET 10 junto com o perfil
+/// do usuário autenticado.
+final permissionsProvider = FutureProvider<List<PermissionItem>>((ref) {
+  return ref.watch(profileRepositoryProvider).fetchPermissions();
 });
 
 class AppInfo {

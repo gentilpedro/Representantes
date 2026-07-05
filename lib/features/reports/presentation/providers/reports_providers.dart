@@ -1,11 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../data/repositories/mock_reports_repository.dart';
+import '../../../../core/providers/core_providers.dart';
+import '../../data/repositories/api_reports_repository.dart';
 import '../../domain/entities/reports_summary.dart';
 import '../../domain/repositories/reports_repository.dart';
 
 final reportsRepositoryProvider = Provider<ReportsRepository>(
-  (ref) => MockReportsRepository(),
+  (ref) => ApiReportsRepository(ref.watch(apiClientProvider)),
 );
 
 final reportPeriodProvider = StateProvider.autoDispose<ReportPeriod>(

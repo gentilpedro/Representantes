@@ -1,14 +1,14 @@
-# Pedro Dev Representantes
+# Josapar Representantes
 
 > ⚠️ **Este projeto é um protótipo funcional.** Foi construído a partir de telas do
 > Visily para validar fluxos e experiência de uso com representantes de vendas da
-> Pedro Dev **Nenhum dado é real** — toda a camada de dados (login, pedidos,
+> Josapar. **Nenhum dado é real** — toda a camada de dados (login, pedidos,
 > clientes, agenda, relatórios, sincronização) é servida por repositórios *mock* em
 > memória, feitos para simular a futura Web API .NET 10 da empresa. Quando a API real
 > existir, basta trocar as implementações em `lib/**/data/repositories/` — as telas não
 > precisam mudar.
 
-App em Flutter para representantes comerciais da Pedro Dev, cobrindo:
+App em Flutter para representantes comerciais da Josapar, cobrindo:
 
 - Login e dashboard do representante
 - Pedidos (lista, novo pedido, catálogo de produtos, carrinho)
@@ -29,10 +29,10 @@ A autenticação é mock: **aceita qualquer código/e-mail e qualquer senha, des
 fiquem em branco.** Não existe validação real de credenciais nesta fase. Sugestão para
 testar:
 
-| Campo               | Valor de exemplo         |
-|---------------------|---------------------------|
-| Código ou e-mail    | `88294` (ou qualquer texto) |
-| Senha               | `123456` (ou qualquer texto) |
+| Campo             | Valor de exemplo               |
+| ----------------- | ------------------------------ |
+| Código ou e-mail | `88294` (ou qualquer texto)  |
+| Senha             | `123456` (ou qualquer texto) |
 
 Após o login, o app sempre retorna o mesmo usuário fixo do protótipo: **Ricardo
 Santos**, Representante Comercial Sênior, Região Sul.
@@ -82,13 +82,16 @@ flutter build web
    → Opções do desenvolvedor → Depuração USB), ou inicie um emulador pelo Android
    Studio (Device Manager).
 2. Confirme que o Flutter enxerga o dispositivo:
+
    ```bash
    flutter devices
    ```
 3. Rode o app:
+
    ```bash
    flutter run
    ```
+
    Se houver mais de um dispositivo conectado (ex.: emulador + celular físico), use
    `flutter run -d <device-id>` (o id aparece na saída de `flutter devices`).
 

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_palette.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../../core/widgets/responsive_content.dart';
 import '../../../auth/presentation/providers/auth_providers.dart';
@@ -15,7 +15,7 @@ class ProfileScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(authControllerProvider).valueOrNull;
     final darkMode = ref.watch(darkModeProvider);
-    final permissions = ref.watch(permissionsProvider);
+    final permissionsAsync = ref.watch(permissionsProvider);
     final appInfo = ref.watch(appInfoProvider);
 
     return Scaffold(
@@ -36,7 +36,7 @@ class ProfileScreen extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AppColors.primarySoft,
+                color: context.colors.primarySoft,
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Column(
@@ -46,12 +46,12 @@ class ProfileScreen extends ConsumerWidget {
                     children: [
                       Stack(
                         children: [
-                          const CircleAvatar(
+                          CircleAvatar(
                             radius: 26,
-                            backgroundColor: AppColors.surface,
+                            backgroundColor: context.colors.surface,
                             child: Icon(
                               Icons.person,
-                              color: AppColors.primary,
+                              color: context.colors.primary,
                               size: 26,
                             ),
                           ),
@@ -62,7 +62,7 @@ class ProfileScreen extends ConsumerWidget {
                               width: 12,
                               height: 12,
                               decoration: BoxDecoration(
-                                color: AppColors.success,
+                                color: context.colors.success,
                                 shape: BoxShape.circle,
                                 border: Border.all(
                                   color: Colors.white,
@@ -80,16 +80,16 @@ class ProfileScreen extends ConsumerWidget {
                           children: [
                             Text(
                               user?.name ?? '-',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontWeight: FontWeight.w800,
                                 fontSize: 17,
-                                color: AppColors.primaryDark,
+                                color: context.colors.primaryDark,
                               ),
                             ),
                             Text(
                               user?.role ?? '',
-                              style: const TextStyle(
-                                color: AppColors.textSecondary,
+                              style: TextStyle(
+                                color: context.colors.textSecondary,
                                 fontSize: 12,
                               ),
                             ),
@@ -112,27 +112,27 @@ class ProfileScreen extends ConsumerWidget {
                     children: [
                       Row(
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.sync,
                             size: 14,
-                            color: AppColors.textSecondary,
+                            color: context.colors.textSecondary,
                           ),
                           const SizedBox(width: 6),
                           Text(
                             'Última Sincronização: Hoje, ${user?.lastSyncAt != null ? AppFormatters.timeOfDay(user!.lastSyncAt!) : '-'}',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 11,
-                              color: AppColors.textSecondary,
+                              color: context.colors.textSecondary,
                             ),
                           ),
                         ],
                       ),
                       Text(
                         user?.appVersion ?? '',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
-                          color: AppColors.primary,
+                          color: context.colors.primary,
                         ),
                       ),
                     ],
@@ -141,12 +141,12 @@ class ProfileScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 20),
-            const Text(
+            Text(
               'PREFERÊNCIAS DO SISTEMA',
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w700,
-                color: AppColors.textMuted,
+                color: context.colors.textMuted,
               ),
             ),
             const SizedBox(height: 6),
@@ -156,10 +156,10 @@ class ProfileScreen extends ConsumerWidget {
                   SwitchListTile(
                     value: darkMode,
                     onChanged: (value) =>
-                        ref.read(darkModeProvider.notifier).state = value,
-                    secondary: const Icon(
+                        ref.read(darkModeProvider.notifier).setEnabled(value),
+                    secondary: Icon(
                       Icons.dark_mode_outlined,
-                      color: AppColors.textSecondary,
+                      color: context.colors.textSecondary,
                     ),
                     title: const Text(
                       'Modo Escuro',
@@ -172,13 +172,13 @@ class ProfileScreen extends ConsumerWidget {
                       'Alternar visual da interface',
                       style: TextStyle(fontSize: 11),
                     ),
-                    activeThumbColor: AppColors.primary,
+                    activeThumbColor: context.colors.primary,
                   ),
                   const Divider(height: 1),
                   ListTile(
-                    leading: const Icon(
+                    leading: Icon(
                       Icons.language_outlined,
-                      color: AppColors.textSecondary,
+                      color: context.colors.textSecondary,
                     ),
                     title: const Text(
                       'Idioma',
@@ -196,9 +196,9 @@ class ProfileScreen extends ConsumerWidget {
                   ),
                   const Divider(height: 1),
                   ListTile(
-                    leading: const Icon(
+                    leading: Icon(
                       Icons.notifications_none,
-                      color: AppColors.textSecondary,
+                      color: context.colors.textSecondary,
                     ),
                     title: const Text(
                       'Notificações',
@@ -225,22 +225,51 @@ class ProfileScreen extends ConsumerWidget {
               child: Card(
                 child: ExpansionTile(
                   initiallyExpanded: true,
-                  leading: const Icon(
+                  leading: Icon(
                     Icons.shield_outlined,
-                    color: AppColors.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
-                  title: const Text(
+                  title: Text(
                     'PERMISSÕES E SEGURANÇA',
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.textSecondary,
+                      color: context.colors.textSecondary,
                     ),
                   ),
                   childrenPadding: const EdgeInsets.fromLTRB(4, 0, 4, 14),
                   children: [
-                    for (final permission in permissions)
-                      _PermissionRow(permission: permission),
+                    permissionsAsync.when(
+                      loading: () => const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 16),
+                        child: Center(
+                          child: SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                        ),
+                      ),
+                      error: (error, _) => Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        child: Text(
+                          'Não foi possível carregar as permissões.',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: context.colors.textMuted,
+                          ),
+                        ),
+                      ),
+                      data: (permissions) => Column(
+                        children: [
+                          for (final permission in permissions)
+                            _PermissionRow(permission: permission),
+                        ],
+                      ),
+                    ),
                     const SizedBox(height: 6),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -257,12 +286,12 @@ class ProfileScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 20),
-            const Text(
+            Text(
               'SOBRE O APLICATIVO',
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w700,
-                color: AppColors.textMuted,
+                color: context.colors.textMuted,
               ),
             ),
             const SizedBox(height: 6),
@@ -270,9 +299,9 @@ class ProfileScreen extends ConsumerWidget {
               child: Column(
                 children: [
                   ListTile(
-                    leading: const Icon(
+                    leading: Icon(
                       Icons.info_outline,
-                      color: AppColors.textSecondary,
+                      color: context.colors.textSecondary,
                     ),
                     title: const Text(
                       'Versão do Sistema',
@@ -295,9 +324,9 @@ class ProfileScreen extends ConsumerWidget {
                   ),
                   const Divider(height: 1),
                   ListTile(
-                    leading: const Icon(
+                    leading: Icon(
                       Icons.storage_outlined,
-                      color: AppColors.textSecondary,
+                      color: context.colors.textSecondary,
                     ),
                     title: const Text(
                       'Limpar Cache Offline',
@@ -322,15 +351,15 @@ class ProfileScreen extends ConsumerWidget {
             ElevatedButton.icon(
               onPressed: () =>
                   ref.read(authControllerProvider.notifier).logout(),
-              style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
+              style: ElevatedButton.styleFrom(backgroundColor: context.colors.error),
               icon: const Icon(Icons.logout),
               label: const Text('Sair da Conta'),
             ),
             const SizedBox(height: 16),
-            const Center(
+            Center(
               child: Text(
                 'JOSAPAR S.A. © 2024',
-                style: TextStyle(fontSize: 11, color: AppColors.textMuted),
+                style: TextStyle(fontSize: 11, color: context.colors.textMuted),
               ),
             ),
           ],
@@ -355,10 +384,10 @@ class _MiniTag extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 10,
           fontWeight: FontWeight.w700,
-          color: AppColors.primary,
+          color: context.colors.primary,
         ),
       ),
     );
@@ -382,7 +411,7 @@ class _PermissionRow extends StatelessWidget {
           Icon(
             permission.icon,
             size: 18,
-            color: isGranted ? AppColors.success : AppColors.textMuted,
+            color: isGranted ? context.colors.success : context.colors.textMuted,
           ),
           const SizedBox(width: 10),
           Expanded(
@@ -398,9 +427,9 @@ class _PermissionRow extends StatelessWidget {
                 ),
                 Text(
                   permission.description,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
-                    color: AppColors.textMuted,
+                    color: context.colors.textMuted,
                   ),
                 ),
               ],

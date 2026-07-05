@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_palette.dart';
 
 /// Painel de identidade visual reaproveitado por todas as telas públicas
 /// (Boas-vindas, Login) no layout de desktop — preenche o espaço que, em
@@ -11,11 +11,11 @@ class AuthBrandPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [AppColors.primaryDark, AppColors.primary],
+          colors: [context.colors.primaryDark, context.colors.primary],
         ),
       ),
       child: Center(
@@ -30,15 +30,12 @@ class AuthBrandPanel extends StatelessWidget {
                 Container(
                   width: 64,
                   height: 64,
+                  padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(16),
                   ),
-                  child: const Icon(
-                    Icons.bolt,
-                    color: AppColors.primary,
-                    size: 32,
-                  ),
+                  child: Image.asset('assets/branding/app_icon.png'),
                 ),
                 const SizedBox(height: 28),
                 const Text(

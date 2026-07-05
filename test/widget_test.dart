@@ -2,26 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:josapar_representantes/features/auth/domain/entities/app_user.dart';
-import 'package:josapar_representantes/features/auth/domain/repositories/auth_repository.dart';
+import 'package:josapar_representantes/core/theme/app_theme.dart';
 import 'package:josapar_representantes/features/auth/presentation/providers/auth_providers.dart';
 import 'package:josapar_representantes/features/auth/presentation/screens/login_screen.dart';
 
-class _FakeAuthRepository implements AuthRepository {
-  @override
-  Future<AppUser?> restoreSession() async => null;
-
-  @override
-  Future<AppUser> login({
-    required String identifier,
-    required String password,
-  }) {
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<void> logout() async {}
-}
+import 'fakes/fake_auth_repository.dart';
 
 void main() {
   testWidgets('Login screen shows the main call to action', (
@@ -30,9 +15,11 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          authRepositoryProvider.overrideWithValue(_FakeAuthRepository()),
+          authRepositoryProvider.overrideWithValue(
+            FakeAuthRepository.loggedOut(),
+          ),
         ],
-        child: const MaterialApp(home: LoginScreen()),
+        child: MaterialApp(theme: AppTheme.light(), home: const LoginScreen()),
       ),
     );
     await tester.pumpAndSettle();

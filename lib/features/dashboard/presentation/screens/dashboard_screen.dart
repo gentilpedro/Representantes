@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/app_routes.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_palette.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../../core/widgets/responsive_content.dart';
 import '../../domain/entities/dashboard_summary.dart';
@@ -24,8 +24,8 @@ class DashboardScreen extends ConsumerWidget {
       body: ResponsiveContent(
         child: SafeArea(
           child: summaryAsync.when(
-            loading: () => const Center(
-              child: CircularProgressIndicator(color: AppColors.primary),
+            loading: () => Center(
+              child: CircularProgressIndicator(color: context.colors.primary),
             ),
             error: (error, _) => Center(
               child: Text(
@@ -95,6 +95,11 @@ class DashboardScreen extends ConsumerWidget {
                         label: 'Catálogo',
                         onTap: () => context.push(AppRoutes.catalog),
                       ),
+                      QuickAccessItem(
+                        icon: Icons.person_search_outlined,
+                        label: 'Leads',
+                        onTap: () => context.push(AppRoutes.leads),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 22),
@@ -132,11 +137,12 @@ class _TopBar extends StatelessWidget {
         Container(
           width: 36,
           height: 36,
-          decoration: BoxDecoration(
-            color: AppColors.textPrimary,
-            borderRadius: BorderRadius.circular(10),
+          padding: const EdgeInsets.all(6),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.all(Radius.circular(10)),
           ),
-          child: const Icon(Icons.bolt, color: Colors.white, size: 20),
+          child: Image.asset('assets/branding/app_icon.png'),
         ),
         Row(
           children: [
@@ -153,8 +159,8 @@ class _TopBar extends StatelessWidget {
                   top: 6,
                   child: Container(
                     padding: const EdgeInsets.all(3),
-                    decoration: const BoxDecoration(
-                      color: AppColors.error,
+                    decoration: BoxDecoration(
+                      color: context.colors.error,
                       shape: BoxShape.circle,
                     ),
                     child: const Text(
@@ -199,8 +205,8 @@ class _Greeting extends StatelessWidget {
               const SizedBox(height: 4),
               Text(
                 'Você tem ${summary.scheduledVisitsToday} visitas agendadas hoje.',
-                style: const TextStyle(
-                  color: AppColors.textSecondary,
+                style: TextStyle(
+                  color: context.colors.textSecondary,
                   fontSize: 13,
                 ),
               ),
@@ -210,8 +216,8 @@ class _Greeting extends StatelessWidget {
         Container(
           width: 42,
           height: 42,
-          decoration: const BoxDecoration(
-            color: AppColors.primary,
+          decoration: BoxDecoration(
+            color: context.colors.primary,
             shape: BoxShape.circle,
           ),
           child: const Icon(Icons.adjust, color: Colors.white, size: 20),

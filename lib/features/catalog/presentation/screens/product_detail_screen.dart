@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_palette.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../../core/widgets/responsive_content.dart';
 import '../../../orders/presentation/providers/new_order_providers.dart';
@@ -47,8 +47,8 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
       ),
       body: ResponsiveContent(
         child: detailAsync.when(
-          loading: () => const Center(
-            child: CircularProgressIndicator(color: AppColors.primary),
+          loading: () => Center(
+            child: CircularProgressIndicator(color: context.colors.primary),
           ),
           error: (error, _) => Center(
             child: Text('Não foi possível carregar o produto.\n$error'),
@@ -75,13 +75,13 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
             imageUrl: detail.images.first,
             fit: BoxFit.cover,
             placeholder: (context, url) =>
-                const ColoredBox(color: AppColors.neutralSoft),
-            errorWidget: (context, url, error) => const ColoredBox(
-              color: AppColors.neutralSoft,
+                ColoredBox(color: context.colors.neutralSoft),
+            errorWidget: (context, url, error) => ColoredBox(
+              color: context.colors.neutralSoft,
               child: Icon(
                 Icons.image_not_supported_outlined,
                 size: 40,
-                color: AppColors.textMuted,
+                color: context.colors.textMuted,
               ),
             ),
           ),
@@ -93,9 +93,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
             children: [
               Text(
                 detail.categoryLabel,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 11,
-                  color: AppColors.textMuted,
+                  color: context.colors.textMuted,
                   fontWeight: FontWeight.w700,
                   letterSpacing: 0.5,
                 ),
@@ -116,8 +116,8 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                   Icon(
                     product.isFavorite ? Icons.star : Icons.star_border,
                     color: product.isFavorite
-                        ? AppColors.warning
-                        : AppColors.textMuted,
+                        ? context.colors.warning
+                        : context.colors.textMuted,
                   ),
                 ],
               ),
@@ -127,10 +127,10 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                 children: [
                   Text(
                     AppFormatters.currency(product.price),
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w800,
-                      color: AppColors.primary,
+                      color: context.colors.primary,
                     ),
                   ),
                   if (product.originalPrice != null) ...[
@@ -139,9 +139,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                       padding: const EdgeInsets.only(bottom: 4),
                       child: Text(
                         AppFormatters.currency(product.originalPrice!),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14,
-                          color: AppColors.textMuted,
+                          color: context.colors.textMuted,
                           decoration: TextDecoration.lineThrough,
                         ),
                       ),
@@ -154,13 +154,13 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                         vertical: 3,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.errorSoft,
+                        color: context.colors.errorSoft,
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
                         '↘ ${product.discountPercent}% OFF',
-                        style: const TextStyle(
-                          color: AppColors.error,
+                        style: TextStyle(
+                          color: context.colors.error,
                           fontWeight: FontWeight.w700,
                           fontSize: 11,
                         ),
@@ -171,12 +171,12 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
               ),
               if (detail.appliedPromotions.isNotEmpty) ...[
                 const SizedBox(height: 20),
-                const Text(
+                Text(
                   'PROMOÇÕES APLICÁVEIS',
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
-                    color: AppColors.textMuted,
+                    color: context.colors.textMuted,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -191,27 +191,27 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                           vertical: 8,
                         ),
                         decoration: BoxDecoration(
-                          color: AppColors.errorSoft,
+                          color: context.colors.errorSoft,
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(
-                            color: AppColors.error.withValues(alpha: 0.2),
+                            color: context.colors.error.withValues(alpha: 0.2),
                           ),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.check_circle,
                               size: 14,
-                              color: AppColors.error,
+                              color: context.colors.error,
                             ),
                             const SizedBox(width: 6),
                             Text(
                               promo,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
-                                color: AppColors.error,
+                                color: context.colors.error,
                               ),
                             ),
                           ],
@@ -221,12 +221,12 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                 ),
               ],
               const SizedBox(height: 20),
-              const Text(
+              Text(
                 'ESTOQUE POR DEPÓSITO',
                 style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.textMuted,
+                  color: context.colors.textMuted,
                 ),
               ),
               Card(
@@ -275,9 +275,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
       child: SafeArea(
         child: Container(
           padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
-          decoration: const BoxDecoration(
-            color: AppColors.surface,
-            border: Border(top: BorderSide(color: AppColors.border)),
+          decoration: BoxDecoration(
+            color: context.colors.surface,
+            border: Border(top: BorderSide(color: context.colors.border)),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -308,11 +308,11 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      const Text(
+                      Text(
                         'TOTAL DO ITEM',
                         style: TextStyle(
                           fontSize: 9,
-                          color: AppColors.textMuted,
+                          color: context.colors.textMuted,
                         ),
                       ),
                       Text(
@@ -365,7 +365,7 @@ class _QuantityStepper extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: context.colors.border),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
@@ -410,10 +410,10 @@ class _ExpandableSection extends StatelessWidget {
         child: ExpansionTile(
           title: Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w700,
-              color: AppColors.textSecondary,
+              color: context.colors.textSecondary,
             ),
           ),
           childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
@@ -421,9 +421,9 @@ class _ExpandableSection extends StatelessWidget {
           children: [
             Text(
               content,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13,
-                color: AppColors.textPrimary,
+                color: context.colors.textPrimary,
                 height: 1.4,
               ),
             ),

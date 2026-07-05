@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/app_routes.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_palette.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../../core/widgets/responsive_content.dart';
 import '../../domain/entities/client_detail.dart';
@@ -32,8 +32,8 @@ class ClientDetailScreen extends ConsumerWidget {
       ),
       body: ResponsiveContent(
         child: detailAsync.when(
-          loading: () => const Center(
-            child: CircularProgressIndicator(color: AppColors.primary),
+          loading: () => Center(
+            child: CircularProgressIndicator(color: context.colors.primary),
           ),
           error: (error, _) => Center(
             child: Text('Não foi possível carregar o cliente.\n$error'),
@@ -56,13 +56,13 @@ class ClientDetailScreen extends ConsumerWidget {
           children: [
             CircleAvatar(
               radius: 28,
-              backgroundColor: AppColors.neutralSoft,
+              backgroundColor: context.colors.neutralSoft,
               child: Text(
                 detail.name.substring(0, 1),
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.textSecondary,
+                  color: context.colors.textSecondary,
                 ),
               ),
             ),
@@ -89,9 +89,9 @@ class ClientDetailScreen extends ConsumerWidget {
                   const SizedBox(height: 2),
                   Text(
                     '${detail.code} • ${detail.cnpj}',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
-                      color: AppColors.textMuted,
+                      color: context.colors.textMuted,
                     ),
                   ),
                 ],
@@ -116,11 +116,11 @@ class ClientDetailScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Row(
+                Row(
                   children: [
-                    Icon(Icons.credit_card, size: 16, color: AppColors.primary),
-                    SizedBox(width: 6),
-                    Text(
+                    Icon(Icons.credit_card, size: 16, color: context.colors.primary),
+                    const SizedBox(width: 6),
+                    const Text(
                       'Resumo Financeiro',
                       style: TextStyle(fontWeight: FontWeight.w700),
                     ),
@@ -130,11 +130,11 @@ class ClientDetailScreen extends ConsumerWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
+                    Text(
                       'Limite Utilizado',
                       style: TextStyle(
                         fontSize: 12,
-                        color: AppColors.textSecondary,
+                        color: context.colors.textSecondary,
                       ),
                     ),
                     Text(
@@ -152,8 +152,8 @@ class ClientDetailScreen extends ConsumerWidget {
                   child: LinearProgressIndicator(
                     value: detail.creditUsedPercent.clamp(0, 1),
                     minHeight: 8,
-                    backgroundColor: AppColors.neutralSoft,
-                    valueColor: const AlwaysStoppedAnimation(AppColors.primary),
+                    backgroundColor: context.colors.neutralSoft,
+                    valueColor: AlwaysStoppedAnimation(context.colors.primary),
                   ),
                 ),
                 const SizedBox(height: 14),
@@ -179,14 +179,14 @@ class ClientDetailScreen extends ConsumerWidget {
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: AppColors.errorSoft,
+                      color: context.colors.errorSoft,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.error_outline,
-                          color: AppColors.error,
+                          color: context.colors.error,
                           size: 18,
                         ),
                         const SizedBox(width: 10),
@@ -194,18 +194,18 @@ class ClientDetailScreen extends ConsumerWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
+                              Text(
                                 '1 Fatura Vencendo',
                                 style: TextStyle(
-                                  color: AppColors.error,
+                                  color: context.colors.error,
                                   fontWeight: FontWeight.w700,
                                   fontSize: 12,
                                 ),
                               ),
                               Text(
                                 'Vence em ${detail.pendingInvoice!.dueDateLabel} - ${AppFormatters.currency(detail.pendingInvoice!.amount)}',
-                                style: const TextStyle(
-                                  color: AppColors.error,
+                                style: TextStyle(
+                                  color: context.colors.error,
                                   fontSize: 11,
                                 ),
                               ),
@@ -221,12 +221,12 @@ class ClientDetailScreen extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: 16),
-        const Text(
+        Text(
           'ENDEREÇO DE ENTREGA',
           style: TextStyle(
             fontSize: 11,
             fontWeight: FontWeight.w700,
-            color: AppColors.textMuted,
+            color: context.colors.textMuted,
           ),
         ),
         const SizedBox(height: 6),
@@ -235,9 +235,9 @@ class ClientDetailScreen extends ConsumerWidget {
             padding: const EdgeInsets.all(14),
             child: Row(
               children: [
-                const Icon(
+                Icon(
                   Icons.location_on_outlined,
-                  color: AppColors.primary,
+                  color: context.colors.primary,
                 ),
                 const SizedBox(width: 10),
                 Expanded(
@@ -266,11 +266,11 @@ class ClientDetailScreen extends ConsumerWidget {
           child: Card(
             child: ExpansionTile(
               initiallyExpanded: true,
-              title: const Row(
+              title: Row(
                 children: [
-                  Icon(Icons.history, size: 16, color: AppColors.textSecondary),
-                  SizedBox(width: 8),
-                  Text(
+                  Icon(Icons.history, size: 16, color: context.colors.textSecondary),
+                  const SizedBox(width: 8),
+                  const Text(
                     'Histórico de Pedidos',
                     style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
                   ),
@@ -280,12 +280,12 @@ class ClientDetailScreen extends ConsumerWidget {
               expandedCrossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 if (detail.orderHistory.isEmpty)
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 8),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
                     child: Text(
                       'Nenhum pedido registrado ainda.',
                       style: TextStyle(
-                        color: AppColors.textMuted,
+                        color: context.colors.textMuted,
                         fontSize: 12,
                       ),
                     ),
@@ -309,9 +309,9 @@ class ClientDetailScreen extends ConsumerWidget {
                                 ),
                                 Text(
                                   order.dateLabel,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 11,
-                                    color: AppColors.textMuted,
+                                    color: context.colors.textMuted,
                                   ),
                                 ),
                               ],
@@ -331,14 +331,14 @@ class ClientDetailScreen extends ConsumerWidget {
                               vertical: 3,
                             ),
                             decoration: BoxDecoration(
-                              color: AppColors.successSoft,
+                              color: context.colors.successSoft,
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: Text(
                               order.statusLabel,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 10,
-                                color: AppColors.success,
+                                color: context.colors.success,
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
@@ -359,12 +359,12 @@ class ClientDetailScreen extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: 16),
-        const Text(
+        Text(
           'OBSERVAÇÕES',
           style: TextStyle(
             fontSize: 11,
             fontWeight: FontWeight.w700,
-            color: AppColors.textMuted,
+            color: context.colors.textMuted,
           ),
         ),
         const SizedBox(height: 6),
@@ -373,10 +373,10 @@ class ClientDetailScreen extends ConsumerWidget {
             padding: const EdgeInsets.all(14),
             child: Row(
               children: [
-                const Icon(
+                Icon(
                   Icons.chat_bubble_outline,
                   size: 16,
-                  color: AppColors.textMuted,
+                  color: context.colors.textMuted,
                 ),
                 const SizedBox(width: 10),
                 Expanded(
@@ -384,9 +384,9 @@ class ClientDetailScreen extends ConsumerWidget {
                     detail.notes?.isNotEmpty == true
                         ? detail.notes!
                         : 'Nenhuma observação registrada.',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
-                      color: AppColors.textSecondary,
+                      color: context.colors.textSecondary,
                     ),
                   ),
                 ),
@@ -439,7 +439,7 @@ class _AmountBlock extends StatelessWidget {
       children: [
         Text(
           label,
-          style: const TextStyle(fontSize: 10, color: AppColors.textMuted),
+          style: TextStyle(fontSize: 10, color: context.colors.textMuted),
         ),
         Text(
           value,

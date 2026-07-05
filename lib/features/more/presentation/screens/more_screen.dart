@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/app_routes.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_palette.dart';
 import '../../../../core/widgets/responsive_content.dart';
 
 /// Menu "Mais": agrupa as telas que não cabem na barra inferior principal
@@ -22,6 +22,11 @@ class MoreScreen extends StatelessWidget {
         icon: Icons.bar_chart_outlined,
         label: 'Relatórios & Indicadores',
         route: AppRoutes.reports,
+      ),
+      _MoreItem(
+        icon: Icons.person_search_outlined,
+        label: 'Leads',
+        route: AppRoutes.leads,
       ),
       _MoreItem(
         icon: Icons.sync_outlined,
@@ -46,7 +51,7 @@ class MoreScreen extends StatelessWidget {
             final item = items[index];
             return Card(
               child: ListTile(
-                leading: Icon(item.icon, color: AppColors.primary),
+                leading: Icon(item.icon, color: context.colors.primary),
                 title: Text(
                   item.label,
                   style: const TextStyle(fontWeight: FontWeight.w600),

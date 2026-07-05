@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_palette.dart';
 import '../../../../core/widgets/status_chip.dart';
 import '../../domain/entities/scheduled_visit.dart';
 import '../providers/agenda_providers.dart';
@@ -37,9 +37,14 @@ class _VisitCardState extends ConsumerState<VisitCard> {
     if (!mounted) return;
     setState(() => _isLocating = false);
 
-    ref
+    await ref
         .read(agendaControllerProvider.notifier)
-        .checkIn(widget.visit.id, geoValidated: result.isSuccess);
+        .checkIn(
+          widget.visit.id,
+          latitude: result.position?.latitude,
+          longitude: result.position?.longitude,
+        );
+    if (!mounted) return;
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -53,9 +58,10 @@ class _VisitCardState extends ConsumerState<VisitCard> {
   }
 
   Future<void> _handleCheckOut() async {
-    ref
+    await ref
         .read(agendaControllerProvider.notifier)
         .checkOut(widget.visit.id, _notesController.text);
+    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Check-out registrado. Visita concluída.')),
     );
@@ -75,11 +81,11 @@ class _VisitCardState extends ConsumerState<VisitCard> {
               children: [
                 CircleAvatar(
                   radius: 18,
-                  backgroundColor: AppColors.neutralSoft,
+                  backgroundColor: context.colors.neutralSoft,
                   child: Text(
                     visit.clientName.substring(0, 1),
-                    style: const TextStyle(
-                      color: AppColors.textSecondary,
+                    style: TextStyle(
+                      color: context.colors.textSecondary,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -102,10 +108,10 @@ class _VisitCardState extends ConsumerState<VisitCard> {
                           ),
                           if (visit.status == VisitStatus.inProgress) ...[
                             const SizedBox(width: 8),
-                            const StatusChip(
+                            StatusChip(
                               label: 'Em Andamento',
                               foreground: Colors.white,
-                              background: AppColors.primary,
+                              background: context.colors.primary,
                               filled: true,
                             ),
                           ],
@@ -113,17 +119,17 @@ class _VisitCardState extends ConsumerState<VisitCard> {
                       ),
                       Row(
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.access_time,
                             size: 12,
-                            color: AppColors.textMuted,
+                            color: context.colors.textMuted,
                           ),
                           const SizedBox(width: 4),
                           Text(
                             'Agendado: ${visit.scheduledTimeLabel}',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 11,
-                              color: AppColors.textMuted,
+                              color: context.colors.textMuted,
                             ),
                           ),
                         ],
@@ -137,18 +143,18 @@ class _VisitCardState extends ConsumerState<VisitCard> {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(
+                Icon(
                   Icons.location_on_outlined,
                   size: 14,
-                  color: AppColors.textMuted,
+                  color: context.colors.textMuted,
                 ),
                 const SizedBox(width: 4),
                 Expanded(
                   child: Text(
                     visit.address,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
-                      color: AppColors.textSecondary,
+                      color: context.colors.textSecondary,
                     ),
                   ),
                 ),
@@ -157,31 +163,31 @@ class _VisitCardState extends ConsumerState<VisitCard> {
             if (visit.status == VisitStatus.inProgress) ...[
               const SizedBox(height: 10),
               if (visit.isGeoValidated)
-                const Row(
+                Row(
                   children: [
                     Icon(
                       Icons.check_circle,
                       size: 14,
-                      color: AppColors.success,
+                      color: context.colors.success,
                     ),
-                    SizedBox(width: 6),
+                    const SizedBox(width: 6),
                     Text(
                       'Localização validada via GPS',
                       style: TextStyle(
                         fontSize: 12,
-                        color: AppColors.success,
+                        color: context.colors.success,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                   ],
                 ),
               const SizedBox(height: 8),
-              const Text(
+              Text(
                 'NOTAS DA VISITA',
                 style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.textMuted,
+                  color: context.colors.textMuted,
                 ),
               ),
               const SizedBox(height: 4),
@@ -206,7 +212,7 @@ class _VisitCardState extends ConsumerState<VisitCard> {
                 const SizedBox(width: 8),
                 Container(
                   decoration: BoxDecoration(
-                    border: Border.all(color: AppColors.border),
+                    border: Border.all(color: context.colors.border),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: IconButton(
@@ -249,7 +255,7 @@ class _VisitCardState extends ConsumerState<VisitCard> {
       case VisitStatus.inProgress:
         return ElevatedButton.icon(
           onPressed: _handleCheckOut,
-          style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
+          style: ElevatedButton.styleFrom(backgroundColor: context.colors.error),
           icon: const Icon(Icons.stop_circle_outlined, size: 16),
           label: const Text('Check-out'),
         );

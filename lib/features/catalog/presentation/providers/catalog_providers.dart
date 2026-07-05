@@ -1,12 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../data/repositories/mock_catalog_repository.dart';
+import '../../../../core/providers/core_providers.dart';
+import '../../data/repositories/api_catalog_repository.dart';
 import '../../domain/entities/product.dart';
 import '../../domain/entities/product_detail.dart';
 import '../../domain/repositories/catalog_repository.dart';
 
 final catalogRepositoryProvider = Provider<CatalogRepository>(
-  (ref) => MockCatalogRepository(),
+  (ref) => ApiCatalogRepository(ref.watch(apiClientProvider)),
 );
 
 final productsProvider = FutureProvider.autoDispose<List<Product>>((ref) {

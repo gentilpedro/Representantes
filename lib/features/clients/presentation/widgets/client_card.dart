@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_palette.dart';
 import '../../../../core/widgets/status_chip.dart';
 import '../../domain/entities/client_list_item.dart';
 import 'client_tier_chip.dart';
@@ -45,8 +45,8 @@ class ClientCard extends StatelessWidget {
                     icon: Icon(
                       client.isFavorite ? Icons.star : Icons.star_border,
                       color: client.isFavorite
-                          ? AppColors.warning
-                          : AppColors.textMuted,
+                          ? context.colors.warning
+                          : context.colors.textMuted,
                       size: 20,
                     ),
                     padding: EdgeInsets.zero,
@@ -56,34 +56,34 @@ class ClientCard extends StatelessWidget {
               ),
               Text(
                 '# ${client.code}',
-                style: const TextStyle(
-                  color: AppColors.textMuted,
+                style: TextStyle(
+                  color: context.colors.textMuted,
                   fontSize: 12,
                 ),
               ),
               const SizedBox(height: 6),
               if (client.isOffline) ...[
-                const StatusChip(
+                StatusChip(
                   label: 'Offline',
                   icon: Icons.cloud_off_outlined,
-                  foreground: AppColors.textSecondary,
-                  background: AppColors.neutralSoft,
+                  foreground: context.colors.textSecondary,
+                  background: context.colors.neutralSoft,
                 ),
                 const SizedBox(height: 6),
               ],
               Row(
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.badge_outlined,
                     size: 14,
-                    color: AppColors.textMuted,
+                    color: context.colors.textMuted,
                   ),
                   const SizedBox(width: 6),
                   Text(
                     client.cnpj,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
-                      color: AppColors.textSecondary,
+                      color: context.colors.textSecondary,
                     ),
                   ),
                 ],
@@ -91,17 +91,17 @@ class ClientCard extends StatelessWidget {
               const SizedBox(height: 2),
               Row(
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.location_on_outlined,
                     size: 14,
-                    color: AppColors.textMuted,
+                    color: context.colors.textMuted,
                   ),
                   const SizedBox(width: 6),
                   Text(
                     '${client.city}, ${client.state}',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
-                      color: AppColors.textSecondary,
+                      color: context.colors.textSecondary,
                     ),
                   ),
                 ],
@@ -113,17 +113,17 @@ class ClientCard extends StatelessWidget {
                   ClientTierChip(tier: client.tier),
                   Row(
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.history,
                         size: 13,
-                        color: AppColors.textMuted,
+                        color: context.colors.textMuted,
                       ),
                       const SizedBox(width: 4),
                       Text(
                         'Últ. Pedido: ${client.lastOrderDateLabel}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 11,
-                          color: AppColors.textMuted,
+                          color: context.colors.textMuted,
                         ),
                       ),
                     ],

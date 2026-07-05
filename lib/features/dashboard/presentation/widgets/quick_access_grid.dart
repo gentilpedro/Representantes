@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_palette.dart';
 
 class QuickAccessItem {
   const QuickAccessItem({
@@ -45,10 +45,14 @@ class QuickAccessGrid extends StatelessWidget {
                     width: 36,
                     height: 36,
                     decoration: BoxDecoration(
-                      color: AppColors.primarySoft,
+                      color: context.colors.primarySoft,
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: Icon(item.icon, color: AppColors.primary, size: 19),
+                    child: Icon(
+                      item.icon,
+                      color: context.colors.primary,
+                      size: 19,
+                    ),
                   ),
                   const SizedBox(width: 10),
                   Expanded(

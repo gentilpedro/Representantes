@@ -2,60 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:josapar_representantes/core/providers/core_providers.dart';
-import 'package:josapar_representantes/core/services/connectivity_service.dart';
-import 'package:josapar_representantes/features/agenda/data/services/location_service.dart';
-import 'package:josapar_representantes/features/agenda/presentation/providers/agenda_providers.dart';
-import 'package:josapar_representantes/features/auth/domain/entities/app_user.dart';
-import 'package:josapar_representantes/features/auth/domain/repositories/auth_repository.dart';
-import 'package:josapar_representantes/features/auth/presentation/providers/auth_providers.dart';
 import 'package:josapar_representantes/main.dart';
 
-/// A instância real usa o plugin `geolocator`, que trava esperando resposta
-/// de platform channel em ambiente de teste (sem handler mockado). Nos
-/// testes, sobrescrevemos por uma implementação que resolve na hora — o
-/// mesmo padrão usado para o repositório de autenticação.
-class _FakeLocationService implements LocationService {
-  @override
-  Future<LocationResult> getCurrentPosition() async {
-    return const LocationResult(
-      errorMessage: 'GPS indisponível neste ambiente de teste.',
-    );
-  }
-}
-
-/// `AppShell` mantém o `SyncController` sempre ativo, que checa
-/// conectividade real via `connectivity_plus` — mesmo problema de platform
-/// channel do `geolocator` acima, mesma solução.
-class _FakeConnectivityService implements ConnectivityService {
-  @override
-  Future<bool> isOnline() async => true;
-
-  @override
-  Stream<bool> get onStatusChange => const Stream.empty();
-}
-
-class _AlreadyLoggedInAuthRepository implements AuthRepository {
-  static final _user = AppUser(
-    id: '88294',
-    name: 'Ricardo Santos',
-    role: 'Representante Comercial Sênior',
-    region: 'Região Sul',
-    appVersion: 'v2.4.0',
-  );
-
-  @override
-  Future<AppUser?> restoreSession() async => _user;
-
-  @override
-  Future<AppUser> login({
-    required String identifier,
-    required String password,
-  }) async => _user;
-
-  @override
-  Future<void> logout() async {}
-}
+import 'fakes/test_overrides.dart';
 
 void main() {
   testWidgets('Fluxo de Agenda: roteiro do dia, status das visitas e check-in', (
@@ -63,15 +12,7 @@ void main() {
   ) async {
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [
-          authRepositoryProvider.overrideWithValue(
-            _AlreadyLoggedInAuthRepository(),
-          ),
-          locationServiceProvider.overrideWithValue(_FakeLocationService()),
-          connectivityServiceProvider.overrideWithValue(
-            _FakeConnectivityService(),
-          ),
-        ],
+        overrides: testOverrides(),
         child: const JosaparRepresentantesApp(),
       ),
     );
@@ -79,7 +20,7 @@ void main() {
     // `AppShell` mantém o `SyncController` sempre observado em segundo
     // plano; sem um widget animando (spinner) durante o carregamento,
     // `pumpAndSettle` sozinho não garante tempo suficiente para os
-    // `Future.delayed` internos do mock resolverem — um `pump` manual
+    // `Future.delayed` internos do fake resolverem — um `pump` manual
     // avança o relógio fake de uma vez, evitando timers pendentes.
     await tester.pump(const Duration(seconds: 2));
 
@@ -116,5 +57,31 @@ void main() {
     // Agora duas visitas têm botão "Check-out" (a que já estava em andamento + a recém check-in).
     expect(find.text('Check-out'), findsNWidgets(2));
     expect(find.text('Check-in'), findsOneWidget);
+
+    // Deixa o SnackBar do check-in sumir — senão ele ocupa a área do FAB.
+    await tester.pump(const Duration(seconds: 5));
+    await tester.pumpAndSettle();
+
+    // Agenda uma visita nova pelo FAB.
+    await tester.tap(find.byIcon(Icons.add));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Nova Visita'), findsOneWidget);
+    await tester.tap(find.text('Alterar'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Selecionar Cliente'), findsOneWidget);
+    await tester.tap(find.text('Atacado Boa Vista'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Atacado Boa Vista'), findsOneWidget);
+    await tester.tap(find.text('Salvar'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Visita agendada com sucesso.'), findsOneWidget);
+    await tester.pump(const Duration(seconds: 5));
+
+    // A visita nova entra como pendente — mais um botão "Check-in" na lista.
+    expect(find.text('Check-in'), findsNWidgets(2));
   });
 }

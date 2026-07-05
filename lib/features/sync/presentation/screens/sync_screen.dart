@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_palette.dart';
 import '../../../../core/widgets/responsive_content.dart';
 import '../../domain/entities/sync_summary.dart';
 import '../providers/sync_providers.dart';
@@ -26,8 +26,8 @@ class SyncScreen extends ConsumerWidget {
       ),
       body: ResponsiveContent(
         child: summaryAsync.when(
-          loading: () => const Center(
-            child: CircularProgressIndicator(color: AppColors.primary),
+          loading: () => Center(
+            child: CircularProgressIndicator(color: context.colors.primary),
           ),
           error: (error, _) => Center(
             child: Text('Não foi possível carregar a sincronização.\n$error'),
@@ -51,8 +51,8 @@ class SyncScreen extends ConsumerWidget {
         Container(
           padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [AppColors.primary, AppColors.primaryDark],
+            gradient: LinearGradient(
+              colors: [context.colors.primary, context.colors.primaryDark],
             ),
             borderRadius: BorderRadius.circular(18),
           ),
@@ -171,15 +171,15 @@ class SyncScreen extends ConsumerWidget {
                             ref.read(syncControllerProvider.notifier).syncNow(),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
-                    foregroundColor: AppColors.primary,
+                    foregroundColor: context.colors.primary,
                   ),
                   icon: isSyncing
-                      ? const SizedBox(
+                      ? SizedBox(
                           width: 16,
                           height: 16,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            color: AppColors.primary,
+                            color: context.colors.primary,
                           ),
                         )
                       : const Icon(Icons.sync),
@@ -196,20 +196,20 @@ class SyncScreen extends ConsumerWidget {
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: AppColors.errorSoft,
+              color: context.colors.errorSoft,
               borderRadius: BorderRadius.circular(14),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Row(
+                Row(
                   children: [
-                    Icon(Icons.error, color: AppColors.error, size: 18),
-                    SizedBox(width: 8),
+                    Icon(Icons.error, color: context.colors.error, size: 18),
+                    const SizedBox(width: 8),
                     Text(
                       'Conflito Detectado',
                       style: TextStyle(
-                        color: AppColors.error,
+                        color: context.colors.error,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -218,8 +218,8 @@ class SyncScreen extends ConsumerWidget {
                 const SizedBox(height: 6),
                 Text(
                   'Pedido ${summary.conflict!.orderCode} (${summary.conflict!.clientName}) falhou: ${summary.conflict!.reason}',
-                  style: const TextStyle(
-                    color: AppColors.error,
+                  style: TextStyle(
+                    color: context.colors.error,
                     fontSize: 12,
                     height: 1.4,
                   ),
@@ -234,7 +234,7 @@ class SyncScreen extends ConsumerWidget {
                     ),
                   ),
                   style: TextButton.styleFrom(
-                    foregroundColor: AppColors.error,
+                    foregroundColor: context.colors.error,
                     padding: EdgeInsets.zero,
                     minimumSize: Size.zero,
                   ),
@@ -254,20 +254,20 @@ class SyncScreen extends ConsumerWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Row(
+            Row(
               children: [
                 Icon(
                   Icons.storage_outlined,
                   size: 15,
-                  color: AppColors.textSecondary,
+                  color: context.colors.textSecondary,
                 ),
-                SizedBox(width: 6),
+                const SizedBox(width: 6),
                 Text(
                   'FILA DE TRANSMISSÃO',
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
-                    color: AppColors.textMuted,
+                    color: context.colors.textMuted,
                   ),
                 ),
               ],
@@ -275,14 +275,14 @@ class SyncScreen extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
               decoration: BoxDecoration(
-                color: AppColors.neutralSoft,
+                color: context.colors.neutralSoft,
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
                 '${summary.queue.length} ITENS',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 10,
-                  color: AppColors.textSecondary,
+                  color: context.colors.textSecondary,
                 ),
               ),
             ),
@@ -290,12 +290,12 @@ class SyncScreen extends ConsumerWidget {
         ),
         const SizedBox(height: 10),
         if (summary.queue.isEmpty)
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 16),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16),
             child: Center(
               child: Text(
                 'Fila vazia. Tudo sincronizado!',
-                style: TextStyle(color: AppColors.textMuted),
+                style: TextStyle(color: context.colors.textMuted),
               ),
             ),
           )
@@ -305,16 +305,16 @@ class SyncScreen extends ConsumerWidget {
             const SizedBox(height: 10),
           ],
         const SizedBox(height: 12),
-        const Row(
+        Row(
           children: [
-            Icon(Icons.history, size: 15, color: AppColors.textSecondary),
-            SizedBox(width: 6),
+            Icon(Icons.history, size: 15, color: context.colors.textSecondary),
+            const SizedBox(width: 6),
             Text(
               'HISTÓRICO DE SINCRONIA',
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w700,
-                color: AppColors.textMuted,
+                color: context.colors.textMuted,
               ),
             ),
           ],
@@ -334,14 +334,14 @@ class SyncScreen extends ConsumerWidget {
                 ),
                 subtitle: Text(
                   entry.summary,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
-                    color: AppColors.textMuted,
+                    color: context.colors.textMuted,
                   ),
                 ),
-                leading: const Icon(
+                leading: Icon(
                   Icons.check_circle_outline,
-                  color: AppColors.success,
+                  color: context.colors.success,
                 ),
                 children: [
                   Padding(
@@ -350,9 +350,9 @@ class SyncScreen extends ConsumerWidget {
                       alignment: Alignment.centerLeft,
                       child: Text(
                         entry.summary,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
-                          color: AppColors.textSecondary,
+                          color: context.colors.textSecondary,
                         ),
                       ),
                     ),

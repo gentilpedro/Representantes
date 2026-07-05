@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/app_routes.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_palette.dart';
 import '../../../../core/widgets/responsive_content.dart';
 import '../../domain/entities/order_summary.dart';
 import '../providers/orders_providers.dart';
@@ -80,8 +80,8 @@ class OrdersScreen extends ConsumerWidget {
             ),
             Expanded(
               child: ordersAsync.when(
-                loading: () => const Center(
-                  child: CircularProgressIndicator(color: AppColors.primary),
+                loading: () => Center(
+                  child: CircularProgressIndicator(color: context.colors.primary),
                 ),
                 error: (error, _) => Center(
                   child: Text('Não foi possível carregar os pedidos.\n$error'),
@@ -131,13 +131,13 @@ class OrdersScreen extends ConsumerWidget {
                         ],
                       ],
                       const SizedBox(height: 12),
-                      const Text(
+                      Text(
                         'Exibindo os últimos 30 dias de pedidos. Para períodos maiores, '
                         'utilize o módulo de Relatórios.',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 11,
-                          color: AppColors.textMuted,
+                          color: context.colors.textMuted,
                           fontStyle: FontStyle.italic,
                         ),
                       ),
@@ -170,23 +170,23 @@ class _SectionHeader extends StatelessWidget {
       children: [
         Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontWeight: FontWeight.w700,
             fontSize: 12,
-            color: AppColors.textSecondary,
+            color: context.colors.textSecondary,
           ),
         ),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
           decoration: BoxDecoration(
-            color: AppColors.neutralSoft,
+            color: context.colors.neutralSoft,
             borderRadius: BorderRadius.circular(20),
           ),
           child: Text(
             '$count PEDIDOS',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 10,
-              color: AppColors.textSecondary,
+              color: context.colors.textSecondary,
             ),
           ),
         ),
@@ -213,11 +213,11 @@ class _FilterChip extends ConsumerWidget {
       label: Text(label),
       selected: selected,
       onSelected: (_) => ref.read(orderFilterProvider.notifier).state = value,
-      selectedColor: AppColors.primary,
-      backgroundColor: AppColors.surface,
-      side: const BorderSide(color: AppColors.border),
+      selectedColor: context.colors.primary,
+      backgroundColor: context.colors.surface,
+      side: BorderSide(color: context.colors.border),
       labelStyle: TextStyle(
-        color: selected ? Colors.white : AppColors.textPrimary,
+        color: selected ? Colors.white : context.colors.textPrimary,
         fontWeight: FontWeight.w600,
         fontSize: 13,
       ),

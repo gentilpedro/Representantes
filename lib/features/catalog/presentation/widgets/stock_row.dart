@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_palette.dart';
 import '../../../../core/widgets/status_chip.dart';
 import '../../domain/entities/product_detail.dart';
 
@@ -15,10 +15,10 @@ class StockRow extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         children: [
-          const Icon(
+          Icon(
             Icons.location_on_outlined,
             size: 18,
-            color: AppColors.textSecondary,
+            color: context.colors.textSecondary,
           ),
           const SizedBox(width: 10),
           Expanded(
@@ -34,39 +34,39 @@ class StockRow extends StatelessWidget {
                 ),
                 Text(
                   '${stock.bundlesAvailable} fardos disponíveis',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
-                    color: AppColors.textMuted,
+                    color: context.colors.textMuted,
                   ),
                 ),
               ],
             ),
           ),
-          _levelChip(stock.level),
+          _levelChip(context, stock.level),
         ],
       ),
     );
   }
 
-  Widget _levelChip(StockLevel level) {
+  Widget _levelChip(BuildContext context, StockLevel level) {
     switch (level) {
       case StockLevel.high:
-        return const StatusChip(
+        return StatusChip(
           label: 'Alto',
-          foreground: AppColors.success,
-          background: AppColors.successSoft,
+          foreground: context.colors.success,
+          background: context.colors.successSoft,
         );
       case StockLevel.medium:
-        return const StatusChip(
+        return StatusChip(
           label: 'Médio',
-          foreground: AppColors.warning,
-          background: AppColors.warningSoft,
+          foreground: context.colors.warning,
+          background: context.colors.warningSoft,
         );
       case StockLevel.critical:
-        return const StatusChip(
+        return StatusChip(
           label: 'Crítico',
           foreground: Colors.white,
-          background: AppColors.error,
+          background: context.colors.error,
           filled: true,
         );
     }
