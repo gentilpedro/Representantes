@@ -10,7 +10,7 @@ class ApiConfig {
 
   static const String baseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'https://api.josapar.example.com',
+    defaultValue: 'https://represapi.runasp.net',
   );
 
   static const Duration connectTimeout = Duration(seconds: 15);
