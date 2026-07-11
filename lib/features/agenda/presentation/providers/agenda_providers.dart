@@ -9,7 +9,10 @@ import '../../domain/repositories/agenda_repository.dart';
 DateTime _dateOnly(DateTime date) => DateTime(date.year, date.month, date.day);
 
 final agendaRepositoryProvider = Provider<AgendaRepository>(
-  (ref) => ApiAgendaRepository(ref.watch(apiClientProvider)),
+  (ref) => ApiAgendaRepository(
+    ref.watch(apiClientProvider),
+    ref.watch(appDatabaseProvider),
+  ),
 );
 
 final locationServiceProvider = Provider<LocationService>(
@@ -27,7 +30,11 @@ class AgendaController extends AsyncNotifier<DailyRoute> {
     return ref.watch(agendaRepositoryProvider).fetchDailyRoute(date);
   }
 
-  Future<void> checkIn(String visitId, {double? latitude, double? longitude}) async {
+  Future<void> checkIn(
+    String visitId, {
+    double? latitude,
+    double? longitude,
+  }) async {
     await ref
         .read(agendaRepositoryProvider)
         .checkIn(visitId, latitude: latitude, longitude: longitude);
@@ -46,11 +53,13 @@ class AgendaController extends AsyncNotifier<DailyRoute> {
     required DateTime scheduledAtUtc,
     String? notes,
   }) async {
-    await ref.read(agendaRepositoryProvider).createVisit(
-      clientId: clientId,
-      scheduledAtUtc: scheduledAtUtc,
-      notes: notes,
-    );
+    await ref
+        .read(agendaRepositoryProvider)
+        .createVisit(
+          clientId: clientId,
+          scheduledAtUtc: scheduledAtUtc,
+          notes: notes,
+        );
     ref.invalidateSelf();
     await future;
   }

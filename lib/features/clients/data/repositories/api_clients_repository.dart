@@ -1,5 +1,9 @@
-import 'package:dio/dio.dart';
+import 'dart:convert';
 
+import 'package:dio/dio.dart';
+import 'package:drift/drift.dart' show Value;
+
+import '../../../../core/database/app_database.dart';
 import '../../../../core/network/api_client.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../domain/clients_exception.dart';
@@ -10,19 +14,38 @@ import '../../domain/repositories/clients_repository.dart';
 /// Implementação real de [ClientsRepository], contra `GET /api/clients`,
 /// `GET /api/clients/{id}` e `PATCH /api/clients/{id}/favorite` da Web API
 /// .NET 10.
+///
+/// Igual ao catálogo (ver `ApiCatalogRepository`): lista e detalhe de
+/// clientes são cacheados no [AppDatabase] a cada busca bem-sucedida, pra
+/// que o representante consiga consultar e selecionar cliente pra um
+/// pedido mesmo sem conexão.
 class ApiClientsRepository implements ClientsRepository {
-  ApiClientsRepository(this._apiClient);
+  ApiClientsRepository(this._apiClient, this._db);
+
+  static const _dataset = 'clients';
 
   final ApiClient _apiClient;
+  final AppDatabase _db;
 
   @override
   Future<List<ClientListItem>> fetchClients() async {
     try {
       final response = await _apiClient.dio.get<List<dynamic>>('/api/clients');
-      return response.data!
-          .map((json) => _clientListItemFromJson(json as Map<String, dynamic>))
-          .toList();
+      final jsonList = response.data!.cast<Map<String, dynamic>>();
+      final clients = jsonList.map(_clientListItemFromJson).toList();
+      // Cacheia a partir do JSON bruto (não da entidade já convertida) pra
+      // preservar o `lastOrderAtUtc` de verdade — a entidade só carrega o
+      // rótulo já formatado (`lastOrderDateLabel`), não a data original.
+      await _db.replaceAllClients(
+        jsonList.map(_clientToCompanionFromJson).toList(),
+      );
+      await _db.upsertSyncMetadata(_dataset, DateTime.now());
+      return clients;
     } on DioException catch (e) {
+      final cached = await _db.fetchAllClients();
+      if (cached.isNotEmpty) {
+        return cached.map(_clientFromRow).toList();
+      }
       throw ClientsException(_errorMessage(e));
     }
   }
@@ -33,8 +56,15 @@ class ApiClientsRepository implements ClientsRepository {
       final response = await _apiClient.dio.get<Map<String, dynamic>>(
         '/api/clients/$clientId',
       );
+      await _db.upsertClientDetailJson(clientId, jsonEncode(response.data));
       return _clientDetailFromJson(response.data!);
     } on DioException catch (e) {
+      final cachedJson = await _db.fetchClientDetailJson(clientId);
+      if (cachedJson != null) {
+        return _clientDetailFromJson(
+          jsonDecode(cachedJson) as Map<String, dynamic>,
+        );
+      }
       throw ClientsException(_errorMessage(e));
     }
   }
@@ -46,9 +76,46 @@ class ApiClientsRepository implements ClientsRepository {
         '/api/clients/$clientId/favorite',
         data: {'isFavorite': isFavorite},
       );
+      await _db.updateCachedClientFavorite(clientId, isFavorite);
     } on DioException catch (e) {
       throw ClientsException(_errorMessage(e));
     }
+  }
+
+  ClientsTableCompanion _clientToCompanionFromJson(Map<String, dynamic> json) {
+    final lastOrderAtUtc = json['lastOrderAtUtc'] as String?;
+    return ClientsTableCompanion.insert(
+      id: json['id'] as String,
+      code: json['code'] as String,
+      name: json['name'] as String,
+      cnpj: json['cnpj'] as String,
+      city: json['city'] as String,
+      state: json['state'] as String,
+      tier: json['tier'] as String,
+      lastOrderAtUtc: Value(
+        lastOrderAtUtc == null ? null : DateTime.parse(lastOrderAtUtc),
+      ),
+      creditLimit: (json['creditLimit'] as num).toDouble(),
+      isFavorite: Value(json['isFavorite'] as bool),
+    );
+  }
+
+  ClientListItem _clientFromRow(ClientsTableData row) {
+    return ClientListItem(
+      id: row.id,
+      code: row.code,
+      name: row.name,
+      cnpj: row.cnpj,
+      city: row.city,
+      state: row.state,
+      tier: _tierFromJson(row.tier),
+      lastOrderDateLabel: row.lastOrderAtUtc == null
+          ? 'Sem pedidos'
+          : AppFormatters.shortDate(row.lastOrderAtUtc!),
+      creditLimit: row.creditLimit,
+      isFavorite: row.isFavorite,
+      isOffline: true,
+    );
   }
 
   @override
@@ -155,8 +222,7 @@ class ApiClientsRepository implements ClientsRepository {
       isFavorite: json['isFavorite'] as bool,
       orderHistory: orderHistoryJson
           .map(
-            (item) =>
-                _orderHistoryItemFromJson(item as Map<String, dynamic>),
+            (item) => _orderHistoryItemFromJson(item as Map<String, dynamic>),
           )
           .toList(),
     );
