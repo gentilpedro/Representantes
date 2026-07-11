@@ -1785,6 +1785,1055 @@ class ProductsTableCompanion extends UpdateCompanion<ProductsTableData> {
   }
 }
 
+class $ClientsTableTable extends ClientsTable
+    with TableInfo<$ClientsTableTable, ClientsTableData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ClientsTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _codeMeta = const VerificationMeta('code');
+  @override
+  late final GeneratedColumn<String> code = GeneratedColumn<String>(
+    'code',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _cnpjMeta = const VerificationMeta('cnpj');
+  @override
+  late final GeneratedColumn<String> cnpj = GeneratedColumn<String>(
+    'cnpj',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _cityMeta = const VerificationMeta('city');
+  @override
+  late final GeneratedColumn<String> city = GeneratedColumn<String>(
+    'city',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _stateMeta = const VerificationMeta('state');
+  @override
+  late final GeneratedColumn<String> state = GeneratedColumn<String>(
+    'state',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _tierMeta = const VerificationMeta('tier');
+  @override
+  late final GeneratedColumn<String> tier = GeneratedColumn<String>(
+    'tier',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _lastOrderAtUtcMeta = const VerificationMeta(
+    'lastOrderAtUtc',
+  );
+  @override
+  late final GeneratedColumn<DateTime> lastOrderAtUtc =
+      GeneratedColumn<DateTime>(
+        'last_order_at_utc',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _creditLimitMeta = const VerificationMeta(
+    'creditLimit',
+  );
+  @override
+  late final GeneratedColumn<double> creditLimit = GeneratedColumn<double>(
+    'credit_limit',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _isFavoriteMeta = const VerificationMeta(
+    'isFavorite',
+  );
+  @override
+  late final GeneratedColumn<bool> isFavorite = GeneratedColumn<bool>(
+    'is_favorite',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_favorite" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    code,
+    name,
+    cnpj,
+    city,
+    state,
+    tier,
+    lastOrderAtUtc,
+    creditLimit,
+    isFavorite,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'clients_table';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ClientsTableData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('code')) {
+      context.handle(
+        _codeMeta,
+        code.isAcceptableOrUnknown(data['code']!, _codeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_codeMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('cnpj')) {
+      context.handle(
+        _cnpjMeta,
+        cnpj.isAcceptableOrUnknown(data['cnpj']!, _cnpjMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_cnpjMeta);
+    }
+    if (data.containsKey('city')) {
+      context.handle(
+        _cityMeta,
+        city.isAcceptableOrUnknown(data['city']!, _cityMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_cityMeta);
+    }
+    if (data.containsKey('state')) {
+      context.handle(
+        _stateMeta,
+        state.isAcceptableOrUnknown(data['state']!, _stateMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_stateMeta);
+    }
+    if (data.containsKey('tier')) {
+      context.handle(
+        _tierMeta,
+        tier.isAcceptableOrUnknown(data['tier']!, _tierMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_tierMeta);
+    }
+    if (data.containsKey('last_order_at_utc')) {
+      context.handle(
+        _lastOrderAtUtcMeta,
+        lastOrderAtUtc.isAcceptableOrUnknown(
+          data['last_order_at_utc']!,
+          _lastOrderAtUtcMeta,
+        ),
+      );
+    }
+    if (data.containsKey('credit_limit')) {
+      context.handle(
+        _creditLimitMeta,
+        creditLimit.isAcceptableOrUnknown(
+          data['credit_limit']!,
+          _creditLimitMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_creditLimitMeta);
+    }
+    if (data.containsKey('is_favorite')) {
+      context.handle(
+        _isFavoriteMeta,
+        isFavorite.isAcceptableOrUnknown(data['is_favorite']!, _isFavoriteMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  ClientsTableData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ClientsTableData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      code: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}code'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      cnpj: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}cnpj'],
+      )!,
+      city: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}city'],
+      )!,
+      state: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}state'],
+      )!,
+      tier: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}tier'],
+      )!,
+      lastOrderAtUtc: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}last_order_at_utc'],
+      ),
+      creditLimit: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}credit_limit'],
+      )!,
+      isFavorite: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_favorite'],
+      )!,
+    );
+  }
+
+  @override
+  $ClientsTableTable createAlias(String alias) {
+    return $ClientsTableTable(attachedDatabase, alias);
+  }
+}
+
+class ClientsTableData extends DataClass
+    implements Insertable<ClientsTableData> {
+  final String id;
+  final String code;
+  final String name;
+  final String cnpj;
+  final String city;
+  final String state;
+  final String tier;
+  final DateTime? lastOrderAtUtc;
+  final double creditLimit;
+  final bool isFavorite;
+  const ClientsTableData({
+    required this.id,
+    required this.code,
+    required this.name,
+    required this.cnpj,
+    required this.city,
+    required this.state,
+    required this.tier,
+    this.lastOrderAtUtc,
+    required this.creditLimit,
+    required this.isFavorite,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['code'] = Variable<String>(code);
+    map['name'] = Variable<String>(name);
+    map['cnpj'] = Variable<String>(cnpj);
+    map['city'] = Variable<String>(city);
+    map['state'] = Variable<String>(state);
+    map['tier'] = Variable<String>(tier);
+    if (!nullToAbsent || lastOrderAtUtc != null) {
+      map['last_order_at_utc'] = Variable<DateTime>(lastOrderAtUtc);
+    }
+    map['credit_limit'] = Variable<double>(creditLimit);
+    map['is_favorite'] = Variable<bool>(isFavorite);
+    return map;
+  }
+
+  ClientsTableCompanion toCompanion(bool nullToAbsent) {
+    return ClientsTableCompanion(
+      id: Value(id),
+      code: Value(code),
+      name: Value(name),
+      cnpj: Value(cnpj),
+      city: Value(city),
+      state: Value(state),
+      tier: Value(tier),
+      lastOrderAtUtc: lastOrderAtUtc == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastOrderAtUtc),
+      creditLimit: Value(creditLimit),
+      isFavorite: Value(isFavorite),
+    );
+  }
+
+  factory ClientsTableData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ClientsTableData(
+      id: serializer.fromJson<String>(json['id']),
+      code: serializer.fromJson<String>(json['code']),
+      name: serializer.fromJson<String>(json['name']),
+      cnpj: serializer.fromJson<String>(json['cnpj']),
+      city: serializer.fromJson<String>(json['city']),
+      state: serializer.fromJson<String>(json['state']),
+      tier: serializer.fromJson<String>(json['tier']),
+      lastOrderAtUtc: serializer.fromJson<DateTime?>(json['lastOrderAtUtc']),
+      creditLimit: serializer.fromJson<double>(json['creditLimit']),
+      isFavorite: serializer.fromJson<bool>(json['isFavorite']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'code': serializer.toJson<String>(code),
+      'name': serializer.toJson<String>(name),
+      'cnpj': serializer.toJson<String>(cnpj),
+      'city': serializer.toJson<String>(city),
+      'state': serializer.toJson<String>(state),
+      'tier': serializer.toJson<String>(tier),
+      'lastOrderAtUtc': serializer.toJson<DateTime?>(lastOrderAtUtc),
+      'creditLimit': serializer.toJson<double>(creditLimit),
+      'isFavorite': serializer.toJson<bool>(isFavorite),
+    };
+  }
+
+  ClientsTableData copyWith({
+    String? id,
+    String? code,
+    String? name,
+    String? cnpj,
+    String? city,
+    String? state,
+    String? tier,
+    Value<DateTime?> lastOrderAtUtc = const Value.absent(),
+    double? creditLimit,
+    bool? isFavorite,
+  }) => ClientsTableData(
+    id: id ?? this.id,
+    code: code ?? this.code,
+    name: name ?? this.name,
+    cnpj: cnpj ?? this.cnpj,
+    city: city ?? this.city,
+    state: state ?? this.state,
+    tier: tier ?? this.tier,
+    lastOrderAtUtc: lastOrderAtUtc.present
+        ? lastOrderAtUtc.value
+        : this.lastOrderAtUtc,
+    creditLimit: creditLimit ?? this.creditLimit,
+    isFavorite: isFavorite ?? this.isFavorite,
+  );
+  ClientsTableData copyWithCompanion(ClientsTableCompanion data) {
+    return ClientsTableData(
+      id: data.id.present ? data.id.value : this.id,
+      code: data.code.present ? data.code.value : this.code,
+      name: data.name.present ? data.name.value : this.name,
+      cnpj: data.cnpj.present ? data.cnpj.value : this.cnpj,
+      city: data.city.present ? data.city.value : this.city,
+      state: data.state.present ? data.state.value : this.state,
+      tier: data.tier.present ? data.tier.value : this.tier,
+      lastOrderAtUtc: data.lastOrderAtUtc.present
+          ? data.lastOrderAtUtc.value
+          : this.lastOrderAtUtc,
+      creditLimit: data.creditLimit.present
+          ? data.creditLimit.value
+          : this.creditLimit,
+      isFavorite: data.isFavorite.present
+          ? data.isFavorite.value
+          : this.isFavorite,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ClientsTableData(')
+          ..write('id: $id, ')
+          ..write('code: $code, ')
+          ..write('name: $name, ')
+          ..write('cnpj: $cnpj, ')
+          ..write('city: $city, ')
+          ..write('state: $state, ')
+          ..write('tier: $tier, ')
+          ..write('lastOrderAtUtc: $lastOrderAtUtc, ')
+          ..write('creditLimit: $creditLimit, ')
+          ..write('isFavorite: $isFavorite')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    code,
+    name,
+    cnpj,
+    city,
+    state,
+    tier,
+    lastOrderAtUtc,
+    creditLimit,
+    isFavorite,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ClientsTableData &&
+          other.id == this.id &&
+          other.code == this.code &&
+          other.name == this.name &&
+          other.cnpj == this.cnpj &&
+          other.city == this.city &&
+          other.state == this.state &&
+          other.tier == this.tier &&
+          other.lastOrderAtUtc == this.lastOrderAtUtc &&
+          other.creditLimit == this.creditLimit &&
+          other.isFavorite == this.isFavorite);
+}
+
+class ClientsTableCompanion extends UpdateCompanion<ClientsTableData> {
+  final Value<String> id;
+  final Value<String> code;
+  final Value<String> name;
+  final Value<String> cnpj;
+  final Value<String> city;
+  final Value<String> state;
+  final Value<String> tier;
+  final Value<DateTime?> lastOrderAtUtc;
+  final Value<double> creditLimit;
+  final Value<bool> isFavorite;
+  final Value<int> rowid;
+  const ClientsTableCompanion({
+    this.id = const Value.absent(),
+    this.code = const Value.absent(),
+    this.name = const Value.absent(),
+    this.cnpj = const Value.absent(),
+    this.city = const Value.absent(),
+    this.state = const Value.absent(),
+    this.tier = const Value.absent(),
+    this.lastOrderAtUtc = const Value.absent(),
+    this.creditLimit = const Value.absent(),
+    this.isFavorite = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ClientsTableCompanion.insert({
+    required String id,
+    required String code,
+    required String name,
+    required String cnpj,
+    required String city,
+    required String state,
+    required String tier,
+    this.lastOrderAtUtc = const Value.absent(),
+    required double creditLimit,
+    this.isFavorite = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       code = Value(code),
+       name = Value(name),
+       cnpj = Value(cnpj),
+       city = Value(city),
+       state = Value(state),
+       tier = Value(tier),
+       creditLimit = Value(creditLimit);
+  static Insertable<ClientsTableData> custom({
+    Expression<String>? id,
+    Expression<String>? code,
+    Expression<String>? name,
+    Expression<String>? cnpj,
+    Expression<String>? city,
+    Expression<String>? state,
+    Expression<String>? tier,
+    Expression<DateTime>? lastOrderAtUtc,
+    Expression<double>? creditLimit,
+    Expression<bool>? isFavorite,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (code != null) 'code': code,
+      if (name != null) 'name': name,
+      if (cnpj != null) 'cnpj': cnpj,
+      if (city != null) 'city': city,
+      if (state != null) 'state': state,
+      if (tier != null) 'tier': tier,
+      if (lastOrderAtUtc != null) 'last_order_at_utc': lastOrderAtUtc,
+      if (creditLimit != null) 'credit_limit': creditLimit,
+      if (isFavorite != null) 'is_favorite': isFavorite,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ClientsTableCompanion copyWith({
+    Value<String>? id,
+    Value<String>? code,
+    Value<String>? name,
+    Value<String>? cnpj,
+    Value<String>? city,
+    Value<String>? state,
+    Value<String>? tier,
+    Value<DateTime?>? lastOrderAtUtc,
+    Value<double>? creditLimit,
+    Value<bool>? isFavorite,
+    Value<int>? rowid,
+  }) {
+    return ClientsTableCompanion(
+      id: id ?? this.id,
+      code: code ?? this.code,
+      name: name ?? this.name,
+      cnpj: cnpj ?? this.cnpj,
+      city: city ?? this.city,
+      state: state ?? this.state,
+      tier: tier ?? this.tier,
+      lastOrderAtUtc: lastOrderAtUtc ?? this.lastOrderAtUtc,
+      creditLimit: creditLimit ?? this.creditLimit,
+      isFavorite: isFavorite ?? this.isFavorite,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (code.present) {
+      map['code'] = Variable<String>(code.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (cnpj.present) {
+      map['cnpj'] = Variable<String>(cnpj.value);
+    }
+    if (city.present) {
+      map['city'] = Variable<String>(city.value);
+    }
+    if (state.present) {
+      map['state'] = Variable<String>(state.value);
+    }
+    if (tier.present) {
+      map['tier'] = Variable<String>(tier.value);
+    }
+    if (lastOrderAtUtc.present) {
+      map['last_order_at_utc'] = Variable<DateTime>(lastOrderAtUtc.value);
+    }
+    if (creditLimit.present) {
+      map['credit_limit'] = Variable<double>(creditLimit.value);
+    }
+    if (isFavorite.present) {
+      map['is_favorite'] = Variable<bool>(isFavorite.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ClientsTableCompanion(')
+          ..write('id: $id, ')
+          ..write('code: $code, ')
+          ..write('name: $name, ')
+          ..write('cnpj: $cnpj, ')
+          ..write('city: $city, ')
+          ..write('state: $state, ')
+          ..write('tier: $tier, ')
+          ..write('lastOrderAtUtc: $lastOrderAtUtc, ')
+          ..write('creditLimit: $creditLimit, ')
+          ..write('isFavorite: $isFavorite, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ClientDetailsCacheTableTable extends ClientDetailsCacheTable
+    with TableInfo<$ClientDetailsCacheTableTable, ClientDetailsCacheTableData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ClientDetailsCacheTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _clientIdMeta = const VerificationMeta(
+    'clientId',
+  );
+  @override
+  late final GeneratedColumn<String> clientId = GeneratedColumn<String>(
+    'client_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _jsonMeta = const VerificationMeta('json');
+  @override
+  late final GeneratedColumn<String> json = GeneratedColumn<String>(
+    'json',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [clientId, json];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'client_details_cache_table';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ClientDetailsCacheTableData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('client_id')) {
+      context.handle(
+        _clientIdMeta,
+        clientId.isAcceptableOrUnknown(data['client_id']!, _clientIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_clientIdMeta);
+    }
+    if (data.containsKey('json')) {
+      context.handle(
+        _jsonMeta,
+        json.isAcceptableOrUnknown(data['json']!, _jsonMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_jsonMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {clientId};
+  @override
+  ClientDetailsCacheTableData map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ClientDetailsCacheTableData(
+      clientId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}client_id'],
+      )!,
+      json: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}json'],
+      )!,
+    );
+  }
+
+  @override
+  $ClientDetailsCacheTableTable createAlias(String alias) {
+    return $ClientDetailsCacheTableTable(attachedDatabase, alias);
+  }
+}
+
+class ClientDetailsCacheTableData extends DataClass
+    implements Insertable<ClientDetailsCacheTableData> {
+  final String clientId;
+  final String json;
+  const ClientDetailsCacheTableData({
+    required this.clientId,
+    required this.json,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['client_id'] = Variable<String>(clientId);
+    map['json'] = Variable<String>(json);
+    return map;
+  }
+
+  ClientDetailsCacheTableCompanion toCompanion(bool nullToAbsent) {
+    return ClientDetailsCacheTableCompanion(
+      clientId: Value(clientId),
+      json: Value(json),
+    );
+  }
+
+  factory ClientDetailsCacheTableData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ClientDetailsCacheTableData(
+      clientId: serializer.fromJson<String>(json['clientId']),
+      json: serializer.fromJson<String>(json['json']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'clientId': serializer.toJson<String>(clientId),
+      'json': serializer.toJson<String>(json),
+    };
+  }
+
+  ClientDetailsCacheTableData copyWith({String? clientId, String? json}) =>
+      ClientDetailsCacheTableData(
+        clientId: clientId ?? this.clientId,
+        json: json ?? this.json,
+      );
+  ClientDetailsCacheTableData copyWithCompanion(
+    ClientDetailsCacheTableCompanion data,
+  ) {
+    return ClientDetailsCacheTableData(
+      clientId: data.clientId.present ? data.clientId.value : this.clientId,
+      json: data.json.present ? data.json.value : this.json,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ClientDetailsCacheTableData(')
+          ..write('clientId: $clientId, ')
+          ..write('json: $json')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(clientId, json);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ClientDetailsCacheTableData &&
+          other.clientId == this.clientId &&
+          other.json == this.json);
+}
+
+class ClientDetailsCacheTableCompanion
+    extends UpdateCompanion<ClientDetailsCacheTableData> {
+  final Value<String> clientId;
+  final Value<String> json;
+  final Value<int> rowid;
+  const ClientDetailsCacheTableCompanion({
+    this.clientId = const Value.absent(),
+    this.json = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ClientDetailsCacheTableCompanion.insert({
+    required String clientId,
+    required String json,
+    this.rowid = const Value.absent(),
+  }) : clientId = Value(clientId),
+       json = Value(json);
+  static Insertable<ClientDetailsCacheTableData> custom({
+    Expression<String>? clientId,
+    Expression<String>? json,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (clientId != null) 'client_id': clientId,
+      if (json != null) 'json': json,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ClientDetailsCacheTableCompanion copyWith({
+    Value<String>? clientId,
+    Value<String>? json,
+    Value<int>? rowid,
+  }) {
+    return ClientDetailsCacheTableCompanion(
+      clientId: clientId ?? this.clientId,
+      json: json ?? this.json,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (clientId.present) {
+      map['client_id'] = Variable<String>(clientId.value);
+    }
+    if (json.present) {
+      map['json'] = Variable<String>(json.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ClientDetailsCacheTableCompanion(')
+          ..write('clientId: $clientId, ')
+          ..write('json: $json, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $AgendaCacheTableTable extends AgendaCacheTable
+    with TableInfo<$AgendaCacheTableTable, AgendaCacheTableData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AgendaCacheTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _dateMeta = const VerificationMeta('date');
+  @override
+  late final GeneratedColumn<String> date = GeneratedColumn<String>(
+    'date',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _jsonMeta = const VerificationMeta('json');
+  @override
+  late final GeneratedColumn<String> json = GeneratedColumn<String>(
+    'json',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [date, json];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'agenda_cache_table';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<AgendaCacheTableData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('date')) {
+      context.handle(
+        _dateMeta,
+        date.isAcceptableOrUnknown(data['date']!, _dateMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_dateMeta);
+    }
+    if (data.containsKey('json')) {
+      context.handle(
+        _jsonMeta,
+        json.isAcceptableOrUnknown(data['json']!, _jsonMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_jsonMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {date};
+  @override
+  AgendaCacheTableData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return AgendaCacheTableData(
+      date: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}date'],
+      )!,
+      json: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}json'],
+      )!,
+    );
+  }
+
+  @override
+  $AgendaCacheTableTable createAlias(String alias) {
+    return $AgendaCacheTableTable(attachedDatabase, alias);
+  }
+}
+
+class AgendaCacheTableData extends DataClass
+    implements Insertable<AgendaCacheTableData> {
+  final String date;
+  final String json;
+  const AgendaCacheTableData({required this.date, required this.json});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['date'] = Variable<String>(date);
+    map['json'] = Variable<String>(json);
+    return map;
+  }
+
+  AgendaCacheTableCompanion toCompanion(bool nullToAbsent) {
+    return AgendaCacheTableCompanion(date: Value(date), json: Value(json));
+  }
+
+  factory AgendaCacheTableData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return AgendaCacheTableData(
+      date: serializer.fromJson<String>(json['date']),
+      json: serializer.fromJson<String>(json['json']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'date': serializer.toJson<String>(date),
+      'json': serializer.toJson<String>(json),
+    };
+  }
+
+  AgendaCacheTableData copyWith({String? date, String? json}) =>
+      AgendaCacheTableData(date: date ?? this.date, json: json ?? this.json);
+  AgendaCacheTableData copyWithCompanion(AgendaCacheTableCompanion data) {
+    return AgendaCacheTableData(
+      date: data.date.present ? data.date.value : this.date,
+      json: data.json.present ? data.json.value : this.json,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AgendaCacheTableData(')
+          ..write('date: $date, ')
+          ..write('json: $json')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(date, json);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is AgendaCacheTableData &&
+          other.date == this.date &&
+          other.json == this.json);
+}
+
+class AgendaCacheTableCompanion extends UpdateCompanion<AgendaCacheTableData> {
+  final Value<String> date;
+  final Value<String> json;
+  final Value<int> rowid;
+  const AgendaCacheTableCompanion({
+    this.date = const Value.absent(),
+    this.json = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  AgendaCacheTableCompanion.insert({
+    required String date,
+    required String json,
+    this.rowid = const Value.absent(),
+  }) : date = Value(date),
+       json = Value(json);
+  static Insertable<AgendaCacheTableData> custom({
+    Expression<String>? date,
+    Expression<String>? json,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (date != null) 'date': date,
+      if (json != null) 'json': json,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  AgendaCacheTableCompanion copyWith({
+    Value<String>? date,
+    Value<String>? json,
+    Value<int>? rowid,
+  }) {
+    return AgendaCacheTableCompanion(
+      date: date ?? this.date,
+      json: json ?? this.json,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (date.present) {
+      map['date'] = Variable<String>(date.value);
+    }
+    if (json.present) {
+      map['json'] = Variable<String>(json.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AgendaCacheTableCompanion(')
+          ..write('date: $date, ')
+          ..write('json: $json, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -1795,6 +2844,12 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $PendingOrderItemsTableTable pendingOrderItemsTable =
       $PendingOrderItemsTableTable(this);
   late final $ProductsTableTable productsTable = $ProductsTableTable(this);
+  late final $ClientsTableTable clientsTable = $ClientsTableTable(this);
+  late final $ClientDetailsCacheTableTable clientDetailsCacheTable =
+      $ClientDetailsCacheTableTable(this);
+  late final $AgendaCacheTableTable agendaCacheTable = $AgendaCacheTableTable(
+    this,
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -1804,6 +2859,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     pendingOrdersTable,
     pendingOrderItemsTable,
     productsTable,
+    clientsTable,
+    clientDetailsCacheTable,
+    agendaCacheTable,
   ];
 }
 
@@ -2784,6 +3842,622 @@ typedef $$ProductsTableTableProcessedTableManager =
       ProductsTableData,
       PrefetchHooks Function()
     >;
+typedef $$ClientsTableTableCreateCompanionBuilder =
+    ClientsTableCompanion Function({
+      required String id,
+      required String code,
+      required String name,
+      required String cnpj,
+      required String city,
+      required String state,
+      required String tier,
+      Value<DateTime?> lastOrderAtUtc,
+      required double creditLimit,
+      Value<bool> isFavorite,
+      Value<int> rowid,
+    });
+typedef $$ClientsTableTableUpdateCompanionBuilder =
+    ClientsTableCompanion Function({
+      Value<String> id,
+      Value<String> code,
+      Value<String> name,
+      Value<String> cnpj,
+      Value<String> city,
+      Value<String> state,
+      Value<String> tier,
+      Value<DateTime?> lastOrderAtUtc,
+      Value<double> creditLimit,
+      Value<bool> isFavorite,
+      Value<int> rowid,
+    });
+
+class $$ClientsTableTableFilterComposer
+    extends Composer<_$AppDatabase, $ClientsTableTable> {
+  $$ClientsTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get code => $composableBuilder(
+    column: $table.code,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get cnpj => $composableBuilder(
+    column: $table.cnpj,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get city => $composableBuilder(
+    column: $table.city,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get state => $composableBuilder(
+    column: $table.state,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get tier => $composableBuilder(
+    column: $table.tier,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get lastOrderAtUtc => $composableBuilder(
+    column: $table.lastOrderAtUtc,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get creditLimit => $composableBuilder(
+    column: $table.creditLimit,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isFavorite => $composableBuilder(
+    column: $table.isFavorite,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$ClientsTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $ClientsTableTable> {
+  $$ClientsTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get code => $composableBuilder(
+    column: $table.code,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get cnpj => $composableBuilder(
+    column: $table.cnpj,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get city => $composableBuilder(
+    column: $table.city,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get state => $composableBuilder(
+    column: $table.state,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get tier => $composableBuilder(
+    column: $table.tier,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get lastOrderAtUtc => $composableBuilder(
+    column: $table.lastOrderAtUtc,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get creditLimit => $composableBuilder(
+    column: $table.creditLimit,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isFavorite => $composableBuilder(
+    column: $table.isFavorite,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$ClientsTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ClientsTableTable> {
+  $$ClientsTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get code =>
+      $composableBuilder(column: $table.code, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get cnpj =>
+      $composableBuilder(column: $table.cnpj, builder: (column) => column);
+
+  GeneratedColumn<String> get city =>
+      $composableBuilder(column: $table.city, builder: (column) => column);
+
+  GeneratedColumn<String> get state =>
+      $composableBuilder(column: $table.state, builder: (column) => column);
+
+  GeneratedColumn<String> get tier =>
+      $composableBuilder(column: $table.tier, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get lastOrderAtUtc => $composableBuilder(
+    column: $table.lastOrderAtUtc,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get creditLimit => $composableBuilder(
+    column: $table.creditLimit,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get isFavorite => $composableBuilder(
+    column: $table.isFavorite,
+    builder: (column) => column,
+  );
+}
+
+class $$ClientsTableTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ClientsTableTable,
+          ClientsTableData,
+          $$ClientsTableTableFilterComposer,
+          $$ClientsTableTableOrderingComposer,
+          $$ClientsTableTableAnnotationComposer,
+          $$ClientsTableTableCreateCompanionBuilder,
+          $$ClientsTableTableUpdateCompanionBuilder,
+          (
+            ClientsTableData,
+            BaseReferences<_$AppDatabase, $ClientsTableTable, ClientsTableData>,
+          ),
+          ClientsTableData,
+          PrefetchHooks Function()
+        > {
+  $$ClientsTableTableTableManager(_$AppDatabase db, $ClientsTableTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ClientsTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ClientsTableTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ClientsTableTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> code = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String> cnpj = const Value.absent(),
+                Value<String> city = const Value.absent(),
+                Value<String> state = const Value.absent(),
+                Value<String> tier = const Value.absent(),
+                Value<DateTime?> lastOrderAtUtc = const Value.absent(),
+                Value<double> creditLimit = const Value.absent(),
+                Value<bool> isFavorite = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ClientsTableCompanion(
+                id: id,
+                code: code,
+                name: name,
+                cnpj: cnpj,
+                city: city,
+                state: state,
+                tier: tier,
+                lastOrderAtUtc: lastOrderAtUtc,
+                creditLimit: creditLimit,
+                isFavorite: isFavorite,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String code,
+                required String name,
+                required String cnpj,
+                required String city,
+                required String state,
+                required String tier,
+                Value<DateTime?> lastOrderAtUtc = const Value.absent(),
+                required double creditLimit,
+                Value<bool> isFavorite = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ClientsTableCompanion.insert(
+                id: id,
+                code: code,
+                name: name,
+                cnpj: cnpj,
+                city: city,
+                state: state,
+                tier: tier,
+                lastOrderAtUtc: lastOrderAtUtc,
+                creditLimit: creditLimit,
+                isFavorite: isFavorite,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$ClientsTableTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ClientsTableTable,
+      ClientsTableData,
+      $$ClientsTableTableFilterComposer,
+      $$ClientsTableTableOrderingComposer,
+      $$ClientsTableTableAnnotationComposer,
+      $$ClientsTableTableCreateCompanionBuilder,
+      $$ClientsTableTableUpdateCompanionBuilder,
+      (
+        ClientsTableData,
+        BaseReferences<_$AppDatabase, $ClientsTableTable, ClientsTableData>,
+      ),
+      ClientsTableData,
+      PrefetchHooks Function()
+    >;
+typedef $$ClientDetailsCacheTableTableCreateCompanionBuilder =
+    ClientDetailsCacheTableCompanion Function({
+      required String clientId,
+      required String json,
+      Value<int> rowid,
+    });
+typedef $$ClientDetailsCacheTableTableUpdateCompanionBuilder =
+    ClientDetailsCacheTableCompanion Function({
+      Value<String> clientId,
+      Value<String> json,
+      Value<int> rowid,
+    });
+
+class $$ClientDetailsCacheTableTableFilterComposer
+    extends Composer<_$AppDatabase, $ClientDetailsCacheTableTable> {
+  $$ClientDetailsCacheTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get clientId => $composableBuilder(
+    column: $table.clientId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get json => $composableBuilder(
+    column: $table.json,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$ClientDetailsCacheTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $ClientDetailsCacheTableTable> {
+  $$ClientDetailsCacheTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get clientId => $composableBuilder(
+    column: $table.clientId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get json => $composableBuilder(
+    column: $table.json,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$ClientDetailsCacheTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ClientDetailsCacheTableTable> {
+  $$ClientDetailsCacheTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get clientId =>
+      $composableBuilder(column: $table.clientId, builder: (column) => column);
+
+  GeneratedColumn<String> get json =>
+      $composableBuilder(column: $table.json, builder: (column) => column);
+}
+
+class $$ClientDetailsCacheTableTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ClientDetailsCacheTableTable,
+          ClientDetailsCacheTableData,
+          $$ClientDetailsCacheTableTableFilterComposer,
+          $$ClientDetailsCacheTableTableOrderingComposer,
+          $$ClientDetailsCacheTableTableAnnotationComposer,
+          $$ClientDetailsCacheTableTableCreateCompanionBuilder,
+          $$ClientDetailsCacheTableTableUpdateCompanionBuilder,
+          (
+            ClientDetailsCacheTableData,
+            BaseReferences<
+              _$AppDatabase,
+              $ClientDetailsCacheTableTable,
+              ClientDetailsCacheTableData
+            >,
+          ),
+          ClientDetailsCacheTableData,
+          PrefetchHooks Function()
+        > {
+  $$ClientDetailsCacheTableTableTableManager(
+    _$AppDatabase db,
+    $ClientDetailsCacheTableTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ClientDetailsCacheTableTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$ClientDetailsCacheTableTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$ClientDetailsCacheTableTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> clientId = const Value.absent(),
+                Value<String> json = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ClientDetailsCacheTableCompanion(
+                clientId: clientId,
+                json: json,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String clientId,
+                required String json,
+                Value<int> rowid = const Value.absent(),
+              }) => ClientDetailsCacheTableCompanion.insert(
+                clientId: clientId,
+                json: json,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$ClientDetailsCacheTableTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ClientDetailsCacheTableTable,
+      ClientDetailsCacheTableData,
+      $$ClientDetailsCacheTableTableFilterComposer,
+      $$ClientDetailsCacheTableTableOrderingComposer,
+      $$ClientDetailsCacheTableTableAnnotationComposer,
+      $$ClientDetailsCacheTableTableCreateCompanionBuilder,
+      $$ClientDetailsCacheTableTableUpdateCompanionBuilder,
+      (
+        ClientDetailsCacheTableData,
+        BaseReferences<
+          _$AppDatabase,
+          $ClientDetailsCacheTableTable,
+          ClientDetailsCacheTableData
+        >,
+      ),
+      ClientDetailsCacheTableData,
+      PrefetchHooks Function()
+    >;
+typedef $$AgendaCacheTableTableCreateCompanionBuilder =
+    AgendaCacheTableCompanion Function({
+      required String date,
+      required String json,
+      Value<int> rowid,
+    });
+typedef $$AgendaCacheTableTableUpdateCompanionBuilder =
+    AgendaCacheTableCompanion Function({
+      Value<String> date,
+      Value<String> json,
+      Value<int> rowid,
+    });
+
+class $$AgendaCacheTableTableFilterComposer
+    extends Composer<_$AppDatabase, $AgendaCacheTableTable> {
+  $$AgendaCacheTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get date => $composableBuilder(
+    column: $table.date,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get json => $composableBuilder(
+    column: $table.json,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$AgendaCacheTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $AgendaCacheTableTable> {
+  $$AgendaCacheTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get date => $composableBuilder(
+    column: $table.date,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get json => $composableBuilder(
+    column: $table.json,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$AgendaCacheTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $AgendaCacheTableTable> {
+  $$AgendaCacheTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get date =>
+      $composableBuilder(column: $table.date, builder: (column) => column);
+
+  GeneratedColumn<String> get json =>
+      $composableBuilder(column: $table.json, builder: (column) => column);
+}
+
+class $$AgendaCacheTableTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $AgendaCacheTableTable,
+          AgendaCacheTableData,
+          $$AgendaCacheTableTableFilterComposer,
+          $$AgendaCacheTableTableOrderingComposer,
+          $$AgendaCacheTableTableAnnotationComposer,
+          $$AgendaCacheTableTableCreateCompanionBuilder,
+          $$AgendaCacheTableTableUpdateCompanionBuilder,
+          (
+            AgendaCacheTableData,
+            BaseReferences<
+              _$AppDatabase,
+              $AgendaCacheTableTable,
+              AgendaCacheTableData
+            >,
+          ),
+          AgendaCacheTableData,
+          PrefetchHooks Function()
+        > {
+  $$AgendaCacheTableTableTableManager(
+    _$AppDatabase db,
+    $AgendaCacheTableTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AgendaCacheTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$AgendaCacheTableTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$AgendaCacheTableTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> date = const Value.absent(),
+                Value<String> json = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => AgendaCacheTableCompanion(
+                date: date,
+                json: json,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String date,
+                required String json,
+                Value<int> rowid = const Value.absent(),
+              }) => AgendaCacheTableCompanion.insert(
+                date: date,
+                json: json,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$AgendaCacheTableTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $AgendaCacheTableTable,
+      AgendaCacheTableData,
+      $$AgendaCacheTableTableFilterComposer,
+      $$AgendaCacheTableTableOrderingComposer,
+      $$AgendaCacheTableTableAnnotationComposer,
+      $$AgendaCacheTableTableCreateCompanionBuilder,
+      $$AgendaCacheTableTableUpdateCompanionBuilder,
+      (
+        AgendaCacheTableData,
+        BaseReferences<
+          _$AppDatabase,
+          $AgendaCacheTableTable,
+          AgendaCacheTableData
+        >,
+      ),
+      AgendaCacheTableData,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -2799,4 +4473,13 @@ class $AppDatabaseManager {
       );
   $$ProductsTableTableTableManager get productsTable =>
       $$ProductsTableTableTableManager(_db, _db.productsTable);
+  $$ClientsTableTableTableManager get clientsTable =>
+      $$ClientsTableTableTableManager(_db, _db.clientsTable);
+  $$ClientDetailsCacheTableTableTableManager get clientDetailsCacheTable =>
+      $$ClientDetailsCacheTableTableTableManager(
+        _db,
+        _db.clientDetailsCacheTable,
+      );
+  $$AgendaCacheTableTableTableManager get agendaCacheTable =>
+      $$AgendaCacheTableTableTableManager(_db, _db.agendaCacheTable);
 }

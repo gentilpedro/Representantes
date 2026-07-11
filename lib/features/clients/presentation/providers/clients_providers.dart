@@ -9,7 +9,10 @@ import '../../domain/repositories/clients_repository.dart';
 enum ClientFilter { all, favorites, blocked, offline }
 
 final clientsRepositoryProvider = Provider<ClientsRepository>(
-  (ref) => ApiClientsRepository(ref.watch(apiClientProvider)),
+  (ref) => ApiClientsRepository(
+    ref.watch(apiClientProvider),
+    ref.watch(appDatabaseProvider),
+  ),
 );
 
 final clientsListProvider = FutureProvider.autoDispose<List<ClientListItem>>((

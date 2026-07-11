@@ -64,19 +64,63 @@ class ProductsTable extends Table {
   Set<Column> get primaryKey => {id};
 }
 
+/// Clientes baixados do servidor (`GET /api/clients`) — permite consultar e
+/// selecionar cliente pra um pedido mesmo sem conexão. Mesmo padrão do
+/// [ProductsTable]: substituído por inteiro a cada sincronização.
+class ClientsTable extends Table {
+  TextColumn get id => text()();
+  TextColumn get code => text()();
+  TextColumn get name => text()();
+  TextColumn get cnpj => text()();
+  TextColumn get city => text()();
+  TextColumn get state => text()();
+  TextColumn get tier => text()();
+  DateTimeColumn get lastOrderAtUtc => dateTime().nullable()();
+  RealColumn get creditLimit => real()();
+  BoolColumn get isFavorite => boolean().withDefault(const Constant(false))();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+/// Cache do detalhe de cada cliente já visitado com conexão (`GET
+/// /api/clients/{id}`) — guarda a resposta bruta em JSON pra reaproveitar o
+/// mesmo parser da chamada online quando offline.
+class ClientDetailsCacheTable extends Table {
+  TextColumn get clientId => text()();
+  TextColumn get json => text()();
+
+  @override
+  Set<Column> get primaryKey => {clientId};
+}
+
+/// Cache da agenda do dia (`GET /api/agenda?date=`) — uma linha por data já
+/// consultada com conexão, guardada em JSON bruto (mesma ideia do
+/// [ClientDetailsCacheTable]) pra reaproveitar o parser existente.
+class AgendaCacheTable extends Table {
+  TextColumn get date => text()();
+  TextColumn get json => text()();
+
+  @override
+  Set<Column> get primaryKey => {date};
+}
+
 @DriftDatabase(
   tables: [
     SyncMetadataTable,
     PendingOrdersTable,
     PendingOrderItemsTable,
     ProductsTable,
+    ClientsTable,
+    ClientDetailsCacheTable,
+    AgendaCacheTable,
   ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -88,6 +132,13 @@ class AppDatabase extends _$AppDatabase {
       }
       if (from < 3) {
         await m.createTable(productsTable);
+      }
+      if (from < 4) {
+        await m.createTable(clientsTable);
+        await m.createTable(clientDetailsCacheTable);
+      }
+      if (from < 5) {
+        await m.createTable(agendaCacheTable);
       }
     },
   );
@@ -122,14 +173,17 @@ class AppDatabase extends _$AppDatabase {
   Future<List<PendingOrdersTableData>> fetchPendingOrders() =>
       select(pendingOrdersTable).get();
 
-  Future<List<PendingOrderItemsTableData>> fetchPendingOrderItems(String orderId) =>
-      (select(pendingOrderItemsTable)
-            ..where((t) => t.orderId.equals(orderId)))
-          .get();
+  Future<List<PendingOrderItemsTableData>> fetchPendingOrderItems(
+    String orderId,
+  ) => (select(
+    pendingOrderItemsTable,
+  )..where((t) => t.orderId.equals(orderId))).get();
 
   Future<void> deletePendingOrder(String id) {
     return transaction(() async {
-      await (delete(pendingOrderItemsTable)..where((t) => t.orderId.equals(id))).go();
+      await (delete(
+        pendingOrderItemsTable,
+      )..where((t) => t.orderId.equals(id))).go();
       await (delete(pendingOrdersTable)..where((t) => t.id.equals(id))).go();
     });
   }
@@ -154,6 +208,52 @@ class AppDatabase extends _$AppDatabase {
         lastSyncedAt: syncedAt,
       ),
     );
+  }
+
+  /// Substitui todo o cadastro de clientes local pelo lote baixado do
+  /// servidor — mesma lógica de [replaceAllProducts].
+  Future<void> replaceAllClients(List<ClientsTableCompanion> clients) {
+    return transaction(() async {
+      await delete(clientsTable).go();
+      await batch((b) => b.insertAll(clientsTable, clients));
+    });
+  }
+
+  Future<List<ClientsTableData>> fetchAllClients() =>
+      select(clientsTable).get();
+
+  /// Mantém o cache do favorito em dia sem precisar rebaixar a lista
+  /// inteira — usado depois de um `PATCH /favorite` bem-sucedido.
+  Future<void> updateCachedClientFavorite(String clientId, bool isFavorite) {
+    return (update(clientsTable)..where((t) => t.id.equals(clientId))).write(
+      ClientsTableCompanion(isFavorite: Value(isFavorite)),
+    );
+  }
+
+  Future<void> upsertClientDetailJson(String clientId, String json) {
+    return into(clientDetailsCacheTable).insertOnConflictUpdate(
+      ClientDetailsCacheTableCompanion.insert(clientId: clientId, json: json),
+    );
+  }
+
+  Future<String?> fetchClientDetailJson(String clientId) async {
+    final row = await (select(
+      clientDetailsCacheTable,
+    )..where((t) => t.clientId.equals(clientId))).getSingleOrNull();
+    return row?.json;
+  }
+
+  Future<void> upsertAgendaJson(String date, String json) {
+    return into(agendaCacheTable).insertOnConflictUpdate(
+      AgendaCacheTableCompanion.insert(date: date, json: json),
+    );
+  }
+
+  Future<String?> fetchAgendaJson(String date) async {
+    final row = await (select(
+      agendaCacheTable,
+    )..where((t) => t.date.equals(date))).getSingleOrNull();
+    return row?.json;
   }
 
   static QueryExecutor _openConnection() {

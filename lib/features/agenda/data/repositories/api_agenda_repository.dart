@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 
+import '../../../../core/database/app_database.dart';
 import '../../../../core/network/api_client.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../domain/agenda_exception.dart';
@@ -9,33 +12,54 @@ import '../../domain/repositories/agenda_repository.dart';
 
 /// Implementação real de [AgendaRepository], contra `GET /api/agenda` e
 /// `POST /api/visits/{id}/check-in|check-out` da Web API .NET 10.
+///
+/// A agenda do dia é cacheada no [AppDatabase] (mesma ideia do catálogo e
+/// dos clientes) pra que o representante consiga consultar o roteiro do
+/// dia mesmo sem conexão. Check-in, check-out e criação de visita ainda
+/// exigem conexão — ficam pra uma próxima leva, com fila de sincronização
+/// própria como a de pedidos offline.
 class ApiAgendaRepository implements AgendaRepository {
-  ApiAgendaRepository(this._apiClient);
+  ApiAgendaRepository(this._apiClient, this._db);
 
   final ApiClient _apiClient;
+  final AppDatabase _db;
 
   @override
   Future<DailyRoute> fetchDailyRoute(DateTime date) async {
+    final isoDate = _isoDate(date);
     try {
       final response = await _apiClient.dio.get<Map<String, dynamic>>(
         '/api/agenda',
-        queryParameters: {'date': _isoDate(date)},
+        queryParameters: {'date': isoDate},
       );
+      await _db.upsertAgendaJson(isoDate, jsonEncode(response.data));
       return _parseDailyRoute(response.data!);
     } on DioException catch (_) {
-      throw AgendaException('Não foi possível carregar a agenda. Tente novamente.');
+      final cachedJson = await _db.fetchAgendaJson(isoDate);
+      if (cachedJson != null) {
+        return _parseDailyRoute(jsonDecode(cachedJson) as Map<String, dynamic>);
+      }
+      throw AgendaException(
+        'Não foi possível carregar a agenda. Tente novamente.',
+      );
     }
   }
 
   @override
-  Future<void> checkIn(String visitId, {double? latitude, double? longitude}) async {
+  Future<void> checkIn(
+    String visitId, {
+    double? latitude,
+    double? longitude,
+  }) async {
     try {
       await _apiClient.dio.post<Map<String, dynamic>>(
         '/api/visits/$visitId/check-in',
         data: {'latitude': latitude, 'longitude': longitude},
       );
     } on DioException catch (_) {
-      throw AgendaException('Não foi possível registrar o check-in. Tente novamente.');
+      throw AgendaException(
+        'Não foi possível registrar o check-in. Tente novamente.',
+      );
     }
   }
 
@@ -47,7 +71,9 @@ class ApiAgendaRepository implements AgendaRepository {
         data: {'notes': notes},
       );
     } on DioException catch (_) {
-      throw AgendaException('Não foi possível registrar o check-out. Tente novamente.');
+      throw AgendaException(
+        'Não foi possível registrar o check-out. Tente novamente.',
+      );
     }
   }
 
