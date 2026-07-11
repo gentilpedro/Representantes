@@ -33,7 +33,11 @@ jobs:
         run: flutter analyze
 
       - name: Build release APK
-        run: flutter build apk --release --dart-define=API_BASE_URL=${{ secrets.API_BASE_URL }}
+        # --build-number vem do run number do GitHub Actions, incrementando
+        # sozinho a cada build — evita depender de lembrar de bumpar o
+        # número no pubspec.yaml pra cada push. O "X.Y.Z(-beta.N)" (build
+        # name) continua vindo do pubspec.yaml, decidido manualmente.
+        run: flutter build apk --release --build-number=${{ github.run_number }} --dart-define=API_BASE_URL=${{ secrets.API_BASE_URL }}
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
