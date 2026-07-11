@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../core/providers/core_providers.dart';
@@ -31,6 +34,61 @@ final darkModeProvider = StateNotifierProvider<DarkModeNotifier, bool>((ref) {
   return DarkModeNotifier();
 });
 
+/// Base pra permitir substituir por um fake nos testes — a implementação
+/// real usa `path_provider`, sem canal de plataforma mockado no
+/// `flutter_test` (mesma razão pela qual `AppDatabase`/Drift também nunca é
+/// exercitado de verdade nos testes de fluxo, só com fakes de repositório).
+abstract class ProfilePhotoController extends StateNotifier<String?> {
+  ProfilePhotoController() : super(null);
+
+  Future<void> setPhoto(String sourcePath);
+
+  Future<void> clear();
+}
+
+/// Foto de perfil escolhida pelo representante (câmera ou galeria) — fica só
+/// no aparelho, sem sincronizar com o servidor. Sempre salva com o mesmo
+/// nome fixo dentro do diretório de documentos do app: dispensa persistir o
+/// caminho em `shared_preferences` (o "carregar" é só checar se o arquivo
+/// existe).
+class ProfilePhotoNotifier extends ProfilePhotoController {
+  ProfilePhotoNotifier() {
+    _load();
+  }
+
+  Future<String> _photoFilePath() async {
+    final dir = await getApplicationDocumentsDirectory();
+    return '${dir.path}/profile_photo.jpg';
+  }
+
+  Future<void> _load() async {
+    final path = await _photoFilePath();
+    if (await File(path).exists()) {
+      state = path;
+    }
+  }
+
+  @override
+  Future<void> setPhoto(String sourcePath) async {
+    final destPath = await _photoFilePath();
+    await File(sourcePath).copy(destPath);
+    state = destPath;
+  }
+
+  @override
+  Future<void> clear() async {
+    final path = await _photoFilePath();
+    final file = File(path);
+    if (await file.exists()) await file.delete();
+    state = null;
+  }
+}
+
+final profilePhotoProvider =
+    StateNotifierProvider<ProfilePhotoController, String?>((ref) {
+      return ProfilePhotoNotifier();
+    });
+
 final profileRepositoryProvider = Provider<ProfileRepository>((ref) {
   return ApiProfileRepository(ref.watch(apiClientProvider));
 });
@@ -49,8 +107,9 @@ class AppInfo {
 }
 
 final appInfoProvider = Provider<AppInfo>((ref) {
-  return const AppInfo(
-    buildLabel: 'Build 2024.11.02',
+  final packageInfo = ref.watch(packageInfoProvider);
+  return AppInfo(
+    buildLabel: packageInfo.whenOrNull(data: formatAppVersion) ?? '...',
     cacheSizeLabel: '64.5 MB utilizados',
   );
 });

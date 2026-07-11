@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import '../database/app_database.dart';
 import '../network/api_client.dart';
@@ -38,3 +39,15 @@ final appDatabaseProvider = Provider<AppDatabase>((ref) {
   ref.onDispose(db.close);
   return db;
 });
+
+/// Versão/build reais do app, lidos do `pubspec.yaml` (embutidos no binário
+/// no momento do build) — usado pra exibir a versão de verdade em vez de um
+/// texto fixo, essencial pra identificar builds durante o beta.
+final packageInfoProvider = FutureProvider<PackageInfo>((ref) {
+  return PackageInfo.fromPlatform();
+});
+
+/// `v1.0.0 (3)` — versão + build number, formato usado nas telas de Boas-
+/// vindas e Perfil.
+String formatAppVersion(PackageInfo info) =>
+    'v${info.version} (${info.buildNumber})';

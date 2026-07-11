@@ -244,11 +244,13 @@ class _StatusBar extends ConsumerWidget {
   }
 }
 
-class _SecurityFooter extends StatelessWidget {
+class _SecurityFooter extends ConsumerWidget {
   const _SecurityFooter();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final packageInfo = ref.watch(packageInfoProvider);
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -301,7 +303,7 @@ class _SecurityFooter extends StatelessWidget {
                     ],
                   ),
                   Text(
-                    'v2.4.0-stable',
+                    packageInfo.whenOrNull(data: formatAppVersion) ?? '',
                     style: TextStyle(
                       fontSize: 11,
                       color: context.colors.textMuted,

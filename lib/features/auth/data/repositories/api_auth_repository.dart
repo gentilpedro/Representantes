@@ -1,12 +1,12 @@
 import 'package:dio/dio.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import '../../../../core/network/api_client.dart';
+import '../../../../core/providers/core_providers.dart';
 import '../../../../core/storage/session_storage.dart';
 import '../../domain/auth_exception.dart';
 import '../../domain/entities/app_user.dart';
 import '../../domain/repositories/auth_repository.dart';
-
-const _clientAppVersion = 'v2.4.0';
 
 /// Implementação real de [AuthRepository], contra `POST /api/auth/*` da Web
 /// API .NET 10.
@@ -101,13 +101,14 @@ class ApiAuthRepository implements AuthRepository {
   Future<AppUser> _persistAuthResponse(Map<String, dynamic> data) async {
     final token = data['token'] as String;
     final representative = data['representative'] as Map<String, dynamic>;
+    final packageInfo = await PackageInfo.fromPlatform();
 
     final user = AppUser(
       id: representative['id'] as String,
       name: representative['name'] as String,
       role: representative['role'] as String,
       region: representative['region'] as String,
-      appVersion: _clientAppVersion,
+      appVersion: formatAppVersion(packageInfo),
       avatarUrl: representative['avatarUrl'] as String?,
       lastSyncAt: representative['lastSyncAtUtc'] == null
           ? null

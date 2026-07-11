@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../../../core/theme/app_palette.dart';
 import '../../../../core/utils/formatters.dart';
@@ -7,6 +10,59 @@ import '../../../../core/widgets/responsive_content.dart';
 import '../../../auth/presentation/providers/auth_providers.dart';
 import '../../domain/entities/permission_item.dart';
 import '../providers/profile_providers.dart';
+
+enum _PhotoAction { camera, gallery, remove }
+
+Future<void> _showPhotoOptions(
+  BuildContext context,
+  WidgetRef ref, {
+  required bool hasPhoto,
+}) async {
+  final action = await showModalBottomSheet<_PhotoAction>(
+    context: context,
+    builder: (sheetContext) => SafeArea(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ListTile(
+            leading: const Icon(Icons.photo_camera_outlined),
+            title: const Text('Tirar foto'),
+            onTap: () => Navigator.of(sheetContext).pop(_PhotoAction.camera),
+          ),
+          ListTile(
+            leading: const Icon(Icons.photo_library_outlined),
+            title: const Text('Escolher da galeria'),
+            onTap: () => Navigator.of(sheetContext).pop(_PhotoAction.gallery),
+          ),
+          if (hasPhoto)
+            ListTile(
+              leading: const Icon(Icons.delete_outline),
+              title: const Text('Remover foto'),
+              onTap: () => Navigator.of(sheetContext).pop(_PhotoAction.remove),
+            ),
+        ],
+      ),
+    ),
+  );
+
+  if (action == null) return;
+
+  if (action == _PhotoAction.remove) {
+    await ref.read(profilePhotoProvider.notifier).clear();
+    return;
+  }
+
+  final picked = await ImagePicker().pickImage(
+    source: action == _PhotoAction.camera
+        ? ImageSource.camera
+        : ImageSource.gallery,
+    maxWidth: 512,
+    imageQuality: 80,
+  );
+  if (picked == null) return;
+
+  await ref.read(profilePhotoProvider.notifier).setPhoto(picked.path);
+}
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -17,6 +73,7 @@ class ProfileScreen extends ConsumerWidget {
     final darkMode = ref.watch(darkModeProvider);
     final permissionsAsync = ref.watch(permissionsProvider);
     final appInfo = ref.watch(appInfoProvider);
+    final photoPath = ref.watch(profilePhotoProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -44,34 +101,66 @@ class ProfileScreen extends ConsumerWidget {
                 children: [
                   Row(
                     children: [
-                      Stack(
-                        children: [
-                          CircleAvatar(
-                            radius: 26,
-                            backgroundColor: context.colors.surface,
-                            child: Icon(
-                              Icons.person,
-                              color: context.colors.primary,
-                              size: 26,
+                      GestureDetector(
+                        onTap: () => _showPhotoOptions(
+                          context,
+                          ref,
+                          hasPhoto: photoPath != null,
+                        ),
+                        child: Stack(
+                          children: [
+                            CircleAvatar(
+                              radius: 26,
+                              backgroundColor: context.colors.surface,
+                              backgroundImage: photoPath != null
+                                  ? FileImage(File(photoPath))
+                                  : null,
+                              child: photoPath == null
+                                  ? Icon(
+                                      Icons.person,
+                                      color: context.colors.primary,
+                                      size: 26,
+                                    )
+                                  : null,
                             ),
-                          ),
-                          Positioned(
-                            right: 0,
-                            bottom: 0,
-                            child: Container(
-                              width: 12,
-                              height: 12,
-                              decoration: BoxDecoration(
-                                color: context.colors.success,
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: Colors.white,
-                                  width: 2,
+                            Positioned(
+                              right: 0,
+                              bottom: 0,
+                              child: Container(
+                                width: 12,
+                                height: 12,
+                                decoration: BoxDecoration(
+                                  color: context.colors.success,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: Colors.white,
+                                    width: 2,
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        ],
+                            Positioned(
+                              left: 0,
+                              bottom: 0,
+                              child: Container(
+                                padding: const EdgeInsets.all(3),
+                                decoration: BoxDecoration(
+                                  color: context.colors.primary,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: Colors.white,
+                                    width: 1.5,
+                                  ),
+                                ),
+                                child: const Icon(
+                                  Icons.camera_alt,
+                                  size: 10,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                       const SizedBox(width: 14),
                       Expanded(
@@ -351,7 +440,9 @@ class ProfileScreen extends ConsumerWidget {
             ElevatedButton.icon(
               onPressed: () =>
                   ref.read(authControllerProvider.notifier).logout(),
-              style: ElevatedButton.styleFrom(backgroundColor: context.colors.error),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: context.colors.error,
+              ),
               icon: const Icon(Icons.logout),
               label: const Text('Sair da Conta'),
             ),
@@ -411,7 +502,9 @@ class _PermissionRow extends StatelessWidget {
           Icon(
             permission.icon,
             size: 18,
-            color: isGranted ? context.colors.success : context.colors.textMuted,
+            color: isGranted
+                ? context.colors.success
+                : context.colors.textMuted,
           ),
           const SizedBox(width: 10),
           Expanded(
