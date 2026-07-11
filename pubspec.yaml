@@ -49,6 +49,14 @@ dependencies:
   shared_preferences: ^2.3.3
   flutter_secure_storage: ^9.2.2
   connectivity_plus: ^6.1.0
+  path_provider: ^2.1.4
+
+  # Foto de perfil (câmera/galeria, salva só localmente no aparelho)
+  image_picker: ^1.1.2
+
+  # Versão/build reais do app (pubspec.yaml), exibidos na tela de Boas-vindas
+  # e em Perfil > Sobre o Aplicativo
+  package_info_plus: ^8.1.1
 
   # Banco de dados de referência (materiais, clientes, leads) sincronizado do servidor
   drift: ^2.21.0
