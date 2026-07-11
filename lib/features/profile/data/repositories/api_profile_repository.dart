@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../core/database/app_database.dart';
 import '../../../../core/network/api_client.dart';
 import '../../domain/entities/permission_item.dart';
 import '../../domain/profile_exception.dart';
@@ -17,9 +20,12 @@ const _iconsByName = <String, IconData>{
 /// Implementação real de [ProfileRepository], contra
 /// `GET /api/profile/permissions` da Web API .NET 10.
 class ApiProfileRepository implements ProfileRepository {
-  ApiProfileRepository(this._apiClient);
+  ApiProfileRepository(this._apiClient, this._db);
+
+  static const _cacheKey = 'permissions';
 
   final ApiClient _apiClient;
+  final AppDatabase _db;
 
   @override
   Future<List<PermissionItem>> fetchPermissions() async {
@@ -27,10 +33,17 @@ class ApiProfileRepository implements ProfileRepository {
       final response = await _apiClient.dio.get<List<dynamic>>(
         '/api/profile/permissions',
       );
+      await _db.upsertJsonCache(_cacheKey, jsonEncode(response.data));
       return response.data!
           .map((v) => _parsePermission(v as Map<String, dynamic>))
           .toList();
     } on DioException catch (_) {
+      final cached = await _db.fetchJsonCache(_cacheKey);
+      if (cached != null) {
+        return (jsonDecode(cached) as List<dynamic>)
+            .map((v) => _parsePermission(v as Map<String, dynamic>))
+            .toList();
+      }
       throw ProfileException(
         'Não foi possível carregar as permissões. Tente novamente.',
       );

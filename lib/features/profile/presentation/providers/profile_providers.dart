@@ -90,7 +90,10 @@ final profilePhotoProvider =
     });
 
 final profileRepositoryProvider = Provider<ProfileRepository>((ref) {
-  return ApiProfileRepository(ref.watch(apiClientProvider));
+  return ApiProfileRepository(
+    ref.watch(apiClientProvider),
+    ref.watch(appDatabaseProvider),
+  );
 });
 
 /// Permissões do representante, vindas da Web API .NET 10 junto com o perfil

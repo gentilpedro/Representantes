@@ -6,7 +6,10 @@ import '../../domain/entities/reports_summary.dart';
 import '../../domain/repositories/reports_repository.dart';
 
 final reportsRepositoryProvider = Provider<ReportsRepository>(
-  (ref) => ApiReportsRepository(ref.watch(apiClientProvider)),
+  (ref) => ApiReportsRepository(
+    ref.watch(apiClientProvider),
+    ref.watch(appDatabaseProvider),
+  ),
 );
 
 final reportPeriodProvider = StateProvider.autoDispose<ReportPeriod>(

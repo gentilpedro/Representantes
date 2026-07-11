@@ -2834,6 +2834,215 @@ class AgendaCacheTableCompanion extends UpdateCompanion<AgendaCacheTableData> {
   }
 }
 
+class $JsonCacheTableTable extends JsonCacheTable
+    with TableInfo<$JsonCacheTableTable, JsonCacheTableData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $JsonCacheTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _keyMeta = const VerificationMeta('key');
+  @override
+  late final GeneratedColumn<String> key = GeneratedColumn<String>(
+    'key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _jsonMeta = const VerificationMeta('json');
+  @override
+  late final GeneratedColumn<String> json = GeneratedColumn<String>(
+    'json',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [key, json];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'json_cache_table';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<JsonCacheTableData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('key')) {
+      context.handle(
+        _keyMeta,
+        key.isAcceptableOrUnknown(data['key']!, _keyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_keyMeta);
+    }
+    if (data.containsKey('json')) {
+      context.handle(
+        _jsonMeta,
+        json.isAcceptableOrUnknown(data['json']!, _jsonMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_jsonMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {key};
+  @override
+  JsonCacheTableData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return JsonCacheTableData(
+      key: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}key'],
+      )!,
+      json: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}json'],
+      )!,
+    );
+  }
+
+  @override
+  $JsonCacheTableTable createAlias(String alias) {
+    return $JsonCacheTableTable(attachedDatabase, alias);
+  }
+}
+
+class JsonCacheTableData extends DataClass
+    implements Insertable<JsonCacheTableData> {
+  final String key;
+  final String json;
+  const JsonCacheTableData({required this.key, required this.json});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['key'] = Variable<String>(key);
+    map['json'] = Variable<String>(json);
+    return map;
+  }
+
+  JsonCacheTableCompanion toCompanion(bool nullToAbsent) {
+    return JsonCacheTableCompanion(key: Value(key), json: Value(json));
+  }
+
+  factory JsonCacheTableData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return JsonCacheTableData(
+      key: serializer.fromJson<String>(json['key']),
+      json: serializer.fromJson<String>(json['json']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'key': serializer.toJson<String>(key),
+      'json': serializer.toJson<String>(json),
+    };
+  }
+
+  JsonCacheTableData copyWith({String? key, String? json}) =>
+      JsonCacheTableData(key: key ?? this.key, json: json ?? this.json);
+  JsonCacheTableData copyWithCompanion(JsonCacheTableCompanion data) {
+    return JsonCacheTableData(
+      key: data.key.present ? data.key.value : this.key,
+      json: data.json.present ? data.json.value : this.json,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('JsonCacheTableData(')
+          ..write('key: $key, ')
+          ..write('json: $json')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(key, json);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is JsonCacheTableData &&
+          other.key == this.key &&
+          other.json == this.json);
+}
+
+class JsonCacheTableCompanion extends UpdateCompanion<JsonCacheTableData> {
+  final Value<String> key;
+  final Value<String> json;
+  final Value<int> rowid;
+  const JsonCacheTableCompanion({
+    this.key = const Value.absent(),
+    this.json = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  JsonCacheTableCompanion.insert({
+    required String key,
+    required String json,
+    this.rowid = const Value.absent(),
+  }) : key = Value(key),
+       json = Value(json);
+  static Insertable<JsonCacheTableData> custom({
+    Expression<String>? key,
+    Expression<String>? json,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (key != null) 'key': key,
+      if (json != null) 'json': json,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  JsonCacheTableCompanion copyWith({
+    Value<String>? key,
+    Value<String>? json,
+    Value<int>? rowid,
+  }) {
+    return JsonCacheTableCompanion(
+      key: key ?? this.key,
+      json: json ?? this.json,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (key.present) {
+      map['key'] = Variable<String>(key.value);
+    }
+    if (json.present) {
+      map['json'] = Variable<String>(json.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('JsonCacheTableCompanion(')
+          ..write('key: $key, ')
+          ..write('json: $json, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -2850,6 +3059,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $AgendaCacheTableTable agendaCacheTable = $AgendaCacheTableTable(
     this,
   );
+  late final $JsonCacheTableTable jsonCacheTable = $JsonCacheTableTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -2862,6 +3072,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     clientsTable,
     clientDetailsCacheTable,
     agendaCacheTable,
+    jsonCacheTable,
   ];
 }
 
@@ -4458,6 +4669,151 @@ typedef $$AgendaCacheTableTableProcessedTableManager =
       AgendaCacheTableData,
       PrefetchHooks Function()
     >;
+typedef $$JsonCacheTableTableCreateCompanionBuilder =
+    JsonCacheTableCompanion Function({
+      required String key,
+      required String json,
+      Value<int> rowid,
+    });
+typedef $$JsonCacheTableTableUpdateCompanionBuilder =
+    JsonCacheTableCompanion Function({
+      Value<String> key,
+      Value<String> json,
+      Value<int> rowid,
+    });
+
+class $$JsonCacheTableTableFilterComposer
+    extends Composer<_$AppDatabase, $JsonCacheTableTable> {
+  $$JsonCacheTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get key => $composableBuilder(
+    column: $table.key,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get json => $composableBuilder(
+    column: $table.json,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$JsonCacheTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $JsonCacheTableTable> {
+  $$JsonCacheTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get key => $composableBuilder(
+    column: $table.key,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get json => $composableBuilder(
+    column: $table.json,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$JsonCacheTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $JsonCacheTableTable> {
+  $$JsonCacheTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get key =>
+      $composableBuilder(column: $table.key, builder: (column) => column);
+
+  GeneratedColumn<String> get json =>
+      $composableBuilder(column: $table.json, builder: (column) => column);
+}
+
+class $$JsonCacheTableTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $JsonCacheTableTable,
+          JsonCacheTableData,
+          $$JsonCacheTableTableFilterComposer,
+          $$JsonCacheTableTableOrderingComposer,
+          $$JsonCacheTableTableAnnotationComposer,
+          $$JsonCacheTableTableCreateCompanionBuilder,
+          $$JsonCacheTableTableUpdateCompanionBuilder,
+          (
+            JsonCacheTableData,
+            BaseReferences<
+              _$AppDatabase,
+              $JsonCacheTableTable,
+              JsonCacheTableData
+            >,
+          ),
+          JsonCacheTableData,
+          PrefetchHooks Function()
+        > {
+  $$JsonCacheTableTableTableManager(
+    _$AppDatabase db,
+    $JsonCacheTableTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$JsonCacheTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$JsonCacheTableTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$JsonCacheTableTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> key = const Value.absent(),
+                Value<String> json = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => JsonCacheTableCompanion(key: key, json: json, rowid: rowid),
+          createCompanionCallback:
+              ({
+                required String key,
+                required String json,
+                Value<int> rowid = const Value.absent(),
+              }) => JsonCacheTableCompanion.insert(
+                key: key,
+                json: json,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$JsonCacheTableTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $JsonCacheTableTable,
+      JsonCacheTableData,
+      $$JsonCacheTableTableFilterComposer,
+      $$JsonCacheTableTableOrderingComposer,
+      $$JsonCacheTableTableAnnotationComposer,
+      $$JsonCacheTableTableCreateCompanionBuilder,
+      $$JsonCacheTableTableUpdateCompanionBuilder,
+      (
+        JsonCacheTableData,
+        BaseReferences<_$AppDatabase, $JsonCacheTableTable, JsonCacheTableData>,
+      ),
+      JsonCacheTableData,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -4482,4 +4838,6 @@ class $AppDatabaseManager {
       );
   $$AgendaCacheTableTableTableManager get agendaCacheTable =>
       $$AgendaCacheTableTableTableManager(_db, _db.agendaCacheTable);
+  $$JsonCacheTableTableTableManager get jsonCacheTable =>
+      $$JsonCacheTableTableTableManager(_db, _db.jsonCacheTable);
 }

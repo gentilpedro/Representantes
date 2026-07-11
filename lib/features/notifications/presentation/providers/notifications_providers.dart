@@ -6,7 +6,10 @@ import '../../domain/entities/app_notification.dart';
 import '../../domain/repositories/notifications_repository.dart';
 
 final notificationsRepositoryProvider = Provider<NotificationsRepository>(
-  (ref) => ApiNotificationsRepository(ref.watch(apiClientProvider)),
+  (ref) => ApiNotificationsRepository(
+    ref.watch(apiClientProvider),
+    ref.watch(appDatabaseProvider),
+  ),
 );
 
 class NotificationsController extends AsyncNotifier<List<AppNotification>> {

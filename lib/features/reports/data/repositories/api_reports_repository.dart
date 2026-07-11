@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 
+import '../../../../core/database/app_database.dart';
 import '../../../../core/network/api_client.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../domain/entities/reports_summary.dart';
@@ -7,21 +10,32 @@ import '../../domain/repositories/reports_repository.dart';
 import '../../domain/reports_exception.dart';
 
 /// Implementação real de [ReportsRepository], contra
-/// `GET /api/reports/summary` da Web API .NET 10.
+/// `GET /api/reports/summary` da Web API .NET 10. Cada período tem seu
+/// próprio cache (ver [AppDatabase]), já que os dados mudam de forma
+/// completamente diferente entre "hoje" e "trimestre".
 class ApiReportsRepository implements ReportsRepository {
-  ApiReportsRepository(this._apiClient);
+  ApiReportsRepository(this._apiClient, this._db);
 
   final ApiClient _apiClient;
+  final AppDatabase _db;
+
+  String _cacheKey(ReportPeriod period) => 'reports:${period.name}';
 
   @override
   Future<ReportsSummary> fetchSummary(ReportPeriod period) async {
+    final cacheKey = _cacheKey(period);
     try {
       final response = await _apiClient.dio.get<Map<String, dynamic>>(
         '/api/reports/summary',
         queryParameters: {'period': period.name},
       );
+      await _db.upsertJsonCache(cacheKey, jsonEncode(response.data));
       return _parseSummary(response.data!);
     } on DioException catch (_) {
+      final cached = await _db.fetchJsonCache(cacheKey);
+      if (cached != null) {
+        return _parseSummary(jsonDecode(cached) as Map<String, dynamic>);
+      }
       throw ReportsException(
         'Não foi possível carregar os relatórios. Tente novamente.',
       );
@@ -61,11 +75,18 @@ class ApiReportsRepository implements ReportsRepository {
           .toList(),
       insight: json['insight'] == null
           ? null
-          : SalesInsight(message: (json['insight'] as Map<String, dynamic>)['message'] as String),
+          : SalesInsight(
+              message:
+                  (json['insight'] as Map<String, dynamic>)['message']
+                      as String,
+            ),
     );
   }
 
-  ReportKpi _parseKpi(Map<String, dynamic> json, String Function(double) formatValue) {
+  ReportKpi _parseKpi(
+    Map<String, dynamic> json,
+    String Function(double) formatValue,
+  ) {
     return ReportKpi(
       label: json['label'] as String,
       value: formatValue((json['value'] as num).toDouble()),

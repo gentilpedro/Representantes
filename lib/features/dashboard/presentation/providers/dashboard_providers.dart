@@ -6,7 +6,10 @@ import '../../domain/entities/dashboard_summary.dart';
 import '../../domain/repositories/dashboard_repository.dart';
 
 final dashboardRepositoryProvider = Provider<DashboardRepository>((ref) {
-  return ApiDashboardRepository(ref.watch(apiClientProvider));
+  return ApiDashboardRepository(
+    ref.watch(apiClientProvider),
+    ref.watch(appDatabaseProvider),
+  );
 });
 
 final dashboardSummaryProvider = FutureProvider.autoDispose<DashboardSummary>((
