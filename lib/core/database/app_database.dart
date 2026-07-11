@@ -105,6 +105,20 @@ class AgendaCacheTable extends Table {
   Set<Column> get primaryKey => {date};
 }
 
+/// Cache genérico de JSON bruto pra features só-leitura sem forma/consulta
+/// própria que justifique uma tabela dedicada (Dashboard, Relatórios,
+/// Notificações, Leads, Permissões) — cada uma usa sua própria chave
+/// (`dashboard`, `reports:<period>`, `notifications`, `leads`,
+/// `lead:<id>`, `permissions`) e reaproveita o parser já existente no
+/// repositório pra transformar o JSON de volta em entidade.
+class JsonCacheTable extends Table {
+  TextColumn get key => text()();
+  TextColumn get json => text()();
+
+  @override
+  Set<Column> get primaryKey => {key};
+}
+
 @DriftDatabase(
   tables: [
     SyncMetadataTable,
@@ -114,13 +128,14 @@ class AgendaCacheTable extends Table {
     ClientsTable,
     ClientDetailsCacheTable,
     AgendaCacheTable,
+    JsonCacheTable,
   ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -139,6 +154,9 @@ class AppDatabase extends _$AppDatabase {
       }
       if (from < 5) {
         await m.createTable(agendaCacheTable);
+      }
+      if (from < 6) {
+        await m.createTable(jsonCacheTable);
       }
     },
   );
@@ -253,6 +271,19 @@ class AppDatabase extends _$AppDatabase {
     final row = await (select(
       agendaCacheTable,
     )..where((t) => t.date.equals(date))).getSingleOrNull();
+    return row?.json;
+  }
+
+  Future<void> upsertJsonCache(String key, String json) {
+    return into(jsonCacheTable).insertOnConflictUpdate(
+      JsonCacheTableCompanion.insert(key: key, json: json),
+    );
+  }
+
+  Future<String?> fetchJsonCache(String key) async {
+    final row = await (select(
+      jsonCacheTable,
+    )..where((t) => t.key.equals(key))).getSingleOrNull();
     return row?.json;
   }
 

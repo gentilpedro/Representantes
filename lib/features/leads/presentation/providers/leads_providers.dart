@@ -6,7 +6,10 @@ import '../../domain/entities/lead.dart';
 import '../../domain/repositories/leads_repository.dart';
 
 final leadsRepositoryProvider = Provider<LeadsRepository>(
-  (ref) => ApiLeadsRepository(ref.watch(apiClientProvider)),
+  (ref) => ApiLeadsRepository(
+    ref.watch(apiClientProvider),
+    ref.watch(appDatabaseProvider),
+  ),
 );
 
 final leadsListProvider = FutureProvider.autoDispose<List<Lead>>((ref) {

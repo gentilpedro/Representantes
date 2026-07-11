@@ -1,37 +1,60 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 
+import '../../../../core/database/app_database.dart';
 import '../../../../core/network/api_client.dart';
 import '../../domain/entities/lead.dart';
 import '../../domain/leads_exception.dart';
 import '../../domain/repositories/leads_repository.dart';
 
 /// Implementação real de [LeadsRepository], contra `GET/POST /api/leads` e
-/// `GET/PATCH /api/leads/{id}` da Web API .NET 10.
+/// `GET/PATCH /api/leads/{id}` da Web API .NET 10. Leitura (lista e
+/// detalhe) cacheia no [AppDatabase]; criar/atualizar lead ainda exige
+/// conexão.
 class ApiLeadsRepository implements LeadsRepository {
-  ApiLeadsRepository(this._apiClient);
+  ApiLeadsRepository(this._apiClient, this._db);
+
+  static const _listCacheKey = 'leads';
 
   final ApiClient _apiClient;
+  final AppDatabase _db;
+
+  String _detailCacheKey(String id) => 'lead:$id';
 
   @override
   Future<List<Lead>> fetchLeads() async {
     try {
       final response = await _apiClient.dio.get<List<dynamic>>('/api/leads');
+      await _db.upsertJsonCache(_listCacheKey, jsonEncode(response.data));
       return response.data!
           .map((json) => _leadFromJson(json as Map<String, dynamic>))
           .toList();
     } on DioException catch (e) {
+      final cached = await _db.fetchJsonCache(_listCacheKey);
+      if (cached != null) {
+        return (jsonDecode(cached) as List<dynamic>)
+            .map((json) => _leadFromJson(json as Map<String, dynamic>))
+            .toList();
+      }
       throw LeadsException(_errorMessage(e));
     }
   }
 
   @override
   Future<Lead> fetchLead(String id) async {
+    final cacheKey = _detailCacheKey(id);
     try {
       final response = await _apiClient.dio.get<Map<String, dynamic>>(
         '/api/leads/$id',
       );
+      await _db.upsertJsonCache(cacheKey, jsonEncode(response.data));
       return _leadFromJson(response.data!);
     } on DioException catch (e) {
+      final cached = await _db.fetchJsonCache(cacheKey);
+      if (cached != null) {
+        return _leadFromJson(jsonDecode(cached) as Map<String, dynamic>);
+      }
       throw LeadsException(_errorMessage(e));
     }
   }

@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 
+import '../../../../core/database/app_database.dart';
 import '../../../../core/network/api_client.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../domain/dashboard_exception.dart';
@@ -7,11 +10,16 @@ import '../../domain/entities/dashboard_summary.dart';
 import '../../domain/repositories/dashboard_repository.dart';
 
 /// Implementação real de [DashboardRepository], contra
-/// `GET /api/dashboard/summary` da Web API .NET 10.
+/// `GET /api/dashboard/summary` da Web API .NET 10. O último resumo
+/// baixado com sucesso fica cacheado no [AppDatabase] pra continuar
+/// visível (ainda que desatualizado) quando o representante fica offline.
 class ApiDashboardRepository implements DashboardRepository {
-  ApiDashboardRepository(this._apiClient);
+  ApiDashboardRepository(this._apiClient, this._db);
+
+  static const _cacheKey = 'dashboard';
 
   final ApiClient _apiClient;
+  final AppDatabase _db;
 
   @override
   Future<DashboardSummary> fetchSummary() async {
@@ -19,8 +27,13 @@ class ApiDashboardRepository implements DashboardRepository {
       final response = await _apiClient.dio.get<Map<String, dynamic>>(
         '/api/dashboard/summary',
       );
+      await _db.upsertJsonCache(_cacheKey, jsonEncode(response.data));
       return _parseSummary(response.data!);
     } on DioException catch (_) {
+      final cached = await _db.fetchJsonCache(_cacheKey);
+      if (cached != null) {
+        return _parseSummary(jsonDecode(cached) as Map<String, dynamic>);
+      }
       throw DashboardException(
         'Não foi possível carregar o dashboard. Tente novamente.',
       );
