@@ -19,6 +19,11 @@ class CatalogScreen extends ConsumerWidget {
     final productsAsync = ref.watch(filteredProductsProvider);
     final category = ref.watch(catalogCategoryProvider);
     final cartCount = ref.watch(newOrderControllerProvider).items.length;
+    // Se viemos do "Adicionar" do próprio pedido em construção, o pedido já
+    // está na pilha de navegação — voltamos pra ele em vez de empurrar uma
+    // segunda instância da tela (o que deixava os botões de voltar
+    // inconsistentes: "Cancelar" só saía do pedido duplicado mais novo).
+    final cameFromOrder = GoRouterState.of(context).extra == true;
 
     return Scaffold(
       appBar: AppBar(
@@ -28,7 +33,9 @@ class CatalogScreen extends ConsumerWidget {
             clipBehavior: Clip.none,
             children: [
               IconButton(
-                onPressed: () => context.push(AppRoutes.newOrder),
+                onPressed: () => cameFromOrder
+                    ? context.pop()
+                    : context.push(AppRoutes.newOrder),
                 icon: const Icon(Icons.shopping_cart_outlined),
               ),
               if (cartCount > 0)
@@ -131,7 +138,9 @@ class CatalogScreen extends ConsumerWidget {
             Expanded(
               child: productsAsync.when(
                 loading: () => Center(
-                  child: CircularProgressIndicator(color: context.colors.primary),
+                  child: CircularProgressIndicator(
+                    color: context.colors.primary,
+                  ),
                 ),
                 error: (error, _) => Center(
                   child: Text('Não foi possível carregar o catálogo.\n$error'),
