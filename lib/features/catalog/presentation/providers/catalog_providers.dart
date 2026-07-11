@@ -7,7 +7,10 @@ import '../../domain/entities/product_detail.dart';
 import '../../domain/repositories/catalog_repository.dart';
 
 final catalogRepositoryProvider = Provider<CatalogRepository>(
-  (ref) => ApiCatalogRepository(ref.watch(apiClientProvider)),
+  (ref) => ApiCatalogRepository(
+    ref.watch(apiClientProvider),
+    ref.watch(appDatabaseProvider),
+  ),
 );
 
 final productsProvider = FutureProvider.autoDispose<List<Product>>((ref) {

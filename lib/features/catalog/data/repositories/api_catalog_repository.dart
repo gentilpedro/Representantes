@@ -1,5 +1,7 @@
 import 'package:dio/dio.dart';
+import 'package:drift/drift.dart' show Value;
 
+import '../../../../core/database/app_database.dart';
 import '../../../../core/network/api_client.dart';
 import '../../domain/catalog_exception.dart';
 import '../../domain/entities/product.dart';
@@ -8,19 +10,34 @@ import '../../domain/repositories/catalog_repository.dart';
 
 /// Implementação real de [CatalogRepository], contra `GET /api/products` e
 /// `GET /api/products/{id}` da Web API .NET 10.
+///
+/// O catálogo é "baixado" para o [AppDatabase] (SQLite/Drift) a cada busca
+/// bem-sucedida, para que o representante consiga consultar produtos e
+/// montar pedidos mesmo sem conexão — se a chamada à API falhar, cai pro
+/// último catálogo salvo localmente em vez de propagar o erro.
 class ApiCatalogRepository implements CatalogRepository {
-  ApiCatalogRepository(this._apiClient);
+  ApiCatalogRepository(this._apiClient, this._db);
+
+  static const _dataset = 'products';
 
   final ApiClient _apiClient;
+  final AppDatabase _db;
 
   @override
   Future<List<Product>> fetchProducts() async {
     try {
       final response = await _apiClient.dio.get<List<dynamic>>('/api/products');
-      return response.data!
+      final products = response.data!
           .map((json) => _productFromJson(json as Map<String, dynamic>))
           .toList();
+      await _db.replaceAllProducts(products.map(_productToCompanion).toList());
+      await _db.upsertSyncMetadata(_dataset, DateTime.now());
+      return products;
     } on DioException catch (e) {
+      final cached = await _db.fetchAllProducts();
+      if (cached.isNotEmpty) {
+        return cached.map(_productFromRow).toList();
+      }
       throw CatalogException(_errorMessage(e));
     }
   }
@@ -56,6 +73,36 @@ class ApiCatalogRepository implements CatalogRepository {
       availableUnits: json['availableUnits'] as int,
       originalPrice: (json['originalPrice'] as num?)?.toDouble(),
       badge: _badgeFromJson(json['badge'] as String),
+    );
+  }
+
+  ProductsTableCompanion _productToCompanion(Product product) {
+    return ProductsTableCompanion.insert(
+      id: product.id,
+      sku: product.sku,
+      brand: product.brand,
+      name: product.name,
+      category: product.category,
+      imageUrl: product.imageUrl,
+      price: product.price,
+      availableUnits: product.availableUnits,
+      originalPrice: Value(product.originalPrice),
+      badge: product.badge.name,
+    );
+  }
+
+  Product _productFromRow(ProductsTableData row) {
+    return Product(
+      id: row.id,
+      sku: row.sku,
+      brand: row.brand,
+      name: row.name,
+      category: row.category,
+      imageUrl: row.imageUrl,
+      price: row.price,
+      availableUnits: row.availableUnits,
+      originalPrice: row.originalPrice,
+      badge: ProductBadge.values.byName(row.badge),
     );
   }
 
