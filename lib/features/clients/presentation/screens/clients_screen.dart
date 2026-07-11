@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_palette.dart';
 import '../../../../core/widgets/responsive_content.dart';
+import '../../domain/clients_exception.dart';
+import '../../domain/entities/client_list_item.dart';
 import '../../domain/entities/client_summary.dart';
 import '../providers/clients_providers.dart';
 import '../widgets/client_card.dart';
@@ -93,7 +95,9 @@ class ClientsScreen extends ConsumerWidget {
             Expanded(
               child: clientsAsync.when(
                 loading: () => Center(
-                  child: CircularProgressIndicator(color: context.colors.primary),
+                  child: CircularProgressIndicator(
+                    color: context.colors.primary,
+                  ),
                 ),
                 error: (error, _) => Center(
                   child: Text('Não foi possível carregar os clientes.\n$error'),
@@ -131,14 +135,8 @@ class ClientsScreen extends ConsumerWidget {
                               : () => context.push(
                                   AppRoutes.clientDetail(client.id),
                                 ),
-                          onToggleFavorite: () {
-                            ref
-                                .read(clientsRepositoryProvider)
-                                .toggleFavorite(client.id, !client.isFavorite)
-                                .then((_) {
-                                  ref.invalidate(clientsListProvider);
-                                });
-                          },
+                          onToggleFavorite: () =>
+                              _toggleFavorite(context, ref, client),
                         ),
                         const SizedBox(height: 12),
                       ],
@@ -166,6 +164,27 @@ class ClientsScreen extends ConsumerWidget {
               child: const Icon(Icons.person_add_alt_1_outlined),
             ),
     );
+  }
+}
+
+/// Sem isso, uma falha na chamada (rede lenta, timeout) passava batido:
+/// nada mudava na tela e nenhum aviso era mostrado — parecia que o botão
+/// simplesmente não fazia nada.
+Future<void> _toggleFavorite(
+  BuildContext context,
+  WidgetRef ref,
+  ClientListItem client,
+) async {
+  try {
+    await ref
+        .read(clientsRepositoryProvider)
+        .toggleFavorite(client.id, !client.isFavorite);
+    ref.invalidate(clientsListProvider);
+  } on ClientsException catch (e) {
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(e.message)));
   }
 }
 

@@ -94,11 +94,21 @@ class ApiOrdersRepository implements OrdersRepository {
         '/api/orders/batch-sync',
         data: payload,
       );
-      final createdCount =
-          (response.data!['created'] as List<dynamic>).length;
+      final createdCount = (response.data!['created'] as List<dynamic>).length;
+      // Pedidos rejeitados (ex: cliente ou produto que deixou de existir)
+      // não bloqueiam mais o resto do lote no servidor — mas continuam na
+      // fila local em vez de sumir, já que ainda não foram de fato
+      // sincronizados.
+      final rejectedIds = (response.data!['rejected'] as List<dynamic>)
+          .map(
+            (r) => (r as Map<String, dynamic>)['clientGeneratedId'] as String,
+          )
+          .toSet();
 
       for (final order in pendingRows) {
-        await _db.deletePendingOrder(order.id);
+        if (!rejectedIds.contains(order.id)) {
+          await _db.deletePendingOrder(order.id);
+        }
       }
 
       return createdCount;
