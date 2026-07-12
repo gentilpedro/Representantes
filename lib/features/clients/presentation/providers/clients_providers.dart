@@ -12,6 +12,8 @@ final clientsRepositoryProvider = Provider<ClientsRepository>(
   (ref) => ApiClientsRepository(
     ref.watch(apiClientProvider),
     ref.watch(appDatabaseProvider),
+    ref.watch(connectivityServiceProvider),
+    ref.watch(pendingActionsQueueProvider),
   ),
 );
 

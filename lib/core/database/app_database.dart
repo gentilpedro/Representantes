@@ -119,6 +119,21 @@ class JsonCacheTable extends Table {
   Set<Column> get primaryKey => {key};
 }
 
+/// Fila de ações de escrita feitas sem conexão (favoritar/criar cliente,
+/// check-in/check-out/criar visita, criar/atualizar lead) — cada linha é
+/// reenviada pro servidor assim que a conexão volta (ver
+/// `PendingActionsSyncer`). `actionType` identifica o endpoint/verbo,
+/// `payload` guarda os dados da requisição em JSON.
+class PendingActionsTable extends Table {
+  TextColumn get id => text()();
+  TextColumn get actionType => text()();
+  TextColumn get payload => text()();
+  DateTimeColumn get createdAt => dateTime()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
 @DriftDatabase(
   tables: [
     SyncMetadataTable,
@@ -129,13 +144,14 @@ class JsonCacheTable extends Table {
     ClientDetailsCacheTable,
     AgendaCacheTable,
     JsonCacheTable,
+    PendingActionsTable,
   ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
 
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -157,6 +173,9 @@ class AppDatabase extends _$AppDatabase {
       }
       if (from < 6) {
         await m.createTable(jsonCacheTable);
+      }
+      if (from < 7) {
+        await m.createTable(pendingActionsTable);
       }
     },
   );
@@ -240,6 +259,14 @@ class AppDatabase extends _$AppDatabase {
   Future<List<ClientsTableData>> fetchAllClients() =>
       select(clientsTable).get();
 
+  /// Insere (ou atualiza) um único cliente no cache sem apagar o resto —
+  /// diferente de [replaceAllClients], usado quando um cliente é criado
+  /// offline e precisa aparecer na lista antes da próxima sincronização
+  /// completa.
+  Future<void> insertClient(ClientsTableCompanion client) {
+    return into(clientsTable).insertOnConflictUpdate(client);
+  }
+
   /// Mantém o cache do favorito em dia sem precisar rebaixar a lista
   /// inteira — usado depois de um `PATCH /favorite` bem-sucedido.
   Future<void> updateCachedClientFavorite(String clientId, bool isFavorite) {
@@ -285,6 +312,34 @@ class AppDatabase extends _$AppDatabase {
       jsonCacheTable,
     )..where((t) => t.key.equals(key))).getSingleOrNull();
     return row?.json;
+  }
+
+  Future<void> savePendingAction({
+    required String id,
+    required String actionType,
+    required String payload,
+    required DateTime createdAt,
+  }) {
+    return into(pendingActionsTable).insert(
+      PendingActionsTableCompanion.insert(
+        id: id,
+        actionType: actionType,
+        payload: payload,
+        createdAt: createdAt,
+      ),
+    );
+  }
+
+  /// Mais antiga primeiro — ações são reenviadas na mesma ordem em que
+  /// foram criadas.
+  Future<List<PendingActionsTableData>> fetchPendingActions() {
+    return (select(
+      pendingActionsTable,
+    )..orderBy([(t) => OrderingTerm(expression: t.createdAt)])).get();
+  }
+
+  Future<void> deletePendingAction(String id) {
+    return (delete(pendingActionsTable)..where((t) => t.id.equals(id))).go();
   }
 
   static QueryExecutor _openConnection() {

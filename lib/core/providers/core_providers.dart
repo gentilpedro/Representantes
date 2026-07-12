@@ -6,6 +6,8 @@ import '../database/app_database.dart';
 import '../network/api_client.dart';
 import '../services/connectivity_service.dart';
 import '../storage/session_storage.dart';
+import '../sync/pending_actions_queue.dart';
+import '../sync/pending_actions_syncer.dart';
 
 final secureStorageProvider = Provider<FlutterSecureStorage>((ref) {
   return const FlutterSecureStorage();
@@ -38,6 +40,23 @@ final appDatabaseProvider = Provider<AppDatabase>((ref) {
   final db = AppDatabase();
   ref.onDispose(db.close);
   return db;
+});
+
+/// Fila de ações de escrita feitas offline (favoritar/criar cliente,
+/// check-in/check-out/criar visita, criar/atualizar lead) — ver
+/// `lib/core/sync/pending_actions_queue.dart`.
+final pendingActionsQueueProvider = Provider<PendingActionsQueue>((ref) {
+  return PendingActionsQueue(ref.watch(appDatabaseProvider));
+});
+
+/// Reenvia a fila acima assim que a conexão volta — disparado pelo mesmo
+/// listener de conectividade que já sincroniza pedidos offline (ver
+/// `SyncController`).
+final pendingActionsSyncerProvider = Provider<PendingActionsSyncerBase>((ref) {
+  return PendingActionsSyncer(
+    ref.watch(appDatabaseProvider),
+    ref.watch(apiClientProvider),
+  );
 });
 
 /// Versão/build reais do app, lidos do `pubspec.yaml` (embutidos no binário
