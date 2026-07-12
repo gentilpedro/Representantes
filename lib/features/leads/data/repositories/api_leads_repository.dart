@@ -1,24 +1,38 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:uuid/uuid.dart';
 
 import '../../../../core/database/app_database.dart';
 import '../../../../core/network/api_client.dart';
+import '../../../../core/services/connectivity_service.dart';
+import '../../../../core/sync/pending_actions_queue.dart';
 import '../../domain/entities/lead.dart';
 import '../../domain/leads_exception.dart';
 import '../../domain/repositories/leads_repository.dart';
 
+const _uuid = Uuid();
+
 /// Implementação real de [LeadsRepository], contra `GET/POST /api/leads` e
 /// `GET/PATCH /api/leads/{id}` da Web API .NET 10. Leitura (lista e
-/// detalhe) cacheia no [AppDatabase]; criar/atualizar lead ainda exige
-/// conexão.
+/// detalhe) cacheia no [AppDatabase]. Criar/atualizar lead sem conexão
+/// atualiza o cache local na hora e enfileira a ação real via
+/// [PendingActionsQueue] (ver `PendingActionsSyncer`), mesmo padrão de
+/// pedidos/clientes/agenda offline.
 class ApiLeadsRepository implements LeadsRepository {
-  ApiLeadsRepository(this._apiClient, this._db);
+  ApiLeadsRepository(
+    this._apiClient,
+    this._db,
+    this._connectivity,
+    this._queue,
+  );
 
   static const _listCacheKey = 'leads';
 
   final ApiClient _apiClient;
   final AppDatabase _db;
+  final ConnectivityService _connectivity;
+  final PendingActionsQueue _queue;
 
   String _detailCacheKey(String id) => 'lead:$id';
 
@@ -69,23 +83,63 @@ class ApiLeadsRepository implements LeadsRepository {
     String? source,
     String? notes,
   }) async {
+    final body = {
+      'contactName': contactName,
+      'companyName': companyName,
+      'cnpj': cnpj,
+      'phone': phone,
+      'email': email,
+      'source': source,
+      'notes': notes,
+    };
+
+    if (!await _connectivity.isOnline()) {
+      return _createLeadPendingLocally(body);
+    }
     try {
       final response = await _apiClient.dio.post<Map<String, dynamic>>(
         '/api/leads',
-        data: {
-          'contactName': contactName,
-          'companyName': companyName,
-          'cnpj': cnpj,
-          'phone': phone,
-          'email': email,
-          'source': source,
-          'notes': notes,
-        },
+        data: body,
       );
       return _leadFromJson(response.data!);
     } on DioException catch (e) {
+      if (e.response == null) {
+        return _createLeadPendingLocally(body);
+      }
       throw LeadsException(_errorMessage(e));
     }
+  }
+
+  /// Cria um lead "provisório" (`offline-<uuid>`, mesma convenção de
+  /// pedidos/clientes/agenda offline) no cache local — sempre com
+  /// `status: new`, igual à criação online — e enfileira a criação real.
+  Future<Lead> _createLeadPendingLocally(Map<String, dynamic> body) async {
+    await _queue.enqueue(PendingActionType.createLead, body);
+
+    final leadJson = {
+      ...body,
+      'id': 'offline-${_uuid.v4()}',
+      'status': 'new',
+      'createdAtUtc': DateTime.now().toUtc().toIso8601String(),
+      'lastContactAtUtc': null,
+    };
+
+    await _db.upsertJsonCache(
+      _detailCacheKey(leadJson['id'] as String),
+      jsonEncode(leadJson),
+    );
+    await _prependToCachedList(leadJson);
+
+    return _leadFromJson(leadJson);
+  }
+
+  Future<void> _prependToCachedList(Map<String, dynamic> leadJson) async {
+    final cachedListJson = await _db.fetchJsonCache(_listCacheKey);
+    if (cachedListJson == null) return;
+    final list = (jsonDecode(cachedListJson) as List<dynamic>)
+        .cast<Map<String, dynamic>>();
+    list.insert(0, leadJson);
+    await _db.upsertJsonCache(_listCacheKey, jsonEncode(list));
   }
 
   @override
@@ -101,25 +155,70 @@ class ApiLeadsRepository implements LeadsRepository {
     String? notes,
     DateTime? lastContactAtUtc,
   }) async {
+    final body = {
+      'contactName': contactName,
+      'companyName': companyName,
+      'cnpj': cnpj,
+      'phone': phone,
+      'email': email,
+      'status': _statusToJson(status),
+      'source': source,
+      'notes': notes,
+      'lastContactAtUtc': lastContactAtUtc?.toUtc().toIso8601String(),
+    };
+
+    if (!await _connectivity.isOnline()) {
+      return _updateLeadPendingLocally(id, body);
+    }
     try {
       final response = await _apiClient.dio.patch<Map<String, dynamic>>(
         '/api/leads/$id',
-        data: {
-          'contactName': contactName,
-          'companyName': companyName,
-          'cnpj': cnpj,
-          'phone': phone,
-          'email': email,
-          'status': _statusToJson(status),
-          'source': source,
-          'notes': notes,
-          'lastContactAtUtc': lastContactAtUtc?.toUtc().toIso8601String(),
-        },
+        data: body,
       );
       return _leadFromJson(response.data!);
     } on DioException catch (e) {
+      if (e.response == null) {
+        return _updateLeadPendingLocally(id, body);
+      }
       throw LeadsException(_errorMessage(e));
     }
+  }
+
+  /// Atualiza o lead no cache local (detalhe + entrada na lista, se já
+  /// cacheada) e enfileira a atualização real. Preserva o `createdAtUtc`
+  /// original quando o lead já estava em cache; sem isso, usa agora como
+  /// aproximação (só afeta exibição enquanto a ação não sincroniza).
+  Future<Lead> _updateLeadPendingLocally(
+    String id,
+    Map<String, dynamic> body,
+  ) async {
+    await _queue.enqueue(PendingActionType.updateLead, {'id': id, ...body});
+
+    final existingJson = await _db.fetchJsonCache(_detailCacheKey(id));
+    final createdAtUtc = existingJson != null
+        ? (jsonDecode(existingJson) as Map<String, dynamic>)['createdAtUtc']
+        : DateTime.now().toUtc().toIso8601String();
+
+    final leadJson = {...body, 'id': id, 'createdAtUtc': createdAtUtc};
+
+    await _db.upsertJsonCache(_detailCacheKey(id), jsonEncode(leadJson));
+    await _updateCachedListEntry(leadJson);
+
+    return _leadFromJson(leadJson);
+  }
+
+  Future<void> _updateCachedListEntry(Map<String, dynamic> leadJson) async {
+    final cachedListJson = await _db.fetchJsonCache(_listCacheKey);
+    if (cachedListJson == null) return;
+    final list = (jsonDecode(cachedListJson) as List<dynamic>)
+        .cast<Map<String, dynamic>>();
+    final index = list.indexWhere((l) => l['id'] == leadJson['id']);
+    if (index == -1) {
+      list.insert(0, leadJson);
+    } else {
+      list[index] = leadJson;
+    }
+    await _db.upsertJsonCache(_listCacheKey, jsonEncode(list));
   }
 
   String _errorMessage(DioException e) {

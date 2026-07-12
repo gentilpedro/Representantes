@@ -74,7 +74,9 @@ class PendingActionsSyncer implements PendingActionsSyncerBase {
       ),
       PendingActionType.updateLead => _apiClient.dio.patch(
         '/api/leads/${payload['id']}',
-        data: payload,
+        // `id` só serve pra montar a URL acima — o corpo não deve levá-lo,
+        // mesma forma da chamada online (ver `ApiLeadsRepository.updateLead`).
+        data: {...payload}..remove('id'),
       ),
     };
   }
