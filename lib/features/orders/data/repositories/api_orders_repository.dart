@@ -4,6 +4,7 @@ import 'package:uuid/uuid.dart';
 import '../../../../core/database/app_database.dart';
 import '../../../../core/network/api_client.dart';
 import '../../../../core/services/connectivity_service.dart';
+import '../../../../core/sync/pending_actions_queue.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../domain/entities/cart_item.dart';
 import '../../domain/entities/order_summary.dart';
@@ -13,15 +14,25 @@ import '../../domain/repositories/orders_repository.dart';
 const _uuid = Uuid();
 
 /// Implementação real de [OrdersRepository], contra `/api/orders` da Web API
-/// .NET 10. Pedidos finalizados (`isDraft: false`) sem conexão são gravados
-/// numa fila local (Drift) e enviados de uma vez em [syncPendingOrders] via
-/// `POST /api/orders/batch-sync` — rascunhos nunca entram nessa fila.
+/// .NET 10. Sem conexão, todo pedido (rascunho ou não) é gravado numa fila
+/// local (Drift, [PendingOrdersTable]):
+/// - Não-rascunho: reenviado em lote em [syncPendingOrders] via
+///   `POST /api/orders/batch-sync`.
+/// - Rascunho: o batch-sync não aceita rascunho, então é reenviado
+///   individualmente via [PendingActionsQueue]/`PendingActionsSyncer`
+///   (`createDraftOrder`), mesmo padrão de clientes/agenda/leads offline.
 class ApiOrdersRepository implements OrdersRepository {
-  ApiOrdersRepository(this._apiClient, this._db, this._connectivity);
+  ApiOrdersRepository(
+    this._apiClient,
+    this._db,
+    this._connectivity,
+    this._queue,
+  );
 
   final ApiClient _apiClient;
   final AppDatabase _db;
   final ConnectivityService _connectivity;
+  final PendingActionsQueue _queue;
 
   @override
   Future<List<OrderSummary>> fetchOrders() async {
@@ -48,12 +59,13 @@ class ApiOrdersRepository implements OrdersRepository {
     String? notes,
     required bool isDraft,
   }) async {
-    if (!isDraft && !await _connectivity.isOnline()) {
+    if (!await _connectivity.isOnline()) {
       return _createPendingLocally(
         clientId: clientId,
         clientName: clientName,
         items: items,
         notes: notes,
+        isDraft: isDraft,
       );
     }
 
@@ -67,7 +79,13 @@ class ApiOrdersRepository implements OrdersRepository {
 
   @override
   Future<int> syncPendingOrders() async {
-    final pendingRows = await _db.fetchPendingOrders();
+    // Rascunhos têm sua própria linha aqui só pra aparecer na lista antes
+    // de sincronizar — quem os sincroniza de verdade é o
+    // PendingActionsSyncer (`createDraftOrder`), já que o batch-sync abaixo
+    // não aceita rascunho.
+    final pendingRows = (await _db.fetchPendingOrders())
+        .where((o) => !o.isDraft)
+        .toList();
     if (pendingRows.isEmpty) return 0;
 
     final payload = <Map<String, dynamic>>[];
@@ -152,6 +170,7 @@ class ApiOrdersRepository implements OrdersRepository {
     required String clientName,
     required List<CartItem> items,
     String? notes,
+    required bool isDraft,
   }) async {
     final id = _uuid.v4();
     final now = DateTime.now();
@@ -164,6 +183,7 @@ class ApiOrdersRepository implements OrdersRepository {
       notes: notes,
       total: total,
       createdAt: now,
+      isDraft: isDraft,
       items: items
           .map(
             (item) => PendingOrderItemsTableCompanion.insert(
@@ -180,6 +200,24 @@ class ApiOrdersRepository implements OrdersRepository {
           .toList(),
     );
 
+    if (isDraft) {
+      await _queue.enqueue(PendingActionType.createDraftOrder, {
+        'localOrderId': id,
+        'clientId': clientId,
+        'notes': notes,
+        'isDraft': true,
+        'items': items
+            .map(
+              (item) => {
+                'productId': item.productId,
+                'quantity': item.quantity,
+                'discountPercent': item.discountPercent,
+              },
+            )
+            .toList(),
+      });
+    }
+
     return OrderSummary(
       id: id,
       code: 'OFFLINE-${id.substring(0, 4).toUpperCase()}',
@@ -187,7 +225,7 @@ class ApiOrdersRepository implements OrdersRepository {
       dateLabel: AppFormatters.shortDate(now),
       itemsCount: items.length,
       total: total,
-      status: OrderStatus.pending,
+      status: isDraft ? OrderStatus.draft : OrderStatus.pending,
       isToday: true,
     );
   }
@@ -205,7 +243,7 @@ class ApiOrdersRepository implements OrdersRepository {
           dateLabel: AppFormatters.shortDate(row.createdAt),
           itemsCount: items.length,
           total: row.total,
-          status: OrderStatus.pending,
+          status: row.isDraft ? OrderStatus.draft : OrderStatus.pending,
           isToday: true,
         ),
       );
