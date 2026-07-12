@@ -30,9 +30,17 @@ class PendingActionsSyncer implements PendingActionsSyncerBase {
     final pending = await _db.fetchPendingActions();
     for (final action in pending) {
       final payload = jsonDecode(action.payload) as Map<String, dynamic>;
+      final type = PendingActionType.values.byName(action.actionType);
       try {
-        await _replay(action.actionType, payload);
+        await _replay(type, payload);
         await _db.deletePendingAction(action.id);
+        if (type == PendingActionType.createDraftOrder) {
+          // O rascunho tem uma linha própria em PendingOrdersTable (pra
+          // aparecer na lista de Pedidos antes de sincronizar) que
+          // `syncPendingOrders` não toca (só cuida de pedidos não-rascunho)
+          // — cabe aqui limpar depois que o POST de verdade deu certo.
+          await _db.deletePendingOrder(payload['localOrderId'] as String);
+        }
       } on DioException catch (e) {
         if (e.response != null) {
           await _db.deletePendingAction(action.id);
@@ -42,8 +50,7 @@ class PendingActionsSyncer implements PendingActionsSyncerBase {
     }
   }
 
-  Future<void> _replay(String actionType, Map<String, dynamic> payload) {
-    final type = PendingActionType.values.byName(actionType);
+  Future<void> _replay(PendingActionType type, Map<String, dynamic> payload) {
     return switch (type) {
       PendingActionType.toggleClientFavorite => _apiClient.dio.patch(
         '/api/clients/${payload['clientId']}/favorite',
@@ -77,6 +84,13 @@ class PendingActionsSyncer implements PendingActionsSyncerBase {
         // `id` só serve pra montar a URL acima — o corpo não deve levá-lo,
         // mesma forma da chamada online (ver `ApiLeadsRepository.updateLead`).
         data: {...payload}..remove('id'),
+      ),
+      PendingActionType.createDraftOrder => _apiClient.dio.post(
+        '/api/orders',
+        // `localOrderId` só serve pra `syncAll` limpar o
+        // `PendingOrdersTable` depois — não faz parte do corpo esperado
+        // pela API (mesmo request de `ApiOrdersRepository._createRemote`).
+        data: {...payload}..remove('localOrderId'),
       ),
     };
   }

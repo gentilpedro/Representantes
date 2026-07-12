@@ -297,6 +297,21 @@ class $PendingOrdersTableTable extends PendingOrdersTable
     type: DriftSqlType.dateTime,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _isDraftMeta = const VerificationMeta(
+    'isDraft',
+  );
+  @override
+  late final GeneratedColumn<bool> isDraft = GeneratedColumn<bool>(
+    'is_draft',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_draft" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -305,6 +320,7 @@ class $PendingOrdersTableTable extends PendingOrdersTable
     notes,
     total,
     createdAt,
+    isDraft,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -361,6 +377,12 @@ class $PendingOrdersTableTable extends PendingOrdersTable
     } else if (isInserting) {
       context.missing(_createdAtMeta);
     }
+    if (data.containsKey('is_draft')) {
+      context.handle(
+        _isDraftMeta,
+        isDraft.isAcceptableOrUnknown(data['is_draft']!, _isDraftMeta),
+      );
+    }
     return context;
   }
 
@@ -394,6 +416,10 @@ class $PendingOrdersTableTable extends PendingOrdersTable
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
       )!,
+      isDraft: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_draft'],
+      )!,
     );
   }
 
@@ -411,6 +437,7 @@ class PendingOrdersTableData extends DataClass
   final String? notes;
   final double total;
   final DateTime createdAt;
+  final bool isDraft;
   const PendingOrdersTableData({
     required this.id,
     required this.clientId,
@@ -418,6 +445,7 @@ class PendingOrdersTableData extends DataClass
     this.notes,
     required this.total,
     required this.createdAt,
+    required this.isDraft,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -430,6 +458,7 @@ class PendingOrdersTableData extends DataClass
     }
     map['total'] = Variable<double>(total);
     map['created_at'] = Variable<DateTime>(createdAt);
+    map['is_draft'] = Variable<bool>(isDraft);
     return map;
   }
 
@@ -443,6 +472,7 @@ class PendingOrdersTableData extends DataClass
           : Value(notes),
       total: Value(total),
       createdAt: Value(createdAt),
+      isDraft: Value(isDraft),
     );
   }
 
@@ -458,6 +488,7 @@ class PendingOrdersTableData extends DataClass
       notes: serializer.fromJson<String?>(json['notes']),
       total: serializer.fromJson<double>(json['total']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      isDraft: serializer.fromJson<bool>(json['isDraft']),
     );
   }
   @override
@@ -470,6 +501,7 @@ class PendingOrdersTableData extends DataClass
       'notes': serializer.toJson<String?>(notes),
       'total': serializer.toJson<double>(total),
       'createdAt': serializer.toJson<DateTime>(createdAt),
+      'isDraft': serializer.toJson<bool>(isDraft),
     };
   }
 
@@ -480,6 +512,7 @@ class PendingOrdersTableData extends DataClass
     Value<String?> notes = const Value.absent(),
     double? total,
     DateTime? createdAt,
+    bool? isDraft,
   }) => PendingOrdersTableData(
     id: id ?? this.id,
     clientId: clientId ?? this.clientId,
@@ -487,6 +520,7 @@ class PendingOrdersTableData extends DataClass
     notes: notes.present ? notes.value : this.notes,
     total: total ?? this.total,
     createdAt: createdAt ?? this.createdAt,
+    isDraft: isDraft ?? this.isDraft,
   );
   PendingOrdersTableData copyWithCompanion(PendingOrdersTableCompanion data) {
     return PendingOrdersTableData(
@@ -498,6 +532,7 @@ class PendingOrdersTableData extends DataClass
       notes: data.notes.present ? data.notes.value : this.notes,
       total: data.total.present ? data.total.value : this.total,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      isDraft: data.isDraft.present ? data.isDraft.value : this.isDraft,
     );
   }
 
@@ -509,14 +544,15 @@ class PendingOrdersTableData extends DataClass
           ..write('clientName: $clientName, ')
           ..write('notes: $notes, ')
           ..write('total: $total, ')
-          ..write('createdAt: $createdAt')
+          ..write('createdAt: $createdAt, ')
+          ..write('isDraft: $isDraft')
           ..write(')'))
         .toString();
   }
 
   @override
   int get hashCode =>
-      Object.hash(id, clientId, clientName, notes, total, createdAt);
+      Object.hash(id, clientId, clientName, notes, total, createdAt, isDraft);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -526,7 +562,8 @@ class PendingOrdersTableData extends DataClass
           other.clientName == this.clientName &&
           other.notes == this.notes &&
           other.total == this.total &&
-          other.createdAt == this.createdAt);
+          other.createdAt == this.createdAt &&
+          other.isDraft == this.isDraft);
 }
 
 class PendingOrdersTableCompanion
@@ -537,6 +574,7 @@ class PendingOrdersTableCompanion
   final Value<String?> notes;
   final Value<double> total;
   final Value<DateTime> createdAt;
+  final Value<bool> isDraft;
   final Value<int> rowid;
   const PendingOrdersTableCompanion({
     this.id = const Value.absent(),
@@ -545,6 +583,7 @@ class PendingOrdersTableCompanion
     this.notes = const Value.absent(),
     this.total = const Value.absent(),
     this.createdAt = const Value.absent(),
+    this.isDraft = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   PendingOrdersTableCompanion.insert({
@@ -554,6 +593,7 @@ class PendingOrdersTableCompanion
     this.notes = const Value.absent(),
     required double total,
     required DateTime createdAt,
+    this.isDraft = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        clientId = Value(clientId),
@@ -567,6 +607,7 @@ class PendingOrdersTableCompanion
     Expression<String>? notes,
     Expression<double>? total,
     Expression<DateTime>? createdAt,
+    Expression<bool>? isDraft,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -576,6 +617,7 @@ class PendingOrdersTableCompanion
       if (notes != null) 'notes': notes,
       if (total != null) 'total': total,
       if (createdAt != null) 'created_at': createdAt,
+      if (isDraft != null) 'is_draft': isDraft,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -587,6 +629,7 @@ class PendingOrdersTableCompanion
     Value<String?>? notes,
     Value<double>? total,
     Value<DateTime>? createdAt,
+    Value<bool>? isDraft,
     Value<int>? rowid,
   }) {
     return PendingOrdersTableCompanion(
@@ -596,6 +639,7 @@ class PendingOrdersTableCompanion
       notes: notes ?? this.notes,
       total: total ?? this.total,
       createdAt: createdAt ?? this.createdAt,
+      isDraft: isDraft ?? this.isDraft,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -621,6 +665,9 @@ class PendingOrdersTableCompanion
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
+    if (isDraft.present) {
+      map['is_draft'] = Variable<bool>(isDraft.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -636,6 +683,7 @@ class PendingOrdersTableCompanion
           ..write('notes: $notes, ')
           ..write('total: $total, ')
           ..write('createdAt: $createdAt, ')
+          ..write('isDraft: $isDraft, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -3562,6 +3610,7 @@ typedef $$PendingOrdersTableTableCreateCompanionBuilder =
       Value<String?> notes,
       required double total,
       required DateTime createdAt,
+      Value<bool> isDraft,
       Value<int> rowid,
     });
 typedef $$PendingOrdersTableTableUpdateCompanionBuilder =
@@ -3572,6 +3621,7 @@ typedef $$PendingOrdersTableTableUpdateCompanionBuilder =
       Value<String?> notes,
       Value<double> total,
       Value<DateTime> createdAt,
+      Value<bool> isDraft,
       Value<int> rowid,
     });
 
@@ -3611,6 +3661,11 @@ class $$PendingOrdersTableTableFilterComposer
 
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isDraft => $composableBuilder(
+    column: $table.isDraft,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -3653,6 +3708,11 @@ class $$PendingOrdersTableTableOrderingComposer
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<bool> get isDraft => $composableBuilder(
+    column: $table.isDraft,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$PendingOrdersTableTableAnnotationComposer
@@ -3683,6 +3743,9 @@ class $$PendingOrdersTableTableAnnotationComposer
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<bool> get isDraft =>
+      $composableBuilder(column: $table.isDraft, builder: (column) => column);
 }
 
 class $$PendingOrdersTableTableTableManager
@@ -3731,6 +3794,7 @@ class $$PendingOrdersTableTableTableManager
                 Value<String?> notes = const Value.absent(),
                 Value<double> total = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
+                Value<bool> isDraft = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => PendingOrdersTableCompanion(
                 id: id,
@@ -3739,6 +3803,7 @@ class $$PendingOrdersTableTableTableManager
                 notes: notes,
                 total: total,
                 createdAt: createdAt,
+                isDraft: isDraft,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -3749,6 +3814,7 @@ class $$PendingOrdersTableTableTableManager
                 Value<String?> notes = const Value.absent(),
                 required double total,
                 required DateTime createdAt,
+                Value<bool> isDraft = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => PendingOrdersTableCompanion.insert(
                 id: id,
@@ -3757,6 +3823,7 @@ class $$PendingOrdersTableTableTableManager
                 notes: notes,
                 total: total,
                 createdAt: createdAt,
+                isDraft: isDraft,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0

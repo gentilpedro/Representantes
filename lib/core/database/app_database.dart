@@ -13,9 +13,12 @@ class SyncMetadataTable extends Table {
   Set<Column> get primaryKey => {dataset};
 }
 
-/// Pedidos finalizados sem conexão, aguardando envio pra
-/// `POST /api/orders/batch-sync`. `id` é o `ClientGeneratedId` (chave de
-/// idempotência do sync) — nunca um rascunho (`draft`) entra aqui.
+/// Pedidos criados sem conexão — tanto finalizados (`isDraft: false`,
+/// aguardando `POST /api/orders/batch-sync`, `id` é o `ClientGeneratedId`
+/// pra idempotência) quanto rascunhos (`isDraft: true`, sincronizados
+/// individualmente via `PendingActionsSyncer`/`createDraftOrder`, já que o
+/// batch-sync não aceita rascunho). `ApiOrdersRepository.syncPendingOrders`
+/// só processa as linhas com `isDraft: false`.
 class PendingOrdersTable extends Table {
   TextColumn get id => text()();
   TextColumn get clientId => text()();
@@ -23,6 +26,7 @@ class PendingOrdersTable extends Table {
   TextColumn get notes => text().nullable()();
   RealColumn get total => real()();
   DateTimeColumn get createdAt => dateTime()();
+  BoolColumn get isDraft => boolean().withDefault(const Constant(false))();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -151,7 +155,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
 
   @override
-  int get schemaVersion => 7;
+  int get schemaVersion => 8;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -177,6 +181,9 @@ class AppDatabase extends _$AppDatabase {
       if (from < 7) {
         await m.createTable(pendingActionsTable);
       }
+      if (from < 8) {
+        await m.addColumn(pendingOrdersTable, pendingOrdersTable.isDraft);
+      }
     },
   );
 
@@ -189,6 +196,7 @@ class AppDatabase extends _$AppDatabase {
     required double total,
     required DateTime createdAt,
     required List<PendingOrderItemsTableCompanion> items,
+    bool isDraft = false,
   }) {
     return transaction(() async {
       await into(pendingOrdersTable).insert(
@@ -199,6 +207,7 @@ class AppDatabase extends _$AppDatabase {
           notes: Value(notes),
           total: total,
           createdAt: createdAt,
+          isDraft: Value(isDraft),
         ),
       );
       for (final item in items) {

@@ -16,6 +16,7 @@ enum PendingActionType {
   createVisit,
   createLead,
   updateLead,
+  createDraftOrder,
 }
 
 /// Enfileira ações de escrita feitas sem conexão (favoritar/criar cliente,
