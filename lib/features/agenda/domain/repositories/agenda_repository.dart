@@ -5,9 +5,17 @@ import '../entities/daily_route.dart';
 abstract class AgendaRepository {
   Future<DailyRoute> fetchDailyRoute(DateTime date);
 
-  Future<void> checkIn(String visitId, {double? latitude, double? longitude});
+  /// [date] é o dia da agenda sendo visualizado (não precisa ser hoje) —
+  /// usado só pra saber qual cache local atualizar quando offline, já que
+  /// o cache é guardado por dia.
+  Future<void> checkIn(
+    String visitId,
+    DateTime date, {
+    double? latitude,
+    double? longitude,
+  });
 
-  Future<void> checkOut(String visitId, String notes);
+  Future<void> checkOut(String visitId, DateTime date, String notes);
 
   Future<void> createVisit({
     required String clientId,

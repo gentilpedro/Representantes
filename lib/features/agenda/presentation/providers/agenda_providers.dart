@@ -12,6 +12,8 @@ final agendaRepositoryProvider = Provider<AgendaRepository>(
   (ref) => ApiAgendaRepository(
     ref.watch(apiClientProvider),
     ref.watch(appDatabaseProvider),
+    ref.watch(connectivityServiceProvider),
+    ref.watch(pendingActionsQueueProvider),
   ),
 );
 
@@ -35,15 +37,17 @@ class AgendaController extends AsyncNotifier<DailyRoute> {
     double? latitude,
     double? longitude,
   }) async {
+    final date = ref.read(selectedAgendaDateProvider);
     await ref
         .read(agendaRepositoryProvider)
-        .checkIn(visitId, latitude: latitude, longitude: longitude);
+        .checkIn(visitId, date, latitude: latitude, longitude: longitude);
     ref.invalidateSelf();
     await future;
   }
 
   Future<void> checkOut(String visitId, String notes) async {
-    await ref.read(agendaRepositoryProvider).checkOut(visitId, notes);
+    final date = ref.read(selectedAgendaDateProvider);
+    await ref.read(agendaRepositoryProvider).checkOut(visitId, date, notes);
     ref.invalidateSelf();
     await future;
   }
