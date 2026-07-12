@@ -2,6 +2,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/providers/core_providers.dart';
 import '../../../../core/utils/formatters.dart';
+import '../../../agenda/presentation/providers/agenda_providers.dart';
+import '../../../clients/presentation/providers/clients_providers.dart';
+import '../../../leads/presentation/providers/leads_providers.dart';
 import '../../../orders/domain/entities/order_summary.dart';
 import '../../../orders/presentation/providers/orders_providers.dart';
 import '../../data/repositories/api_sync_repository.dart';
@@ -74,12 +77,22 @@ class SyncController extends AsyncNotifier<SyncSummary> {
     state = const AsyncLoading<SyncSummary>().copyWithPrevious(state);
     state = await AsyncValue.guard(() async {
       await ref.read(ordersRepositoryProvider).syncPendingOrders();
-      // Só invalida se a tela de Pedidos estiver de fato montada e
-      // observando — invalidar um provider `autoDispose` nunca lido cria e
-      // descarta o elemento na hora, mas o `Future.delayed` interno
-      // continua rodando "solto" em segundo plano.
+      await ref.read(pendingActionsSyncerProvider).syncAll();
+      // Só invalida se a tela estiver de fato montada e observando —
+      // invalidar um provider `autoDispose` nunca lido cria e descarta o
+      // elemento na hora, mas o `Future.delayed` interno continua rodando
+      // "solto" em segundo plano.
       if (ref.exists(ordersListProvider)) {
         ref.invalidate(ordersListProvider);
+      }
+      if (ref.exists(clientsListProvider)) {
+        ref.invalidate(clientsListProvider);
+      }
+      if (ref.exists(leadsListProvider)) {
+        ref.invalidate(leadsListProvider);
+      }
+      if (ref.exists(agendaControllerProvider)) {
+        ref.invalidate(agendaControllerProvider);
       }
       // Recompõe do zero: `successCount` do `/api/sync/summary` já reflete
       // o servidor pós-sync, e a fila local já foi limpa pelo sync acima.

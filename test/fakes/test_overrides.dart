@@ -35,6 +35,7 @@ import 'fake_leads_repository.dart';
 import 'fake_location_service.dart';
 import 'fake_notifications_repository.dart';
 import 'fake_orders_repository.dart';
+import 'fake_pending_actions_syncer.dart';
 import 'fake_profile_photo_controller.dart';
 import 'fake_profile_repository.dart';
 import 'fake_reports_repository.dart';
@@ -96,6 +97,7 @@ List<Override> testOverrides({
       profileRepository ?? FakeProfileRepository(),
     ),
     profilePhotoProvider.overrideWith((ref) => FakeProfilePhotoController()),
+    pendingActionsSyncerProvider.overrideWithValue(FakePendingActionsSyncer()),
     syncRepositoryProvider.overrideWithValue(
       syncRepository ?? FakeSyncRepository(ordersRepository: orders),
     ),

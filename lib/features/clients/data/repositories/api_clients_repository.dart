@@ -2,14 +2,19 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:drift/drift.dart' show Value;
+import 'package:uuid/uuid.dart';
 
 import '../../../../core/database/app_database.dart';
 import '../../../../core/network/api_client.dart';
+import '../../../../core/services/connectivity_service.dart';
+import '../../../../core/sync/pending_actions_queue.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../domain/clients_exception.dart';
 import '../../domain/entities/client_detail.dart';
 import '../../domain/entities/client_list_item.dart';
 import '../../domain/repositories/clients_repository.dart';
+
+const _uuid = Uuid();
 
 /// Implementação real de [ClientsRepository], contra `GET /api/clients`,
 /// `GET /api/clients/{id}` e `PATCH /api/clients/{id}/favorite` da Web API
@@ -18,14 +23,24 @@ import '../../domain/repositories/clients_repository.dart';
 /// Igual ao catálogo (ver `ApiCatalogRepository`): lista e detalhe de
 /// clientes são cacheados no [AppDatabase] a cada busca bem-sucedida, pra
 /// que o representante consiga consultar e selecionar cliente pra um
-/// pedido mesmo sem conexão.
+/// pedido mesmo sem conexão. Favoritar e criar cliente sem conexão
+/// atualizam o cache local na hora e enfileiram a ação real via
+/// [PendingActionsQueue] (ver `PendingActionsSyncer`), mesmo padrão dos
+/// pedidos offline.
 class ApiClientsRepository implements ClientsRepository {
-  ApiClientsRepository(this._apiClient, this._db);
+  ApiClientsRepository(
+    this._apiClient,
+    this._db,
+    this._connectivity,
+    this._queue,
+  );
 
   static const _dataset = 'clients';
 
   final ApiClient _apiClient;
   final AppDatabase _db;
+  final ConnectivityService _connectivity;
+  final PendingActionsQueue _queue;
 
   @override
   Future<List<ClientListItem>> fetchClients() async {
@@ -71,6 +86,10 @@ class ApiClientsRepository implements ClientsRepository {
 
   @override
   Future<void> toggleFavorite(String clientId, bool isFavorite) async {
+    if (!await _connectivity.isOnline()) {
+      await _enqueueFavoriteToggle(clientId, isFavorite);
+      return;
+    }
     try {
       await _apiClient.dio.patch<Map<String, dynamic>>(
         '/api/clients/$clientId/favorite',
@@ -78,8 +97,23 @@ class ApiClientsRepository implements ClientsRepository {
       );
       await _db.updateCachedClientFavorite(clientId, isFavorite);
     } on DioException catch (e) {
+      // Sem resposta = a conexão caiu no meio da requisição (não é um erro
+      // de validação de verdade) — trata como offline em vez de perder a
+      // ação.
+      if (e.response == null) {
+        await _enqueueFavoriteToggle(clientId, isFavorite);
+        return;
+      }
       throw ClientsException(_errorMessage(e));
     }
+  }
+
+  Future<void> _enqueueFavoriteToggle(String clientId, bool isFavorite) async {
+    await _db.updateCachedClientFavorite(clientId, isFavorite);
+    await _queue.enqueue(PendingActionType.toggleClientFavorite, {
+      'clientId': clientId,
+      'isFavorite': isFavorite,
+    });
   }
 
   ClientsTableCompanion _clientToCompanionFromJson(Map<String, dynamic> json) {
@@ -129,29 +163,85 @@ class ApiClientsRepository implements ClientsRepository {
     required DeliveryAddress deliveryAddress,
     String? notes,
   }) async {
+    final payload = {
+      'name': name,
+      'cnpj': cnpj,
+      'phone': phone,
+      'mobile': mobile,
+      'email': email,
+      'creditLimit': creditLimit,
+      'deliveryAddress': {
+        'street': deliveryAddress.street,
+        'district': deliveryAddress.district,
+        'city': deliveryAddress.city,
+        'state': deliveryAddress.state,
+      },
+      'notes': notes,
+    };
+
+    if (!await _connectivity.isOnline()) {
+      return _createPendingLocally(payload);
+    }
     try {
       final response = await _apiClient.dio.post<Map<String, dynamic>>(
         '/api/clients',
-        data: {
-          'name': name,
-          'cnpj': cnpj,
-          'phone': phone,
-          'mobile': mobile,
-          'email': email,
-          'creditLimit': creditLimit,
-          'deliveryAddress': {
-            'street': deliveryAddress.street,
-            'district': deliveryAddress.district,
-            'city': deliveryAddress.city,
-            'state': deliveryAddress.state,
-          },
-          'notes': notes,
-        },
+        data: payload,
       );
       return _clientDetailFromJson(response.data!);
     } on DioException catch (e) {
+      if (e.response == null) {
+        return _createPendingLocally(payload);
+      }
       throw ClientsException(_createClientErrorMessage(e));
     }
+  }
+
+  /// Cria um cliente "provisório" só no cache local (id/código `OFFLINE-`,
+  /// mesma convenção dos pedidos offline) pra aparecer na lista/detalhe na
+  /// hora, e enfileira a criação de verdade. Quando a lista for
+  /// sincronizada de novo (com conexão), o cliente provisório é substituído
+  /// pelo real, já que `replaceAllClients` reflete o servidor por inteiro.
+  Future<ClientDetail> _createPendingLocally(
+    Map<String, dynamic> payload,
+  ) async {
+    final tempId = 'offline-${_uuid.v4()}';
+    final tempCode = 'OFFLINE-${tempId.substring(8, 12).toUpperCase()}';
+    final addressJson = payload['deliveryAddress'] as Map<String, dynamic>;
+
+    await _queue.enqueue(PendingActionType.createClient, payload);
+    await _db.insertClient(
+      ClientsTableCompanion.insert(
+        id: tempId,
+        code: tempCode,
+        name: payload['name'] as String,
+        cnpj: payload['cnpj'] as String,
+        city: addressJson['city'] as String,
+        state: addressJson['state'] as String,
+        tier: ClientTier.regular.name,
+        lastOrderAtUtc: const Value(null),
+        creditLimit: payload['creditLimit'] as double,
+      ),
+    );
+
+    final detailJson = {
+      'id': tempId,
+      'name': payload['name'],
+      'code': tempCode,
+      'cnpj': payload['cnpj'],
+      'tier': ClientTier.regular.name,
+      'phone': payload['phone'],
+      'mobile': payload['mobile'],
+      'email': payload['email'],
+      'creditLimit': payload['creditLimit'],
+      'creditUsedPercent': 0.0,
+      'deliveryAddress': addressJson,
+      'pendingInvoice': null,
+      'notes': payload['notes'],
+      'isFavorite': false,
+      'orderHistory': <dynamic>[],
+    };
+    await _db.upsertClientDetailJson(tempId, jsonEncode(detailJson));
+    return _clientDetailFromJson(detailJson);
   }
 
   String _createClientErrorMessage(DioException e) {
