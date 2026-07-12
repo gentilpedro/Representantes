@@ -9,6 +9,8 @@ final leadsRepositoryProvider = Provider<LeadsRepository>(
   (ref) => ApiLeadsRepository(
     ref.watch(apiClientProvider),
     ref.watch(appDatabaseProvider),
+    ref.watch(connectivityServiceProvider),
+    ref.watch(pendingActionsQueueProvider),
   ),
 );
 
