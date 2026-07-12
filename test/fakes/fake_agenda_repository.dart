@@ -58,7 +58,12 @@ class FakeAgendaRepository implements AgendaRepository {
   }
 
   @override
-  Future<void> checkIn(String visitId, {double? latitude, double? longitude}) async {
+  Future<void> checkIn(
+    String visitId,
+    DateTime date, {
+    double? latitude,
+    double? longitude,
+  }) async {
     final visit = _visits[visitId];
     if (visit == null) return;
     _visits[visitId] = visit.copyWith(
@@ -68,10 +73,13 @@ class FakeAgendaRepository implements AgendaRepository {
   }
 
   @override
-  Future<void> checkOut(String visitId, String notes) async {
+  Future<void> checkOut(String visitId, DateTime date, String notes) async {
     final visit = _visits[visitId];
     if (visit == null) return;
-    _visits[visitId] = visit.copyWith(status: VisitStatus.completed, notes: notes);
+    _visits[visitId] = visit.copyWith(
+      status: VisitStatus.completed,
+      notes: notes,
+    );
   }
 
   @override
